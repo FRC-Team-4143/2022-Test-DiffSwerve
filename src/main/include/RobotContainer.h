@@ -37,7 +37,7 @@ class RobotContainer {
         m_drive.Drive(
             units::meters_per_second_t(m_driverController.GetLeftY()*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(m_driverController.GetLeftX()*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_driverController.GetRightX()*8), true);
+            units::radians_per_second_t(m_driverController.GetRightX()*AutoConstants::kMaxAngularSpeed), true);
       },
       {&m_drive}
   };
@@ -45,7 +45,7 @@ class RobotContainer {
         m_drive.Drive(
             units::meters_per_second_t(m_driverController.GetLeftY()*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(m_driverController.GetLeftX()*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_driverController.GetRightX()*8), false);
+            units::radians_per_second_t(m_driverController.GetRightX()*AutoConstants::kMaxAngularSpeed), false);
       },
       {&m_drive}
   };

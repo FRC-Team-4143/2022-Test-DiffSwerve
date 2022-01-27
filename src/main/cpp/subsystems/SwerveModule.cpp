@@ -10,9 +10,10 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "RobotContainer.h"
 
-SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, std::string name)
+SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name)
     : m_driveMotor(driveMotorChannel),
       m_turningMotor(turningMotorChannel),
+      m_encoder(encoderChannel),
       m_name(name){
 
   m_turningPIDController.EnableContinuousInput(
@@ -20,31 +21,34 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, std::
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
-  return {units::meters_per_second_t{0},
+  return {units::meters_per_second_t{GetDriveMotorSpeed()},
           //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
-          frc::Rotation2d(units::radian_t((m_turningMotor.GetSelectedSensorPosition()-m_offset)/-4096*2*wpi::numbers::pi))};
+          frc::Rotation2d(units::radian_t((m_encoder.GetPosition()-m_offset)/360*2*wpi::numbers::pi))};
+}
+float SwerveModule::GetDriveMotorSpeed(){
+    return ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
+        * (10.0 / 2048) /*Revs per second*/ * ((10 / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4.5 * 0.0254 * wpi::numbers::pi) /*Axle Revs per Second*/;
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
-    double encoderValue = (m_turningMotor.GetSelectedSensorPosition()-m_offset)/-4096*2*wpi::numbers::pi;
+    double encoderValue = (m_encoder.GetPosition()-m_offset)/360*2*wpi::numbers::pi;
   // Optimize the reference state to avoid spinning further than 90 degrees
   const auto state = frc::SwerveModuleState::Optimize(
       referenceState, units::radian_t(encoderValue));
 
   // Calculate the drive output from the drive PID controller.
-  const auto driveOutput = m_drivePIDController.Calculate(
-      0, state.speed.value());
+  const auto driveOutput = m_drivePIDController.Calculate(GetDriveMotorSpeed(), state.speed.value());
 
   // Calculate the turning motor output from the turning PID controller.
   auto turnOutput = m_turningPIDController.Calculate(
       units::radian_t(encoderValue), state.angle.Radians());
 
   // Set the motor outputs.
-  m_driveMotor.Set(state.speed.value()/(6.5965));
-  m_turningMotor.Set(turnOutput);
+  m_driveMotor.Set(driveOutput/(AutoConstants::kMaxSpeed.value())+turnOutput);
+  m_turningMotor.Set(-driveOutput/(AutoConstants::kMaxSpeed.value())+turnOutput);
 
   frc::SmartDashboard::PutNumber (m_name +" Encoder1", encoderValue);
-  frc::SmartDashboard::PutNumber (m_name + " Drive Power",state.speed.value());
+  frc::SmartDashboard::PutNumber (m_name + " Drive Power",driveOutput/AutoConstants::kMaxSpeed.value());
   frc::SmartDashboard::PutNumber (m_name + " Turn Power",turnOutput);
   
 }
@@ -56,7 +60,7 @@ void SwerveModule::ResetEncoders() {
 // =========================Wheel Offsets=======================================
 
 void SwerveModule::SetWheelOffset() {
-	auto steerPosition = m_turningMotor.GetSelectedSensorPosition();
+	auto steerPosition = m_encoder.GetPosition();
 	frc::Preferences::SetDouble(m_name, steerPosition);
     m_offset = steerPosition;
 }

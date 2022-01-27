@@ -87,8 +87,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
-  units::meter_t kTrackWidth = 0.6096_m;  // Distance between centers of right and left wheels on robot
-  units::meter_t kWheelBase = 0.5461_m;  // Distance between centers of front and back wheels on robot
+  units::meter_t kTrackWidth = 0.52_m;  // Distance between centers of right and left wheels on robot
+  units::meter_t kWheelBase = 0.78_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),

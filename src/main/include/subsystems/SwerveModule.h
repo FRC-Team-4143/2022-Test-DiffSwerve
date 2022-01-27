@@ -23,7 +23,8 @@ class SwerveModule {
       units::inverse<units::squared<units::second>>>;
 
  public:
-  SwerveModule(int driveMotorChannel, int turningMotorChannel, std::string name);
+  SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
+
 
   frc::SwerveModuleState GetState();
 
@@ -33,6 +34,7 @@ class SwerveModule {
 
   void SetWheelOffset();
   void LoadWheelOffset();
+  float GetDriveMotorSpeed();
 
  private:
   // We have to use meters here instead of radians due to the fact that
@@ -46,8 +48,9 @@ class SwerveModule {
         units::unit_t<radians_per_second_squared_t>(
         wpi::numbers::pi * 2.0);  // radians per second squared
 
-  WPI_TalonSRX m_driveMotor;
-  WPI_TalonSRX m_turningMotor;
+  WPI_TalonFX m_driveMotor;
+  WPI_TalonFX m_turningMotor;
+  WPI_CANCoder m_encoder;
 
   std::string m_name;
 
