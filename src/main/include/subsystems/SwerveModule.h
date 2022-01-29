@@ -16,6 +16,7 @@
 #include <string>
 #include <frc/Preferences.h>
 #include "Constants.h"
+#include <frc/controller/SimpleMotorFeedforward.h>
 
 class SwerveModule {
   using radians_per_second_squared_t =
@@ -53,6 +54,8 @@ class SwerveModule {
   WPI_CANCoder m_encoder;
 
   std::string m_name;
+  frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{DriveConstants::ks,DriveConstants::kv,DriveConstants::ka};
+  //frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{1_V, 0.5_V / 1_rad_per_s};
 
   frc2::PIDController m_drivePIDController{
       ModuleConstants::kPModuleDriveController, 0, 0};

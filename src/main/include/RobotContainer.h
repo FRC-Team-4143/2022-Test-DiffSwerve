@@ -35,17 +35,17 @@ class RobotContainer {
   frc2::InstantCommand m_ZeroYaw{[this] {m_drive.ZeroHeading(); }, {&m_drive}};
   frc2::RunCommand m_FieldCentricMode{[this] {
         m_drive.Drive(
-            units::meters_per_second_t(m_driverController.GetLeftY()*AutoConstants::kMaxSpeed),
-            units::meters_per_second_t(m_driverController.GetLeftX()*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_driverController.GetRightX()*AutoConstants::kMaxAngularSpeed), true);
+            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2)*AutoConstants::kMaxSpeed),
+            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2)*AutoConstants::kMaxSpeed),
+            units::radians_per_second_t(-frc::ApplyDeadband(m_driverController.GetRightX(), 0.2)*AutoConstants::kMaxAngularSpeed), true);
       },
       {&m_drive}
   };
   frc2::RunCommand m_CrabMode{[this] {
         m_drive.Drive(
-            units::meters_per_second_t(m_driverController.GetLeftY()*AutoConstants::kMaxSpeed),
-            units::meters_per_second_t(m_driverController.GetLeftX()*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_driverController.GetRightX()*AutoConstants::kMaxAngularSpeed), false);
+            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2)*AutoConstants::kMaxSpeed),
+            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftX(), 0.2)*AutoConstants::kMaxSpeed),
+            units::radians_per_second_t(-frc::ApplyDeadband(m_driverController.GetRightX(), 0.2)*AutoConstants::kMaxAngularSpeed), false);
       },
       {&m_drive}
   };

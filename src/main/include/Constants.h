@@ -63,13 +63,11 @@ constexpr bool kFrontRightDriveEncoderReversed = false;
 constexpr bool kRearRightDriveEncoderReversed = true;
 */
 
-// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-// These characterization values MUST be determined either experimentally or
-// theoretically for *your* robot's drive. The SysId tool provides a convenient
-// method for obtaining these values for your robot.
-//constexpr auto ks = 1_V;
-//constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
-//constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
+
+//constexpr auto ks = 0.64263_V;
+constexpr auto ks = .64263_V;
+constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
+constexpr auto ka = 0 * 1_V * 1_s * 1_s / 1_m;
 
 // Example value only - as above, this must be tuned for your drive!
 //constexpr double kPFrontLeftVel = 0.5;
@@ -90,8 +88,8 @@ constexpr double kWheelDiameterMeters = 0.1143;
     // Assumes the encoders are directly mounted on the wheel shafts
     //(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-constexpr double kPModuleTurningController = 0.125;
-constexpr double kPModuleDriveController = 0.25*6;
+constexpr double kPModuleTurningController = 0.55;
+constexpr double kPModuleDriveController = 0.025;
 }  // namespace ModuleConstants
 
 namespace AutoConstants {

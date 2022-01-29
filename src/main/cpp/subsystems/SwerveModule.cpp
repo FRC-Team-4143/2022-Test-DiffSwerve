@@ -18,6 +18,9 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 
   m_turningPIDController.EnableContinuousInput(
       units::radian_t(0), units::radian_t(2*wpi::numbers::pi));
+  m_driveMotor.SetNeutralMode(NeutralMode::Coast);
+  m_turningMotor.SetNeutralMode(NeutralMode::Coast);
+
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
@@ -40,18 +43,28 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   const auto driveOutput = m_drivePIDController.Calculate(GetDriveMotorSpeed(), state.speed.value());
 
   // Calculate the turning motor output from the turning PID controller.
-  auto turnOutput = m_turningPIDController.Calculate(
-      units::radian_t(encoderValue), state.angle.Radians());
+  auto turnOutput = m_turningPIDController.Calculate(units::radian_t(encoderValue), state.angle.Radians());
 
-  // Set the motor outputs.
-  m_driveMotor.Set(driveOutput/(AutoConstants::kMaxSpeed.value())+turnOutput);
-  m_turningMotor.Set(-driveOutput/(AutoConstants::kMaxSpeed.value())+turnOutput);
+  const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
+
+  // Set the motor outputs
+
+  m_driveMotor.SetVoltage(units::volt_t{12*(driveOutput/AutoConstants::kMaxSpeed.value())}+driveFeedforward+units::volt_t{turnOutput*12});
+  m_turningMotor.SetVoltage(units::volt_t{12*(-driveOutput/AutoConstants::kMaxSpeed.value())}-driveFeedforward+units::volt_t{turnOutput*12});
 
   frc::SmartDashboard::PutNumber (m_name +" Encoder1", encoderValue);
   frc::SmartDashboard::PutNumber (m_name + " Drive Power",driveOutput/AutoConstants::kMaxSpeed.value());
   frc::SmartDashboard::PutNumber (m_name + " Turn Power",turnOutput);
   
+  frc::SmartDashboard::PutNumber (m_name + " SetVoltage",(units::volt_t{12*(driveOutput/AutoConstants::kMaxSpeed.value())}+driveFeedforward+units::volt_t{turnOutput*12}).value());
+  //frc::SmartDashboard::PutNumber (m_name + " driveFeedForward",driveFeedforward.value());
+  
 }
+
+
+
+//  m_driveMotor.SetVoltage(units::volt_t{(12*(driveOutput/(AutoConstants::kMaxSpeed.value())+turnOutput))}+driveFeedforward);
+
 
 void SwerveModule::ResetEncoders() {
 
