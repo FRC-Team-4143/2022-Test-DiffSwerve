@@ -88,7 +88,7 @@ constexpr double kWheelDiameterMeters = 0.1143;
     // Assumes the encoders are directly mounted on the wheel shafts
     //(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-constexpr double kPModuleTurningController = 0.55;
+constexpr double kPModuleTurningController = 0.45;
 constexpr double kPModuleDriveController = 0.025;
 }  // namespace ModuleConstants
 

@@ -110,7 +110,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   SwerveModule m_frontRight;
   SwerveModule m_rearRight;
 
- 
+   int m_counter=0;
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules

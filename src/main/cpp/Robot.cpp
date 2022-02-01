@@ -5,13 +5,11 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include <frc/shuffleboard/Shuffleboard.h>
 
 
 void Robot::RobotInit() {
 
 }
-
 /**
  * This function is called every robot packet, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
@@ -22,20 +20,6 @@ void Robot::RobotInit() {
  */
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
-
-  //Wheel Offset Code;
-		if (frc::RobotController::GetUserButton() == 1 && m_counter == 0) {
-			m_container.m_drive.SetWheelOffsets();
-			m_counter = 100;
-			std::cout << "User Button Pressed" << std::endl;
-			std::cout.flush();
-		}
-
-		if (m_counter > 0) {
-			m_counter -= 1;
-		}
-
-   
 }
 
 /**

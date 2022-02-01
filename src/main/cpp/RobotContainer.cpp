@@ -20,6 +20,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
+#include "commands/SetWheelOffsets.h"
+#include "commands/ZeroYaw.h"
 
 using namespace DriveConstants;
 
@@ -41,7 +43,24 @@ const uint32_t JOYSTICK_BUTTON_START = 8;
 const uint32_t JOYSTICK_BUTTON_LEFT = 9;
 const uint32_t JOYSTICK_BUTTON_RIGHT = 10;
 
-RobotContainer::RobotContainer() {
+RobotContainer::RobotContainer()
+:m_FieldCentricMode{[this] {
+        m_drive.Drive(
+            units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
+            units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2))*AutoConstants::kMaxSpeed),
+            units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), true);
+      },
+      {&m_drive}
+  },
+    m_CrabMode{[this] {
+        m_drive.Drive(
+          units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
+          units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(), 0.2))*AutoConstants::kMaxSpeed),
+          units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), false);
+      },
+      {&m_drive}
+  }
+ {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
@@ -55,8 +74,8 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-    frc::SmartDashboard::PutData("Set WheelOffsets", &m_SetWheelOffsets);
-    frc::SmartDashboard::PutData("Zero Yaw", &m_ZeroYaw);
+    frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));
+    frc::SmartDashboard::PutData("Zero Yaw", new ZeroYaw(&m_drive));
  
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->ToggleWhenPressed(m_CrabMode);
 }

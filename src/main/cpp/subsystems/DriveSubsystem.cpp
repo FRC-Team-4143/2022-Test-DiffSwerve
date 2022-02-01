@@ -11,6 +11,8 @@
 #include <iostream>
 #include "Constants.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/RobotController.h>
+
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
@@ -37,7 +39,17 @@ void DriveSubsystem::Periodic() {
                     m_rearRight.GetState());
   frc::SmartDashboard::PutNumber ("Gyro", m_gyro->GetYaw());
   
+  //Wheel Offset Code;
+		if (frc::RobotController::GetUserButton() == 1 && m_counter == 0) {
+			SetWheelOffsets();
+			m_counter = 100;
+			std::cout << "User Button Pressed" << std::endl;
+			std::cout.flush();
+		}
 
+		if (m_counter > 0) {
+			m_counter -= 1;
+		}
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,

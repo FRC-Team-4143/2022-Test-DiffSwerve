@@ -10,9 +10,11 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc/filter/SlewRateLimiter.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -31,24 +33,8 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
 
   DriveSubsystem m_drive;
-  frc2::InstantCommand m_SetWheelOffsets{[this] {m_drive.SetWheelOffsets(); }, {&m_drive}};
-  frc2::InstantCommand m_ZeroYaw{[this] {m_drive.ZeroHeading(); }, {&m_drive}};
-  frc2::RunCommand m_FieldCentricMode{[this] {
-        m_drive.Drive(
-            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2)*AutoConstants::kMaxSpeed),
-            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2)*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(-frc::ApplyDeadband(m_driverController.GetRightX(), 0.2)*AutoConstants::kMaxAngularSpeed), true);
-      },
-      {&m_drive}
-  };
-  frc2::RunCommand m_CrabMode{[this] {
-        m_drive.Drive(
-            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2)*AutoConstants::kMaxSpeed),
-            units::meters_per_second_t(frc::ApplyDeadband(m_driverController.GetLeftX(), 0.2)*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(-frc::ApplyDeadband(m_driverController.GetRightX(), 0.2)*AutoConstants::kMaxAngularSpeed), false);
-      },
-      {&m_drive}
-  };
+  frc2::RunCommand m_FieldCentricMode;
+  frc2::RunCommand m_CrabMode;
 
  private:
   // The driver's controller
@@ -57,7 +43,10 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  
+  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;

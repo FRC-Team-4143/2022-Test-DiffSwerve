@@ -70,7 +70,7 @@ void SwerveModule::ResetEncoders() {
 
 }
 
-// =========================Wheel Offsets=======================================
+// =========================Wheel Offsets======================================
 
 void SwerveModule::SetWheelOffset() {
 	auto steerPosition = m_encoder.GetPosition();
@@ -83,4 +83,4 @@ void SwerveModule::LoadWheelOffset() {
 	m_offset = steerPosition;
 }
 
-// ================================================================
+// ============================================================================
