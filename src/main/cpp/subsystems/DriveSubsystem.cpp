@@ -89,10 +89,21 @@ void DriveSubsystem::SetModuleStates(
     wpi::array<frc::SwerveModuleState, 4> desiredStates) {
   kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
                                          AutoConstants::kMaxSpeed);
-  m_frontLeft.SetDesiredState(desiredStates[0]);
-  m_frontRight.SetDesiredState(desiredStates[1]);
-  m_rearLeft.SetDesiredState(desiredStates[2]);
-  m_rearRight.SetDesiredState(desiredStates[3]);
+  double flMax = m_frontLeft.SetDesiredState(desiredStates[0]);
+  double frMax = m_frontRight.SetDesiredState(desiredStates[1]);
+  double blMax = m_rearLeft.SetDesiredState(desiredStates[2]);
+  double brMax = m_rearRight.SetDesiredState(desiredStates[3]);
+
+  double driveMax = std::max(std::max(blMax,brMax),std::max(flMax,frMax));
+  if(driveMax>DriveConstants::driveMaxVoltage)
+    driveMax=DriveConstants::driveMaxVoltage/driveMax;
+  else
+    driveMax=1;
+  
+  m_frontLeft.SetVoltage(driveMax);
+  m_frontRight.SetVoltage(driveMax);
+  m_rearLeft.SetVoltage(driveMax);
+  m_rearRight.SetVoltage(driveMax);
 }
 
 void DriveSubsystem::ResetEncoders() {

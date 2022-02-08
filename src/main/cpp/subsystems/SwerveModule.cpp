@@ -20,15 +20,15 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
     m_encoder.ConfigFactoryDefault();
 	m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
     
-    constexpr double MAX_CURRENT = 20.0;
+    constexpr double MAX_CURRENT = 40.0;
 
 	SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
-	m_driveMotor.ConfigSupplyCurrentLimit(supply);
-	m_turningMotor.ConfigSupplyCurrentLimit(supply);
+	//m_driveMotor.ConfigSupplyCurrentLimit(supply);
+	//m_turningMotor.ConfigSupplyCurrentLimit(supply);
 
 	StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
-	m_driveMotor.ConfigStatorCurrentLimit(stator);
-	m_turningMotor.ConfigStatorCurrentLimit(stator);
+	//m_driveMotor.ConfigStatorCurrentLimit(stator);
+	//m_turningMotor.ConfigStatorCurrentLimit(stator);
 
     m_turningPIDController.EnableContinuousInput(
         units::radian_t{0}, units::radian_t(2*wpi::numbers::pi));

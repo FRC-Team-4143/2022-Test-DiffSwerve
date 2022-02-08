@@ -49,7 +49,7 @@ RobotContainer::RobotContainer()
         m_drive.Drive(
             units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2))*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), true);
+            units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), true);
       },
       {&m_drive}
   },
@@ -57,7 +57,7 @@ RobotContainer::RobotContainer()
         m_drive.Drive(
           units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
           units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(), 0.2))*AutoConstants::kMaxSpeed),
-          units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), false);
+          units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), false);
       },
       {&m_drive}
   }
