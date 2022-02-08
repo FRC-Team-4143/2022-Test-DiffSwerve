@@ -22,6 +22,7 @@
 #include "subsystems/DriveSubsystem.h"
 #include "commands/SetWheelOffsets.h"
 #include "commands/ZeroYaw.h"
+#include <frc/livewindow/LiveWindow.h>
 
 using namespace DriveConstants;
 
@@ -65,7 +66,7 @@ RobotContainer::RobotContainer()
 
   // Configure the button bindings
   ConfigureButtonBindings();
-
+  frc::LiveWindow::DisableAllTelemetry();
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.

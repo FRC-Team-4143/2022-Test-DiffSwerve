@@ -66,10 +66,21 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
   auto [fl, fr, bl, br] = states;
 
-  m_frontLeft.SetDesiredState(fl);
-  m_frontRight.SetDesiredState(fr);
-  m_rearLeft.SetDesiredState(bl);
-  m_rearRight.SetDesiredState(br);
+  double flMax = m_frontLeft.SetDesiredState(fl);
+  double frMax = m_frontRight.SetDesiredState(fr);
+  double blMax = m_rearLeft.SetDesiredState(bl);
+  double brMax = m_rearRight.SetDesiredState(br);
+  
+  double driveMax = std::max(std::max(blMax,brMax),std::max(flMax,frMax));
+  if(driveMax>DriveConstants::driveMaxVoltage)
+    driveMax=DriveConstants::driveMaxVoltage/driveMax;
+  else
+    driveMax=1;
+  
+  m_frontLeft.SetVoltage(driveMax);
+  m_frontRight.SetVoltage(driveMax);
+  m_rearLeft.SetVoltage(driveMax);
+  m_rearRight.SetVoltage(driveMax);
 
   frc::SmartDashboard::PutBoolean ("FieldCentric", fieldRelative);
 }

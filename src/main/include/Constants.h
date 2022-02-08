@@ -62,7 +62,7 @@ constexpr bool kRearLeftDriveEncoderReversed = true;
 constexpr bool kFrontRightDriveEncoderReversed = false;
 constexpr bool kRearRightDriveEncoderReversed = true;
 */
-
+constexpr double driveMaxVoltage = 12;
 
 //constexpr auto ks = 0.64263_V;
 constexpr auto ks = .64263_V;

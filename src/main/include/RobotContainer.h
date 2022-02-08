@@ -43,9 +43,9 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{2 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{2 / 1_s};
+  frc::SlewRateLimiter<units::scalar> m_rotLimiter{2 / 1_s};
 
 
   // The chooser for the autonomous routines
