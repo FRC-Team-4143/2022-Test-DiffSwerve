@@ -23,6 +23,7 @@
 #include "commands/SetWheelOffsets.h"
 #include "commands/ZeroYaw.h"
 #include <frc/livewindow/LiveWindow.h>
+#include <frc2/command/RunCommand.h>
 
 using namespace DriveConstants;
 
@@ -45,7 +46,8 @@ const uint32_t JOYSTICK_BUTTON_LEFT = 9;
 const uint32_t JOYSTICK_BUTTON_RIGHT = 10;
 
 RobotContainer::RobotContainer()
-:m_FieldCentricMode{[this] {
+:  m_pickUp{},
+m_FieldCentricMode{[this] {
         m_drive.Drive(
             units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2))*AutoConstants::kMaxSpeed),
@@ -75,6 +77,13 @@ RobotContainer::RobotContainer()
 }
 
 void RobotContainer::ConfigureButtonBindings() {
+
+    frc2::RunCommand rollerInCommand{[this]() {m_pickUp.RollerIn();}, {&m_pickUp}};
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
+
+    frc2::RunCommand rollerOutCommand{[this]() {m_pickUp.RollerOut();}, {&m_pickUp}};
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(rollerOutCommand);
+
     frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));
     frc::SmartDashboard::PutData("Zero Yaw", new ZeroYaw(&m_drive));
  

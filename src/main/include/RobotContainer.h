@@ -15,7 +15,7 @@
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
 #include <frc/filter/SlewRateLimiter.h>
-
+#include "Subsystems/PickUpSubsystem.h"
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
 
@@ -33,6 +33,7 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
 
   DriveSubsystem m_drive;
+  PickUpSubsystem m_pickUp;
   frc2::RunCommand m_FieldCentricMode;
   frc2::RunCommand m_CrabMode;
 
