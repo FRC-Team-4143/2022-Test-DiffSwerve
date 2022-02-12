@@ -3,27 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
-
-#include <utility>
-
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
-#include <frc2/command/button/JoystickButton.h>
 #include <units/angle.h>
 #include <units/velocity.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <utility>
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
 #include "commands/SetWheelOffsets.h"
 #include "commands/ZeroYaw.h"
-#include <frc/livewindow/LiveWindow.h>
-#include <frc2/command/RunCommand.h>
 
 using namespace DriveConstants;
 
@@ -78,22 +76,88 @@ m_FieldCentricMode{[this] {
 
 void RobotContainer::ConfigureButtonBindings() {
 
-    frc2::RunCommand rollerInCommand{[this]() {m_pickUp.RollerIn();}, {&m_pickUp}};
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
+// ============================================================================
+    
+    /*
+    frc2::InstantCommand pickUpBounceCommand{
+        [this]() {m_pickUp.PickUpBounce();},
+        {&m_pickUp}};
+    
+    frc2::InstantCommand pickUpExtendCommand{
+        [this]() {m_pickUp.PickUpExtend();},
+        {&m_pickUp}};
+    */
 
-    frc2::RunCommand rollerOutCommand{[this]() {m_pickUp.RollerOut();}, {&m_pickUp}};
+    frc2::InstantCommand pickUpRetractCommand{
+        [this]() {m_pickUp.PickUpRetract();},
+        {&m_pickUp}};
+
+    frc2::InstantCommand pickUpToggleCommand{
+        [this]() {m_pickUp.PickUpToggle();},
+        {&m_pickUp}};    
+    
+// ============================================================================
+
+    frc2::FunctionalCommand rollerInCommand{
+        [this]() {m_pickUp.RollerIn();},
+        []() {},
+        [this](bool) {m_pickUp.RollerOff();},
+        []() {return false;}, 
+        {&m_pickUp}};
+    
+    frc2::FunctionalCommand rollerOutCommand{
+        [this]() {m_pickUp.RollerOut();},
+        []() {},
+        [this](bool) {m_pickUp.RollerOff();},
+        []() {return false;}, 
+        {&m_pickUp}};
+
+// ============================================================================
+
+    frc2::FunctionalCommand indexerOnCommand{
+        [this]() {m_pickUp.IndexerOn();},
+        []() {},
+        [this](bool) {m_pickUp.IndexerOff();},
+        []() {return false;}
+        };
+        
+// ============================================================================
+
+    frc2::FunctionalCommand shooterOnCommand{
+        [this]() {m_pickUp.ShooterOn();},
+        []() {},
+        [this](bool) {m_pickUp.ShooterOff();},
+        []() {return false;}, 
+        {&m_pickUp}};
+
+    frc2::InstantCommand shooterFasterCommand{
+        [this]() {m_pickUp.ShooterFaster();},
+        {&m_pickUp}};
+
+    frc2::InstantCommand shooterSlowerCommand{
+        [this]() {m_pickUp.ShooterSlower();},
+        {&m_pickUp}};
+
+// ============================================================================
+
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(rollerOutCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_BACK))->WhenPressed(pickUpToggleCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->ToggleWhenPressed(m_CrabMode);
+
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhileHeld(shooterOnCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LB))->WhenPressed(shooterSlowerCommand);
 
     frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));
     frc::SmartDashboard::PutData("Zero Yaw", new ZeroYaw(&m_drive));
- 
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->ToggleWhenPressed(m_CrabMode);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
+  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
   config.SetKinematics(m_drive.kDriveKinematics);
 

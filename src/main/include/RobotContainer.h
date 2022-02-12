@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -27,30 +26,30 @@
  * commands, and button mappings) should be declared here.
  */
 class RobotContainer {
- public:
-  RobotContainer();
+public:
+	RobotContainer();
 
-  frc2::Command* GetAutonomousCommand();
+	frc2::Command* GetAutonomousCommand();
 
-  DriveSubsystem m_drive;
-  PickUpSubsystem m_pickUp;
-  frc2::RunCommand m_FieldCentricMode;
-  frc2::RunCommand m_CrabMode;
+	DriveSubsystem m_drive;
+	PickUpSubsystem m_pickUp;
+	frc2::RunCommand m_FieldCentricMode;
+	frc2::RunCommand m_CrabMode;
 
- private:
-  // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+private:
 
-  // The robot's subsystems and commands are defined here...
+	// The driver's controller
+	frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
 
-  // The robot's subsystems
-  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{2 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{2 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{2 / 1_s};
+	// The robot's subsystems and commands are defined here...
 
+	// The robot's subsystems
+	frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{2 / 1_s};
+	frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{2 / 1_s};
+	frc::SlewRateLimiter<units::scalar> m_rotLimiter{2 / 1_s};
 
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+	// The chooser for the autonomous routines
+	frc::SendableChooser<frc2::Command*> m_chooser;
 
-  void ConfigureButtonBindings();
+	void ConfigureButtonBindings();
 };

@@ -1,20 +1,18 @@
 #pragma once
-
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
-
 #include "subsystems/DriveSubsystem.h"
 
 class SetWheelOffsets : public frc2::CommandHelper<frc2::CommandBase, SetWheelOffsets> {
- public:
-  explicit SetWheelOffsets(DriveSubsystem* subsystem);
+public:
 
-  void Initialize() override;
+	explicit SetWheelOffsets(DriveSubsystem* subsystem);
 
-  bool IsFinished() override;
+	void Initialize() override;
+	bool IsFinished() override;
+	bool RunsWhenDisabled() const override;
 
-  bool RunsWhenDisabled() const override;
+private:
 
- private:
-  DriveSubsystem* m_drive;
+	DriveSubsystem* m_drive;
 };

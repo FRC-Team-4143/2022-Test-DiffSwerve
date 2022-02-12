@@ -69,6 +69,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     // Calculate the turning motor output from the turning PID controller.
     auto turnOutput{m_turningPIDController.Calculate(units::radian_t(encoderValue), state.angle.Radians())};
 
+    
 /*
     auto angle = fmod(m_encoder.GetPosition(), 360);
     if (angle > 180){angle -= 360;}
@@ -102,7 +103,9 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
         - driveFeedforward.value()
         + DriveConstants::driveMaxVoltage * turnOutput;
 
-    
+    if(state.angle.Degrees().value() > 45){
+        driveVoltage = 0;
+    }
 
     frc::SmartDashboard::PutNumber(m_name + " Encoder1", encoderValue);
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
