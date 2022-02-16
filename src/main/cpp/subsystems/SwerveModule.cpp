@@ -150,7 +150,8 @@ void SwerveModule::SetWheelOffset() {
 
 void SwerveModule::LoadWheelOffset() {
 	auto steerPosition{frc::Preferences::GetDouble(m_name)};
-	m_encoder.ConfigMagnetOffset(steerPosition,20);
+    std::cout << "ERROR: " << m_name << " steerPosition " << steerPosition << std::endl;
+    std::cout.flush();
     m_offset = steerPosition;
 }
 
