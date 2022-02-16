@@ -14,7 +14,7 @@ PickUpSubsystem::PickUpSubsystem()
 	m_shooter2 {PickUpConstants::kShooter2Port,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
-	m_shooterSpeed{0.75}
+	m_shooterSpeed{1.0}
 {
 	m_shooter2.SetInverted(true);
 }
@@ -59,7 +59,8 @@ void PickUpSubsystem::PickUpToggle() {
 // ============================================================================
 
 void PickUpSubsystem::RollerIn() {
-	m_roller.Set(TalonSRXControlMode::PercentOutput, -0.75);
+	m_roller.Set(TalonSRXControlMode::PercentOutput, -1.0);
+	PickUpExtend();
 }
 
 // ============================================================================
@@ -72,6 +73,7 @@ void PickUpSubsystem::RollerOut() {
 
 void PickUpSubsystem::RollerOff() {
 	m_roller.Set(TalonSRXControlMode::PercentOutput, 0);
+	PickUpRetract();
 }
 
 // ============================================================================
@@ -79,6 +81,11 @@ void PickUpSubsystem::RollerOff() {
 void PickUpSubsystem::IndexerOn() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, 0.5);
 	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+}
+
+void PickUpSubsystem::IndexerRev() {
+	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.5);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.5);
 }
 
 // ============================================================================
@@ -92,12 +99,14 @@ void PickUpSubsystem::IndexerOff() {
 
 void PickUpSubsystem::ShooterOn() {
 	m_shooter.Set(m_shooterSpeed);
+	m_backSpinShooter.Set(-m_shooterSpeed);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterOff() {
 	m_shooter.Set(0);
+	m_backSpinShooter.Set(0);
 }
 
 // ============================================================================

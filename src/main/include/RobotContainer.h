@@ -33,8 +33,7 @@ public:
 
 	DriveSubsystem m_drive;
 	PickUpSubsystem m_pickUp;
-	frc2::RunCommand m_FieldCentricMode;
-	frc2::RunCommand m_CrabMode;
+	frc2::RunCommand m_DriveCommand;
 
 private:
 
@@ -49,7 +48,7 @@ private:
 	frc::SlewRateLimiter<units::scalar> m_rotLimiter{2 / 1_s};
 
 	// The chooser for the autonomous routines
-	frc::SendableChooser<frc2::Command*> m_chooser;
+	//frc::SendableChooser<frc2::Command*> m_chooser;
 
 	void ConfigureButtonBindings();
 };

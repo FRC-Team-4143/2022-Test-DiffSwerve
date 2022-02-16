@@ -22,6 +22,7 @@
 #include "subsystems/DriveSubsystem.h"
 #include "commands/SetWheelOffsets.h"
 #include "commands/ZeroYaw.h"
+#include "commands/ToggleDriveMode.h"
 
 using namespace DriveConstants;
 
@@ -45,22 +46,14 @@ const uint32_t JOYSTICK_BUTTON_RIGHT = 10;
 
 RobotContainer::RobotContainer()
 :  m_pickUp{},
-m_FieldCentricMode{[this] {
+m_DriveCommand{[this] {
         m_drive.Drive(
             units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2))*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), true);
+            units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed));
       },
       {&m_drive}
-  },
-    m_CrabMode{[this] {
-        m_drive.Drive(
-          units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
-          units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(), 0.2))*AutoConstants::kMaxSpeed),
-          units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed), false);
-      },
-      {&m_drive}
-  }
+}
  {
   // Initialize all of your commands and subsystems here
 
@@ -70,7 +63,7 @@ m_FieldCentricMode{[this] {
   // Set up default drive command
   // The left stick controls translation of the robot.
   // Turning is controlled by the X axis of the right stick.
-  m_drive.SetDefaultCommand(m_FieldCentricMode);
+  m_drive.SetDefaultCommand(m_DriveCommand);
 
 }
 
@@ -120,6 +113,13 @@ void RobotContainer::ConfigureButtonBindings() {
         [this](bool) {m_pickUp.IndexerOff();},
         []() {return false;}
         };
+
+    frc2::FunctionalCommand indexerRevCommand{
+        [this]() {m_pickUp.IndexerRev();},
+        []() {},
+        [this](bool) {m_pickUp.IndexerOff();},
+        []() {return false;}
+        };
         
 // ============================================================================
 
@@ -141,11 +141,11 @@ void RobotContainer::ConfigureButtonBindings() {
 // ============================================================================
 
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(rollerOutCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(indexerRevCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_BACK))->WhenPressed(pickUpToggleCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->ToggleWhenPressed(m_CrabMode);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->WhenPressed(ToggleDriveMode{&m_drive});
 
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhileHeld(shooterOnCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
@@ -201,7 +201,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
           [this]() {
             m_drive.Drive(units::meters_per_second_t(0),
                           units::meters_per_second_t(0),
-                          units::radians_per_second_t(0), false);
+                          units::radians_per_second_t(0));
           },
           {}));
 }

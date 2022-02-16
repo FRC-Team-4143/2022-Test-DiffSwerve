@@ -42,8 +42,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *                      the field.
    */
   void Drive(units::meters_per_second_t xSpeed,
-             units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool fieldRelative);
+             units::meters_per_second_t ySpeed, units::radians_per_second_t rot);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -87,6 +86,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
+  void ToggleFieldCentric();
+
   units::meter_t kTrackWidth = 0.52_m;  // Distance between centers of right and left wheels on robot
   units::meter_t kWheelBase = 0.78_m;  // Distance between centers of front and back wheels on robot
 
@@ -115,6 +116,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // Odometry class for tracking robot pose
   // 4 defines the number of modules
   frc::SwerveDriveOdometry<4> m_odometry;
+
+  bool m_fieldCentric;
 
   
 };

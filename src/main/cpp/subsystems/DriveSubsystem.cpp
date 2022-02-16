@@ -25,7 +25,8 @@ DriveSubsystem::DriveSubsystem()
 
       m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight"},
 
-      m_odometry{kDriveKinematics, units::degree_t(-m_gyro->GetYaw()), frc::Pose2d()} {
+      m_odometry{kDriveKinematics, units::degree_t(-m_gyro->GetYaw()), frc::Pose2d()},
+      m_fieldCentric{false} {
         LoadWheelOffsets();
         
         //m_gyro->Calibrate();
@@ -38,6 +39,7 @@ void DriveSubsystem::Periodic() {
                     m_rearLeft.GetState(), m_frontRight.GetState(),
                     m_rearRight.GetState());
   frc::SmartDashboard::PutNumber ("Gyro", m_gyro->GetYaw());
+  frc::SmartDashboard::PutBoolean ("FieldCentric", m_fieldCentric);
   
   //Wheel Offset Code;
 		if (frc::RobotController::GetUserButton() == 1 && m_counter == 0) {
@@ -54,10 +56,9 @@ void DriveSubsystem::Periodic() {
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            units::meters_per_second_t ySpeed,
-                           units::radians_per_second_t rot,
-                           bool fieldRelative) {
+                           units::radians_per_second_t rot) {
   auto states = kDriveKinematics.ToSwerveModuleStates(
-      fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+      m_fieldCentric ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                           xSpeed, ySpeed, rot, units::degree_t(-m_gyro->GetYaw()))
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
@@ -82,7 +83,6 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_rearLeft.SetVoltage(driveMax);
   m_rearRight.SetVoltage(driveMax);
 
-  frc::SmartDashboard::PutBoolean ("FieldCentric", fieldRelative);
 }
 
 void DriveSubsystem::SetModuleStates(
@@ -133,6 +133,10 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 }
 
+void DriveSubsystem::ToggleFieldCentric(){
+  m_fieldCentric=!m_fieldCentric;
+}
+
 // ================================================================
 
 void DriveSubsystem::SetWheelOffsets() {
@@ -141,7 +145,7 @@ void DriveSubsystem::SetWheelOffsets() {
 	m_frontRight.SetWheelOffset();
 	m_rearRight.SetWheelOffset();
   std::cout << "SetWheelOffsets Complete " << std::endl;
-		std::cout.flush();
+  std::cout.flush();
 }
 
 // ================================================================
@@ -151,6 +155,8 @@ void DriveSubsystem::LoadWheelOffsets() {
 	m_rearLeft.LoadWheelOffset();
 	m_frontRight.LoadWheelOffset();
 	m_rearRight.LoadWheelOffset();
+  std::cout << "LoadWheelOffsets Complete " << std::endl;
+  std::cout.flush();
 }
 
 // ================================================================

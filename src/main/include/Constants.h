@@ -124,8 +124,8 @@ namespace PickUpConstants {
 	constexpr int kShooter2Port = 35;
 	constexpr int kBackSpinShooterPort = 36;
 
-	constexpr int kUpperForwardSolenoidPort = 1;
-	constexpr int kUpperReverseSolenoidPort = 2;
-	constexpr int kLowerForwardSolenoidPort = 3;
-	constexpr int kLowerReverseSolenoidPort = 4;
+	constexpr int kUpperForwardSolenoidPort = 5;
+	constexpr int kUpperReverseSolenoidPort = 1;
+	constexpr int kLowerForwardSolenoidPort = 0;
+	constexpr int kLowerReverseSolenoidPort = 6;
 }

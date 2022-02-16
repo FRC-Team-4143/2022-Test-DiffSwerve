@@ -24,6 +24,7 @@ public:
 
 	void IndexerOn();
 	void IndexerOff();
+	void IndexerRev();
 
 	void ShooterOn();
 	void ShooterOff();

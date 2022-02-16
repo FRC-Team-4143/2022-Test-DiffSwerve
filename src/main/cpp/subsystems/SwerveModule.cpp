@@ -4,6 +4,7 @@
 //#include <wpi/numbers>
 //#include "Constants.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <iostream>
 //#include "RobotContainer.h"
 
 // ============================================================================
@@ -18,6 +19,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
     m_driveMotor.ConfigFactoryDefault();
 	m_turningMotor.ConfigFactoryDefault();
     m_encoder.ConfigFactoryDefault();
+    m_encoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Signed_PlusMinus180,20);
 	m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
     
     constexpr double MAX_CURRENT = 40.0;
@@ -31,7 +33,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 	//m_turningMotor.ConfigStatorCurrentLimit(stator);
 
     m_turningPIDController.EnableContinuousInput(
-        units::radian_t{0}, units::radian_t(2*wpi::numbers::pi));
+        units::radian_t{-wpi::numbers::pi}, units::radian_t(wpi::numbers::pi));
     m_driveMotor.SetNeutralMode(NeutralMode::Coast);
     m_turningMotor.SetNeutralMode(NeutralMode::Coast);
 }
@@ -41,7 +43,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 frc::SwerveModuleState SwerveModule::GetState() {
     return {units::meters_per_second_t{GetDriveMotorSpeed()},
         //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
-        frc::Rotation2d(units::radian_t((m_encoder.GetPosition() - m_offset) / 360 * 2 * wpi::numbers::pi))
+        frc::Rotation2d(units::radian_t((m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi))
     };
 }
 
@@ -55,7 +57,7 @@ float SwerveModule::GetDriveMotorSpeed() {
 // ============================================================================
 
 double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
-    double encoderValue{(m_encoder.GetPosition()-m_offset)/360*2*wpi::numbers::pi};
+    double encoderValue{(m_encoder.GetAbsolutePosition()-m_offset)/360*2*wpi::numbers::pi};
  
 
     // Optimize the reference state to avoid spinning further than 90 degrees
@@ -70,6 +72,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     auto turnOutput{m_turningPIDController.Calculate(units::radian_t(encoderValue), state.angle.Radians())};
 
     
+
 /*
     auto angle = fmod(m_encoder.GetPosition(), 360);
     if (angle > 180){angle -= 360;}
@@ -103,16 +106,18 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
         - driveFeedforward.value()
         + DriveConstants::driveMaxVoltage * turnOutput;
 
-    if(state.angle.Degrees().value() > 45){
+    if(!(fabs(state.angle.Radians().value()-encoderValue) < wpi::numbers::pi/4) &&
+       !(fabs(state.angle.Radians().value()-encoderValue+(wpi::numbers::pi*2)) < wpi::numbers::pi/4) &&
+       !(fabs(state.angle.Radians().value()-encoderValue-(wpi::numbers::pi*2)) < wpi::numbers::pi/4)){
         driveVoltage = 0;
     }
 
-    frc::SmartDashboard::PutNumber(m_name + " Encoder1", encoderValue);
+    frc::SmartDashboard::PutNumber(m_name + " Current Angle", encoderValue);
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
     frc::SmartDashboard::PutNumber(m_name + " Drive Feedforward", driveFeedforward.value());
     frc::SmartDashboard::PutNumber(m_name + " Turn Power", turnOutput);
-    frc::SmartDashboard::PutNumber(m_name + " Current Angle", m_encoder.GetPosition());
     frc::SmartDashboard::PutNumber(m_name + " Wanted Angle", state.angle.Radians().value()*(180/wpi::numbers::pi));
+    frc::SmartDashboard::PutNumber(m_name + " Angle Error", state.angle.Radians().value()-encoderValue);
 
   
     frc::SmartDashboard::PutNumber (m_name + " SetVoltage", driveVoltage);
@@ -134,16 +139,27 @@ void SwerveModule::ResetEncoders() {
 // =========================Wheel Offsets======================================
 
 void SwerveModule::SetWheelOffset() {
-	auto steerPosition{m_encoder.GetPosition()};
+
+    if(m_encoder.ConfigMagnetOffset(0,20)) {
+        std::cout << m_name << " config mag offset 0 failed" << std::endl;
+		std::cout.flush();
+    };
+	auto steerPosition{-m_encoder.GetAbsolutePosition()};
+    std::cout << m_name << " steerPosition " << steerPosition << std::endl;
 	frc::Preferences::SetDouble(m_name, steerPosition);
-    m_offset = steerPosition;
+    if(m_encoder.ConfigMagnetOffset(steerPosition,20)) {
+        std::cout << m_name << " config mag offset steerPosition failed" << std::endl;
+		std::cout.flush();
+    };
+    m_offset = 0;
 }
 
 // ============================================================================
 
 void SwerveModule::LoadWheelOffset() {
 	auto steerPosition{frc::Preferences::GetDouble(m_name)};
-	m_offset = steerPosition;
+	m_encoder.ConfigMagnetOffset(steerPosition,20);
+    m_offset = 0;
 }
 
 // ============================================================================
