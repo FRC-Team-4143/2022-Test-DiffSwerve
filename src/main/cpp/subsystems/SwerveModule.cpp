@@ -139,19 +139,11 @@ void SwerveModule::ResetEncoders() {
 // =========================Wheel Offsets======================================
 
 void SwerveModule::SetWheelOffset() {
-
-    if(m_encoder.ConfigMagnetOffset(0,20)) {
-        std::cout << m_name << " config mag offset 0 failed" << std::endl;
-		std::cout.flush();
-    };
-	auto steerPosition{-m_encoder.GetAbsolutePosition()};
-    std::cout << m_name << " steerPosition " << steerPosition << std::endl;
+	auto steerPosition{m_encoder.GetAbsolutePosition()};
+    std::cout << "ERROR: " << m_name << " steerPosition " << steerPosition << std::endl;
+    std::cout.flush();
 	frc::Preferences::SetDouble(m_name, steerPosition);
-    if(m_encoder.ConfigMagnetOffset(steerPosition,20)) {
-        std::cout << m_name << " config mag offset steerPosition failed" << std::endl;
-		std::cout.flush();
-    };
-    m_offset = 0;
+    m_offset = steerPosition;
 }
 
 // ============================================================================
@@ -159,7 +151,7 @@ void SwerveModule::SetWheelOffset() {
 void SwerveModule::LoadWheelOffset() {
 	auto steerPosition{frc::Preferences::GetDouble(m_name)};
 	m_encoder.ConfigMagnetOffset(steerPosition,20);
-    m_offset = 0;
+    m_offset = steerPosition;
 }
 
 // ============================================================================
