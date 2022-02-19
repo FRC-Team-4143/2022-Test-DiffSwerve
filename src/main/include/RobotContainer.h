@@ -17,6 +17,7 @@
 #include "Subsystems/PickUpSubsystem.h"
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
+#include <frc2/command/button/JoystickButton.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -49,6 +50,8 @@ private:
 
 	// The chooser for the autonomous routines
 	//frc::SendableChooser<frc2::Command*> m_chooser;
+	frc2::JoystickButton *m_rb;
+	frc2::JoystickButton *m_lb;
 
 	void ConfigureButtonBindings();
 };

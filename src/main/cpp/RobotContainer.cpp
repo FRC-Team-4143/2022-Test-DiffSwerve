@@ -23,6 +23,10 @@
 #include "commands/SetWheelOffsets.h"
 #include "commands/ZeroYaw.h"
 #include "commands/ToggleDriveMode.h"
+#include <frc2/command/WaitCommand.h>
+#include "commands/PickUpCycle.h"
+#include "commands/PickUpCycleBounce.h"
+#include <frc2/command/button/Trigger.h>
 
 using namespace DriveConstants;
 
@@ -50,7 +54,7 @@ m_DriveCommand{[this] {
         m_drive.Drive(
             units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
             units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2))*AutoConstants::kMaxSpeed),
-            units::radians_per_second_t(m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed));
+            units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed));
       },
       {&m_drive}
 }
@@ -71,7 +75,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
 // ============================================================================
     
-    /*
+    
     frc2::InstantCommand pickUpBounceCommand{
         [this]() {m_pickUp.PickUpBounce();},
         {&m_pickUp}};
@@ -79,7 +83,7 @@ void RobotContainer::ConfigureButtonBindings() {
     frc2::InstantCommand pickUpExtendCommand{
         [this]() {m_pickUp.PickUpExtend();},
         {&m_pickUp}};
-    */
+    
 
     frc2::InstantCommand pickUpRetractCommand{
         [this]() {m_pickUp.PickUpRetract();},
@@ -140,16 +144,31 @@ void RobotContainer::ConfigureButtonBindings() {
 
 // ============================================================================
 
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
+    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
+    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_BACK))->WhenPressed(shooterFasterCommand);
+    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(shooterSlowerCommand);
+
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(indexerRevCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_BACK))->WhenPressed(pickUpToggleCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->WhenPressed(ToggleDriveMode{&m_drive});
+    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhileHeld(shooterOnCommand);
 
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhileHeld(shooterOnCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LB))->WhenPressed(shooterSlowerCommand);
+
+    frc2::Trigger RT{
+        [this]() 
+        {return m_driverController.GetRightTriggerAxis() != 0;}
+    };
+
+    RT.WhileActiveContinous(shooterOnCommand);
+
+
+    m_rb = new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB);
+    m_lb = new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LB);
+    m_rb->WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
+    m_lb->WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
+  
 
     frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));
     frc::SmartDashboard::PutData("Zero Yaw", new ZeroYaw(&m_drive));
