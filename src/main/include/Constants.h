@@ -113,6 +113,7 @@ namespace AutoConstants {
 
 namespace OIConstants {
 	constexpr int kDriverControllerPort = 0;
+	constexpr int kClimberControllerPort = 1;
 }
 
 namespace PickUpConstants {
@@ -123,9 +124,35 @@ namespace PickUpConstants {
 	constexpr int kShooter1Port = 34;
 	constexpr int kShooter2Port = 35;
 	constexpr int kBackSpinShooterPort = 36;
+	constexpr int kShooterForwardSolenoidPort = 4;
+	constexpr int kShooterReverseSolenoidPort = 2;
 
 	constexpr int kUpperForwardSolenoidPort = 5;
 	constexpr int kUpperReverseSolenoidPort = 1;
 	constexpr int kLowerForwardSolenoidPort = 0;
 	constexpr int kLowerReverseSolenoidPort = 6;
+}
+
+namespace ClimberConstants {
+	constexpr int kRotateLeftPort = 41;
+	constexpr int kRotateRightPort = 42;
+	constexpr int kExtendLeftPort = 43;
+	constexpr int kExtendRightPort = 44;
+
+	constexpr float kMaxExtendPower = .3;
+	constexpr float kMaxRotatePower = .3;
+
+	constexpr double kP = 5e-5; 
+	constexpr double kI = 1e-6; 
+	constexpr double kD = 0;
+	constexpr double kIz = 0; 
+	constexpr double kFF = 0.000156; 
+	constexpr double kMaxOutput = 0.5;
+	constexpr int kMinOutput = -1;
+	constexpr double kMaxVel = 2000; 
+	constexpr double kMinVel = 0; 
+	constexpr double kMaxAcc = 1500; 
+	constexpr double kAllErr = 0;
+	constexpr double MaxRPM = 5700;
+
 }

@@ -52,7 +52,7 @@ class SwerveModule {
 
   std::string m_name;
   frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{DriveConstants::ks,DriveConstants::kv,DriveConstants::ka};
-  //frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{1_V, 0.5_V / 1_rad_per_s};
+  frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{.1_V, 0.24_V / 1_rad_per_s};
 
     frc2::PIDController m_drivePIDController{
         ModuleConstants::kPModuleDriveController, 0, 0

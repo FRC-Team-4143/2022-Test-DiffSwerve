@@ -25,11 +25,16 @@ public:
 	void IndexerOn();
 	void IndexerOff();
 	void IndexerRev();
+	void IndexerLoad();
 
 	void ShooterOn();
 	void ShooterOff();
 	void ShooterFaster();
 	void ShooterSlower();
+
+	void ShooterFar();
+	void ShooterClose();
+	void ShooterDistToggle();
 
 private:
 
@@ -45,6 +50,7 @@ private:
 	rev::CANSparkMax m_shooter2;
 	frc::MotorControllerGroup m_shooter;
 	rev::CANSparkMax m_backSpinShooter;
+	frc::DoubleSolenoid m_shooterSolenoid;
 
 	double m_shooterSpeed;
 };

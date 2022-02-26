@@ -7,6 +7,7 @@ PickUpCycleBounce::PickUpCycleBounce(PickUpSubsystem* subsystem,frc::XboxControl
 void PickUpCycleBounce::Initialize() {
 	m_pickUp->PickUpBounce();
 	m_pickUp->RollerIn();
+	m_pickUp->IndexerLoad();
 	counter = 0;
 }
 
@@ -26,6 +27,7 @@ void PickUpCycleBounce::Execute() {
 
 void PickUpCycleBounce::End(bool) {
 	m_pickUp->RollerOff();
+	m_pickUp->IndexerOff();
 }
 
 bool PickUpCycleBounce::IsFinished() {

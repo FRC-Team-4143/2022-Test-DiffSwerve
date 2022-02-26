@@ -49,7 +49,7 @@ const uint32_t JOYSTICK_BUTTON_LEFT = 9;
 const uint32_t JOYSTICK_BUTTON_RIGHT = 10;
 
 RobotContainer::RobotContainer()
-:  m_pickUp{},
+:  m_pickUp{}, m_climber{&m_climberController},
 m_DriveCommand{[this] {
         m_drive.Drive(
             units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2))*AutoConstants::kMaxSpeed),
@@ -132,15 +132,19 @@ void RobotContainer::ConfigureButtonBindings() {
         []() {},
         [this](bool) {m_pickUp.ShooterOff();},
         []() {return false;}, 
-        {&m_pickUp}};
+        };
 
     frc2::InstantCommand shooterFasterCommand{
         [this]() {m_pickUp.ShooterFaster();},
-        {&m_pickUp}};
+        };
 
     frc2::InstantCommand shooterSlowerCommand{
         [this]() {m_pickUp.ShooterSlower();},
-        {&m_pickUp}};
+        };
+
+    frc2::InstantCommand shooterDistToggleCommand{
+        [this]() {m_pickUp.ShooterDistToggle();},
+        };
 
 // ============================================================================
 
@@ -151,9 +155,9 @@ void RobotContainer::ConfigureButtonBindings() {
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(shooterSlowerCommand);
 
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(indexerRevCommand);
-    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
+    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
     (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->WhenPressed(ToggleDriveMode{&m_drive});
-    //(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhileHeld(shooterOnCommand);
+    (new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhenPressed(shooterDistToggleCommand);
 
 
     frc2::Trigger RT{
@@ -162,6 +166,13 @@ void RobotContainer::ConfigureButtonBindings() {
     };
 
     RT.WhileActiveContinous(shooterOnCommand);
+
+    frc2::Trigger LT{
+        [this]() 
+        {return m_driverController.GetLeftTriggerAxis() != 0;}
+    };
+
+    LT.WhileActiveContinous(indexerOnCommand);
 
 
     m_rb = new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB);
@@ -181,6 +192,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   config.SetKinematics(m_drive.kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
+  /*
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at the origin facing the +X direction
       frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
@@ -190,6 +202,16 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
       // Pass the config
       config);
+  */
+
+auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+      // Start at the origin facing the +X direction
+      frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+      {frc::Translation2d(2_m, 0_m), frc::Translation2d(2_m, -4_m), frc::Translation2d(0_m, -6_m) }, 
+      frc::Pose2d(-1_m, -6_m, frc::Rotation2d(270_deg)),
+      // Pass the config
+      config);
+
 
   frc::ProfiledPIDController<units::radians> thetaController{
       AutoConstants::kPThetaController, 0, 0,
@@ -215,12 +237,29 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
+      frc2::InstantCommand{
+        [this]() {m_pickUp.PickUpExtend();},
+        {&m_pickUp}},
+
+      frc2::InstantCommand{
+        [this]() {m_pickUp.RollerIn();}, 
+        {&m_pickUp}},
+
       std::move(swerveControllerCommand),
+
       frc2::InstantCommand(
           [this]() {
             m_drive.Drive(units::meters_per_second_t(0),
                           units::meters_per_second_t(0),
                           units::radians_per_second_t(0));
           },
-          {}));
+          {}),
+
+      frc2::InstantCommand{
+        [this]() {m_pickUp.PickUpRetract();},
+        {&m_pickUp}},      
+
+      frc2::InstantCommand{
+        [this]() {m_pickUp.RollerOff();}, 
+        {&m_pickUp}});  
 }

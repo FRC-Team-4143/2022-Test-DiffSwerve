@@ -88,8 +88,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   void ToggleFieldCentric();
 
-  units::meter_t kTrackWidth = 0.52_m;  // Distance between centers of right and left wheels on robot
-  units::meter_t kWheelBase = 0.78_m;  // Distance between centers of front and back wheels on robot
+
+  // 2020 robot
+  //units::meter_t kTrackWidth = 0.52_m;  // Distance between centers of right and left wheels on robot
+  //units::meter_t kWheelBase = 0.78_m;  // Distance between centers of front and back wheels on robot
+
+  // 2022 robot
+  units::meter_t kTrackWidth = 0.432_m;  // Distance between centers of right and left wheels on robot
+  units::meter_t kWheelBase = 0.686_m;  // Distance between centers of front and back wheels on robot
+
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),

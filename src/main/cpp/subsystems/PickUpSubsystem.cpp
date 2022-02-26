@@ -1,5 +1,6 @@
 #include "subsystems/PickUpSubsystem.h"
 #include "Constants.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 // ============================================================================
 
@@ -14,7 +15,9 @@ PickUpSubsystem::PickUpSubsystem()
 	m_shooter2 {PickUpConstants::kShooter2Port,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
 	m_shooterSpeed{1.0}
+	
 {
 	m_shooter2.SetInverted(true);
 }
@@ -22,6 +25,7 @@ PickUpSubsystem::PickUpSubsystem()
 // ============================================================================
 
 void PickUpSubsystem::Periodic() {
+	frc::SmartDashboard::PutNumber ("Shooter Speed", m_shooterSpeed);
 }
 
 // ============================================================================
@@ -83,6 +87,12 @@ void PickUpSubsystem::IndexerOn() {
 	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
 }
 
+void PickUpSubsystem::IndexerLoad() {
+	m_index1.Set(TalonSRXControlMode::PercentOutput, 0);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+}
+
+
 void PickUpSubsystem::IndexerRev() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.5);
 	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.5);
@@ -122,3 +132,20 @@ void PickUpSubsystem::ShooterSlower() {
 }
 
 // ============================================================================
+
+void PickUpSubsystem::ShooterFar() {
+	m_shooterSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
+}
+
+void PickUpSubsystem::ShooterClose() {
+	m_shooterSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+}
+
+void PickUpSubsystem::ShooterDistToggle() {
+	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
+		ShooterFar();
+	}
+	else {
+		ShooterClose();
+	}
+}

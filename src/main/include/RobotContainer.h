@@ -18,6 +18,7 @@
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
 #include <frc2/command/button/JoystickButton.h>
+#include "subsystems/ClimberSubsystem.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -34,12 +35,14 @@ public:
 
 	DriveSubsystem m_drive;
 	PickUpSubsystem m_pickUp;
+	ClimberSubsystem m_climber;
 	frc2::RunCommand m_DriveCommand;
 
 private:
 
 	// The driver's controller
 	frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
+	frc::XboxController m_climberController{OIConstants::kClimberControllerPort};
 
 	// The robot's subsystems and commands are defined here...
 

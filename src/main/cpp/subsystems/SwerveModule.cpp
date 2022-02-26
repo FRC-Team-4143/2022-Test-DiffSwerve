@@ -112,7 +112,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
         driveVoltage = 0;
     }
 
-    frc::SmartDashboard::PutNumber(m_name + " Current Angle", encoderValue);
+    (m_name + " Current Angle", encoderValue);
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
     frc::SmartDashboard::PutNumber(m_name + " Drive Feedforward", driveFeedforward.value());
     frc::SmartDashboard::PutNumber(m_name + " Turn Power", turnOutput);
@@ -121,7 +121,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
 
   
     frc::SmartDashboard::PutNumber (m_name + " SetVoltage", driveVoltage);
-    //frc::SmartDashboard::PutNumber (m_name + " driveFeedForward",driveFeedforward.value());
+    //frc::SmartDashboard::PutNumber (mfrc::SmartDashboard::PutNumber_name + " driveFeedForward",driveFeedforward.value());
 
     return std::max(driveVoltage,turnVoltage);
 }
