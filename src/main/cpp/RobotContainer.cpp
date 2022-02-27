@@ -27,6 +27,8 @@
 #include "commands/PickUpCycle.h"
 #include "commands/PickUpCycleBounce.h"
 #include <frc2/command/button/Trigger.h>
+#include <frc2/command/WaitUntilCommand.h>
+
 
 using namespace DriveConstants;
 
@@ -57,7 +59,8 @@ m_DriveCommand{[this] {
             units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2))*AutoConstants::kMaxAngularSpeed));
       },
       {&m_drive}
-}
+},
+    m_testTrajectory{}
  {
   // Initialize all of your commands and subsystems here
 
@@ -69,6 +72,9 @@ m_DriveCommand{[this] {
   // Turning is controlled by the X axis of the right stick.
   m_drive.SetDefaultCommand(m_DriveCommand);
 
+  fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
+  deployDirectory = deployDirectory / "output" / "Test1.wpilib.json";
+  m_testTrajectory = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -202,7 +208,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc::Pose2d(3_m, 0_m, frc::Rotation2d(0_deg)),
       // Pass the config
       config);
-  */
+
 
 auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       // Start at the origin facing the +X direction
@@ -213,6 +219,26 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       config);
 
 
+auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+    frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+    frc::Pose2d(2_m, 0_m, frc::Rotation2d(0_deg)),
+    frc::Pose2d(2_m, -4_m, frc::Rotation2d(180_deg)),
+    config);
+  */
+  /*
+  frc2::RamseteCommand ramseteCommand(
+      trajectory, [this]() { return m_drive.GetPose(); },
+      frc::RamseteController(),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
+      DriveConstants::kDriveKinematics,
+      [this] { return m_drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
+      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
+      [this](auto left, auto right) { m_drive.Drive(left, right); },
+      {&m_drive});
+  */
+
   frc::ProfiledPIDController<units::radians> thetaController{
       AutoConstants::kPThetaController, 0, 0,
       AutoConstants::kThetaControllerConstraints};
@@ -221,7 +247,7 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
                                         units::radian_t(wpi::numbers::pi));
 
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+      m_testTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
@@ -233,8 +259,17 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+  m_drive.ResetOdometry(m_testTrajectory.InitialPose());
+/*
+  bool IsNearWaypoint(Pose2d waypoint, double within) {
+  		double distance = (-m_drivetrain.getPose()).getTranslation().getDistance(waypoint.getTranslation());
+  		return (distance <= within);
+	};
 
+  frc2::WaitUntilCommand pickUpBall1Command(isNearWaypoint(Pose2d(5.675_m, 2.215_m, Rotation2d(-2.56521743299861_rad)), .25_m)){
+
+      }
+*/
   // no auto
   return new frc2::SequentialCommandGroup(
       frc2::InstantCommand{
@@ -248,12 +283,12 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::move(swerveControllerCommand),
 
       frc2::InstantCommand(
-          [this]() {
-            m_drive.Drive(units::meters_per_second_t(0),
-                          units::meters_per_second_t(0),
-                          units::radians_per_second_t(0));
-          },
-          {}),
+        [this]() {
+        m_drive.Drive(units::meters_per_second_t(0),
+                      units::meters_per_second_t(0),
+                      units::radians_per_second_t(0));
+        },
+        {}),
 
       frc2::InstantCommand{
         [this]() {m_pickUp.PickUpRetract();},

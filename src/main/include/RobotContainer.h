@@ -19,6 +19,9 @@
 #include "subsystems/DriveSubsystem.h"
 #include <frc2/command/button/JoystickButton.h>
 #include "subsystems/ClimberSubsystem.h"
+#include <frc/Filesystem.h>
+#include <frc/trajectory/TrajectoryUtil.h>
+#include <wpi/fs.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -57,4 +60,7 @@ private:
 	frc2::JoystickButton *m_lb;
 
 	void ConfigureButtonBindings();
+	frc::Trajectory m_testTrajectory;
+
+	//bool IsNearWaypoint(Pose2d waypoint, double within);
 };

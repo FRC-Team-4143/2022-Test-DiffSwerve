@@ -64,10 +64,17 @@ namespace DriveConstants {
 */
 	constexpr double driveMaxVoltage = 12;
 
-	//constexpr auto ks = 0.64263_V;
+	//DrivePIDConstants
 	constexpr auto ks = .64263_V;
-	constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
+	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
+	constexpr auto kv = 3.5 * 1_V * 1_s / 1_m;
 	constexpr auto ka = 0 * 1_V * 1_s * 1_s / 1_m;
+
+	//TurningPIDConstants
+	constexpr auto kts = .1_V;
+	//constexpr auto ktv = .24_V/(1_rad_per_s);
+	constexpr auto ktv = .33_V/(1_rad_per_s);
+	constexpr auto kta = 0;
 
 	// Example value only - as above, this must be tuned for your drive!
 	//constexpr double kPFrontLeftVel = 0.5;
