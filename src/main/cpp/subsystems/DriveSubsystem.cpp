@@ -28,7 +28,7 @@ DriveSubsystem::DriveSubsystem()
       m_odometry{kDriveKinematics, units::degree_t(-m_gyro->GetYaw()), frc::Pose2d()},
       m_fieldCentric{false} {
         LoadWheelOffsets();
-        
+        frc::SmartDashboard::PutData("Field", &m_field);
         //m_gyro->Calibrate();
         //m_gyro->SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
       }
@@ -38,9 +38,9 @@ void DriveSubsystem::Periodic() {
   m_odometry.Update(units::degree_t(-m_gyro->GetYaw()), m_frontLeft.GetState(),
                     m_rearLeft.GetState(), m_frontRight.GetState(),
                     m_rearRight.GetState());
-  frc::SmartDashboard::PutNumber ("Gyro", m_gyro->GetYaw());
+  frc::SmartDashboard::PutNumber ("Gyro", -m_gyro->GetYaw());
   frc::SmartDashboard::PutBoolean ("FieldCentric", m_fieldCentric);
-  
+  m_field.SetRobotPose(m_odometry.GetPose());
   //Wheel Offset Code;
 		if (frc::RobotController::GetUserButton() == 1 && m_counter == 0) {
 			SetWheelOffsets();
@@ -82,7 +82,6 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_frontRight.SetVoltage(driveMax);
   m_rearLeft.SetVoltage(driveMax);
   m_rearRight.SetVoltage(driveMax);
-
 }
 
 void DriveSubsystem::SetModuleStates(
@@ -131,6 +130,7 @@ frc::Pose2d DriveSubsystem::GetPose() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
+  //m_odometry.ResetPosition(pose, m_gyro->GetRotation2d());
 }
 
 void DriveSubsystem::ToggleFieldCentric(){

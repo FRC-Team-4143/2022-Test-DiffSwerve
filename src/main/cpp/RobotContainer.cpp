@@ -259,6 +259,7 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
+  m_drive.ZeroHeading();
   m_drive.ResetOdometry(m_testTrajectory.InitialPose());
 /*
   bool IsNearWaypoint(Pose2d waypoint, double within) {

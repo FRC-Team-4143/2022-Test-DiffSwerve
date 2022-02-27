@@ -18,6 +18,7 @@
 #include <AHRS.h>
 #include "Constants.h"
 #include "SwerveModule.h"
+#include <frc/smartdashboard/Field2d.h>
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
@@ -125,6 +126,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::SwerveDriveOdometry<4> m_odometry;
 
   bool m_fieldCentric;
+  frc::Field2d m_field;
 
   
 };
