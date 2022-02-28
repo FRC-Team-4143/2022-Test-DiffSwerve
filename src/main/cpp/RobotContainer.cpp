@@ -15,6 +15,7 @@
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
+#include "commands/PWSwerveControllerCommand.h"
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <utility>
@@ -246,7 +247,8 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
   thetaController.EnableContinuousInput(units::radian_t(-wpi::numbers::pi),
                                         units::radian_t(wpi::numbers::pi));
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
+  //frc2::SwerveControllerCommand<4> swerveControllerCommand(
+  PWSwerveControllerCommand<4> swerveControllerCommand(
       m_testTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
