@@ -13,7 +13,9 @@ public:
 	void climberEnabled();
 	void climberDisabled();
 
-
+	void ZeroClimber();
+	double GetLeftRotationPosition();
+	double GetRightRotationPosition();
 
 private:
 	frc::XboxController* m_controller;

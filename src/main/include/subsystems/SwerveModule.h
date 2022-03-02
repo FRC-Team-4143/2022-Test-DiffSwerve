@@ -38,8 +38,14 @@ class SwerveModule {
   // We have to use meters here instead of radians due to the fact that
   // ProfiledPIDController's constraints only take in meters per second and
   // meters per second squared.
-
+/*
   static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
+      units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
+  static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
+        units::unit_t<radians_per_second_squared_t>{
+        wpi::numbers::pi * 2.0 * 100.0
+*/
+    static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
       units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
   static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
         units::unit_t<radians_per_second_squared_t>{

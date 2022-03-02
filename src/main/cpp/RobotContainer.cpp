@@ -29,7 +29,7 @@
 #include "commands/PickUpCycleBounce.h"
 #include <frc2/command/button/Trigger.h>
 #include <frc2/command/WaitUntilCommand.h>
-
+#include "commands/ZeroClimber.h"
 
 using namespace DriveConstants;
 
@@ -188,6 +188,7 @@ void RobotContainer::ConfigureButtonBindings() {
     m_lb->WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
   
 
+    frc::SmartDashboard::PutData("Zero Climber", new ZeroClimber(&m_climber));
     frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));
     frc::SmartDashboard::PutData("Zero Yaw", new ZeroYaw(&m_drive));
 }
@@ -247,7 +248,7 @@ auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
   thetaController.EnableContinuousInput(units::radian_t(-wpi::numbers::pi),
                                         units::radian_t(wpi::numbers::pi));
 
-  //frc2::SwerveControllerCommand<4> swerveControllerCommand(
+  //frc2::SwerveControllerCommand<4> swerveControllerCommand();
   PWSwerveControllerCommand<4> swerveControllerCommand(
       m_testTrajectory, [this]() { return m_drive.GetPose(); },
 

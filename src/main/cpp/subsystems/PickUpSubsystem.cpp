@@ -84,7 +84,7 @@ void PickUpSubsystem::RollerOff() {
 
 void PickUpSubsystem::IndexerOn() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, 0.5);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.75);
 }
 
 void PickUpSubsystem::IndexerLoad() {
@@ -95,7 +95,7 @@ void PickUpSubsystem::IndexerLoad() {
 
 void PickUpSubsystem::IndexerRev() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.5);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.5);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.75);
 }
 
 // ============================================================================
@@ -108,8 +108,8 @@ void PickUpSubsystem::IndexerOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOn() {
-	m_shooter.Set(m_shooterSpeed);
-	m_backSpinShooter.Set(-m_shooterSpeed);
+	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-12});
 }
 
 // ============================================================================
@@ -122,13 +122,13 @@ void PickUpSubsystem::ShooterOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterFaster() {
-	m_shooterSpeed = std::min(1.0, m_shooterSpeed + 0.05);
+	m_shooterSpeed = std::min(1.0, m_shooterSpeed + 0.025);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterSlower() {
-	m_shooterSpeed = std::max(0.0, m_shooterSpeed - 0.05);
+	m_shooterSpeed = std::max(0.0, m_shooterSpeed - 0.025);
 }
 
 // ============================================================================

@@ -22,6 +22,19 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 	m_extendLeftPidController{m_extendLeft.GetPIDController()},
 	m_extendRightPidController{m_extendRight.GetPIDController()}
 {
+    m_rotateLeft.RestoreFactoryDefaults();
+    m_rotateRight.RestoreFactoryDefaults();
+    m_extendLeft.RestoreFactoryDefaults();
+    m_extendRight.RestoreFactoryDefaults();
+
+    m_rotateLeftEncoder.SetPositionConversionFactor(90/17.57);
+    m_rotateRightEncoder.SetPositionConversionFactor(90/17.57);
+    m_extendLeftEncoder.SetPositionConversionFactor(100/260);
+    m_extendRightEncoder.SetPositionConversionFactor(100/260);
+
+    m_rotateLeft.SetInverted(true);
+    m_extendRight.SetInverted(true);
+
 	m_rotateLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_rotateRight.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_extendLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
@@ -99,9 +112,25 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 }
 // ============================================================================
 
+void ClimberSubsystem::ZeroClimber(){
+    m_rotateLeftEncoder.SetPosition(0);
+    m_rotateRightEncoder.SetPosition(0);
+    m_extendLeftEncoder.SetPosition(0);
+    m_extendRightEncoder.SetPosition(0);
+}
+
+double ClimberSubsystem::GetLeftRotationPosition(){
+    return -m_rotateLeftEncoder.GetPosition();
+}
+
+double ClimberSubsystem::GetRightRotationPosition(){
+    return -m_rotateRightEncoder.GetPosition();
+}
+
 void ClimberSubsystem::Periodic() {
 	if(m_controller->GetRightBumper()){
-		m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
+		//m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
+        m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Position", 0), rev::ControlType::kPosition);
 		m_rotateRight.Set(frc::ApplyDeadband(m_controller->GetRightY(),.3)*ClimberConstants::kMaxRotatePower);
 		m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftX(),.3)*ClimberConstants::kMaxExtendPower);
 		m_extendRight.Set(frc::ApplyDeadband(m_controller->GetRightX(),.3)*ClimberConstants::kMaxExtendPower);
@@ -112,9 +141,8 @@ void ClimberSubsystem::Periodic() {
 		m_extendRight.Set(0);
 	}
 
-
-	frc::SmartDashboard::PutNumber("Rotate Left Pos", m_rotateLeftEncoder.GetPosition());
-	frc::SmartDashboard::PutNumber("Rotate Right Pos", m_rotateRightEncoder.GetPosition());
+	frc::SmartDashboard::PutNumber("Rotate Left Pos", GetLeftRotationPosition());
+	frc::SmartDashboard::PutNumber("Rotate Right Pos", GetRightRotationPosition());
 	frc::SmartDashboard::PutNumber("Extend Left Pos", m_extendLeftEncoder.GetPosition());
 	frc::SmartDashboard::PutNumber("Extend Right Pos", m_extendRightEncoder.GetPosition());
 
@@ -132,7 +160,7 @@ void ClimberSubsystem::Periodic() {
     frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
     frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
     frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
-    frc::SmartDashboard::PutNumber("Set Position", 0);
+    //frc::SmartDashboard::PutNumber("Set Position", 0);
     frc::SmartDashboard::PutNumber("Set Velocity", 0);
 
     // button to toggle between velocity and smart motion modes

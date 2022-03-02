@@ -21,8 +21,8 @@
 #include <units/voltage.h>
 #include <wpi/span.h>
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include <frc2/command/CommandBase.h>
+#include <frc2/command/CommandHelper.h>
 
 #pragma once
 
@@ -49,7 +49,7 @@
  */
 template <size_t NumModules>
 class PWSwerveControllerCommand
-    : public CommandHelper<CommandBase, SwerveControllerCommand<NumModules>> {
+    : public frc2::CommandHelper<frc2::CommandBase, PWSwerveControllerCommand<NumModules>> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
                            units::inverse<units::meter>>;
@@ -88,13 +88,13 @@ class PWSwerveControllerCommand
    * @param requirements    The subsystems to require.
    */
   PWSwerveControllerCommand(
-      frc::PathPlannerTrajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc2::PIDController xController, frc2::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      std::initializer_list<Subsystem*> requirements);
+      std::initializer_list<frc2::Subsystem*> requirements);
 
   /**
    * Constructs a new PWSwerveControllerCommand that when executed will follow the
@@ -126,13 +126,13 @@ class PWSwerveControllerCommand
    * @param requirements    The subsystems to require.
    */
   PWSwerveControllerCommand(
-      frc::PathPlannerTrajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc2::PIDController xController, frc2::PIDController yController,
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::span<Subsystem* const> requirements = {});
+      wpi::span<frc2::Subsystem* const> requirements = {});
 
   void Initialize() override;
 
@@ -143,7 +143,7 @@ class PWSwerveControllerCommand
   bool IsFinished() override;
 
  private:
-  frc::PathPlannerTrajectory m_trajectory;
+  frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
   frc::SwerveDriveKinematics<NumModules> m_kinematics;
   frc::HolonomicDriveController m_controller;
@@ -156,4 +156,4 @@ class PWSwerveControllerCommand
 };
 
 
-#include "PWSwerveControllerCommand.inc"
+#include "PWSwerveControllerCommand.cpp"

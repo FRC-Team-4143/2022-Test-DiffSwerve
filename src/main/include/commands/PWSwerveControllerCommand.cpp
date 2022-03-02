@@ -11,12 +11,12 @@
 
 template <size_t NumModules>
 PWSwerveControllerCommand<NumModules>::PWSwerveControllerCommand(
-    frc::PathPlannerTrajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
     frc2::PIDController xController, frc2::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
-    std::initializer_list<Subsystem*> requirements)
+    std::initializer_list<frc2::Subsystem*> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),
@@ -27,12 +27,12 @@ PWSwerveControllerCommand<NumModules>::PWSwerveControllerCommand(
 
 template <size_t NumModules>
 PWSwerveControllerCommand<NumModules>::PWSwerveControllerCommand(
-    frc::PathPlannerTrajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
     frc2::PIDController xController, frc2::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
-    wpi::span<Subsystem* const> requirements)
+    wpi::span<frc2::Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_kinematics(kinematics),
@@ -53,7 +53,7 @@ void PWSwerveControllerCommand<NumModules>::Execute() {
   auto m_desiredState = m_trajectory.Sample(curTime);
 
   auto targetChassisSpeeds =
-      m_controller.Calculate(m_pose(), m_desiredState, m_desiredState.poseMeters.getRotation());
+      m_controller.Calculate(m_pose(), m_desiredState, m_desiredState.pose.Rotation());
   auto targetModuleStates =
       m_kinematics.ToSwerveModuleStates(targetChassisSpeeds);
 

@@ -95,8 +95,11 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 0.45;
-	constexpr double kPModuleDriveController = 0.025;
+	constexpr double kPModuleTurningController = 0.45/2;
+	constexpr double kPModuleDriveController = 0.025/2;
+
+	//constexpr double kPModuleTurningController = 0.45;
+	//constexpr double kPModuleDriveController = 0.025;
 }  // namespace ModuleConstants
 
 namespace AutoConstants {
@@ -112,7 +115,7 @@ namespace AutoConstants {
 
 	constexpr double kPXController = 0.5;
 	constexpr double kPYController = 0.5;
-	constexpr double kPThetaController = 0.5;
+	constexpr double kPThetaController = 1.0;
 
 	extern const frc::TrapezoidProfile<units::radians>::Constraints
 	kThetaControllerConstraints;
@@ -141,25 +144,25 @@ namespace PickUpConstants {
 }
 
 namespace ClimberConstants {
-	constexpr int kRotateLeftPort = 41;
-	constexpr int kRotateRightPort = 42;
+	constexpr int kRotateLeftPort = 42;
+	constexpr int kRotateRightPort = 41;
 	constexpr int kExtendLeftPort = 43;
 	constexpr int kExtendRightPort = 44;
 
 	constexpr float kMaxExtendPower = .3;
-	constexpr float kMaxRotatePower = .3;
+	constexpr float kMaxRotatePower = .4;
 
-	constexpr double kP = 5e-5; 
+	constexpr double kP = 5e-4; 
 	constexpr double kI = 1e-6; 
 	constexpr double kD = 0;
 	constexpr double kIz = 0; 
-	constexpr double kFF = 0.000156; 
-	constexpr double kMaxOutput = 0.5;
-	constexpr int kMinOutput = -1;
-	constexpr double kMaxVel = 2000; 
-	constexpr double kMinVel = 0; 
-	constexpr double kMaxAcc = 1500; 
+	constexpr double kFF = 0; 
+	constexpr double kMaxOutput = 0.3;
+	constexpr int kMinOutput = -0.3;
+	constexpr double kMaxVel = 500; 
+	constexpr double kMinVel = -500; 
+	constexpr double kMaxAcc = 500; 
 	constexpr double kAllErr = 0;
-	constexpr double MaxRPM = 5700;
+	constexpr double MaxRPM = 1500;
 
 }
