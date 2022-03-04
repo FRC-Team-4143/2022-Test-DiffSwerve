@@ -20,7 +20,9 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 	m_rotateLeftPidController{m_rotateLeft.GetPIDController()},
 	m_rotateRightPidController{m_rotateRight.GetPIDController()},
 	m_extendLeftPidController{m_extendLeft.GetPIDController()},
-	m_extendRightPidController{m_extendRight.GetPIDController()}
+	m_extendRightPidController{m_extendRight.GetPIDController()},
+    m_rotateLeftForwardLimit {m_rotateLeft.GetForwardLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)},
+    m_rotateLeftReverseLimit {m_rotateLeft.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)}
 {
     m_rotateLeft.RestoreFactoryDefaults();
     m_rotateRight.RestoreFactoryDefaults();
@@ -32,8 +34,8 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     m_extendLeftEncoder.SetPositionConversionFactor(100/260);
     m_extendRightEncoder.SetPositionConversionFactor(100/260);
 
-    m_rotateLeft.SetInverted(true);
-    m_extendRight.SetInverted(true);
+    //m_rotateLeft.SetInverted(true);
+    //m_extendRight.SetInverted(true);
 
 	m_rotateLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_rotateRight.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
@@ -69,26 +71,31 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     m_extendRightPidController.SetOutputRange(ClimberConstants::kMinOutput, ClimberConstants::kMaxOutput);
 
 
-	m_rotateLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
-    m_rotateLeftPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
-    m_rotateLeftPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
-    m_rotateLeftPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
+	//m_rotateLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+    //m_rotateLeftPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
+    //m_rotateLeftPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
+    //m_rotateLeftPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
 
-	m_rotateRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
-    m_rotateRightPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
-    m_rotateRightPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
-    m_rotateRightPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
+	//m_rotateRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+    //m_rotateRightPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
+    //m_rotateRightPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
+    //m_rotateRightPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
 
 	m_extendLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
     m_extendLeftPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
     m_extendLeftPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
     m_extendLeftPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
 
-	m_rotateRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
-    m_rotateRightPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
-    m_rotateRightPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
-    m_rotateRightPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
+	m_extendRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+    m_extendRightPidController.SetSmartMotionMinOutputVelocity(ClimberConstants::kMinVel);
+    m_extendRightPidController.SetSmartMotionMaxAccel(ClimberConstants::kMaxAcc);
+    m_extendRightPidController.SetSmartMotionAllowedClosedLoopError(ClimberConstants::kAllErr);
 
+    m_rotateLeftForwardLimit.EnableLimitSwitch(false);
+    m_rotateLeftReverseLimit.EnableLimitSwitch(false);
+
+    m_rotateLeft.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
+    m_rotateLeft.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
 
 	// display PID coefficients on SmartDashboard
     frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
@@ -104,11 +111,9 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
     frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
     frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
-    frc::SmartDashboard::PutNumber("Set Position", 0);
-    frc::SmartDashboard::PutNumber("Set Velocity", 0);
+    frc::SmartDashboard::PutNumber("Set Left Position", 0);
+    frc::SmartDashboard::PutNumber("Set Right Position", 0);
 
-    // button to toggle between velocity and smart motion modes
-    frc::SmartDashboard::PutBoolean("Mode", true);
 }
 // ============================================================================
 
@@ -120,20 +125,35 @@ void ClimberSubsystem::ZeroClimber(){
 }
 
 double ClimberSubsystem::GetLeftRotationPosition(){
-    return -m_rotateLeftEncoder.GetPosition();
+    return m_rotateLeftEncoder.GetPosition();
 }
 
 double ClimberSubsystem::GetRightRotationPosition(){
-    return -m_rotateRightEncoder.GetPosition();
+    return m_rotateRightEncoder.GetPosition();
 }
 
 void ClimberSubsystem::Periodic() {
 	if(m_controller->GetRightBumper()){
+        if(m_controller->GetStartButton()) { m_rightPosition = -30.0; m_leftPosition = 30.0;}
+        if(m_controller->GetBackButton()) { m_rightPosition = 0.0; m_leftPosition = 0.0;}
+        if(m_controller->GetYButton()) m_leftPosition+=.5;
+        if(m_controller->GetXButton()) m_leftPosition-=.5;
+        if(m_leftPosition < 0.) m_leftPosition = 0.;
+        if(m_leftPosition > 45.) m_leftPosition = 45.;
+        if(m_controller->GetAButton()) m_rightPosition+=.5;
+        if(m_controller->GetBButton()) m_rightPosition-=.5;
+        if(m_rightPosition > 0.) m_rightPosition = 0.;
+        if(m_rightPosition < -45.) m_rightPosition = -45.;
+
+        
 		//m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
-        m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Position", 0), rev::ControlType::kPosition);
-		m_rotateRight.Set(frc::ApplyDeadband(m_controller->GetRightY(),.3)*ClimberConstants::kMaxRotatePower);
-		m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftX(),.3)*ClimberConstants::kMaxExtendPower);
-		m_extendRight.Set(frc::ApplyDeadband(m_controller->GetRightX(),.3)*ClimberConstants::kMaxExtendPower);
+        //m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Left Position", 0), rev::ControlType::kPosition);
+        m_rotateLeftPidController.SetReference(m_leftPosition, rev::ControlType::kPosition);
+		//m_rotateRight.Set(frc::ApplyDeadband(m_controller->GetRightY(),.3)*ClimberConstants::kMaxRotatePower);
+        //m_rotateRightPidController.SetReference(frc::SmartDashboard::GetNumber("Set Right Position", 0), rev::ControlType::kPosition);
+        m_rotateRightPidController.SetReference(m_rightPosition, rev::ControlType::kPosition);
+		m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxExtendPower);
+		m_extendRight.Set(frc::ApplyDeadband(-m_controller->GetRightY(),.3)*ClimberConstants::kMaxExtendPower);
 	} else {
 		m_rotateLeft.Set(0);
 		m_rotateRight.Set(0);
@@ -160,9 +180,5 @@ void ClimberSubsystem::Periodic() {
     frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
     frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
     frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
-    //frc::SmartDashboard::PutNumber("Set Position", 0);
-    frc::SmartDashboard::PutNumber("Set Velocity", 0);
 
-    // button to toggle between velocity and smart motion modes
-    frc::SmartDashboard::PutBoolean("Mode", true);
 }

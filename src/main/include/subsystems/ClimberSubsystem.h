@@ -34,5 +34,10 @@ private:
 	rev::SparkMaxPIDController m_rotateRightPidController;
 	rev::SparkMaxPIDController m_extendLeftPidController;
 	rev::SparkMaxPIDController m_extendRightPidController;
+
+	rev::SparkMaxLimitSwitch m_rotateLeftForwardLimit;
+    rev::SparkMaxLimitSwitch m_rotateLeftReverseLimit;
 	
+	double m_rightPosition = 0;
+	double m_leftPosition = 0;
 };

@@ -51,7 +51,7 @@ frc::SwerveModuleState SwerveModule::GetState() {
 
 float SwerveModule::GetDriveMotorSpeed() {
     return ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
-        * (10.0 / 2048) /*Revs per second*/ * ((10 / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4.5 * 0.0254 * wpi::numbers::pi) /*Axle Revs per Second*/;
+        * (10.0 / 2048) /*Revs per second*/ * ((14  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4.5 * 0.0254 * wpi::numbers::pi) /*Axle Revs per Second*/;
 }
 
 // ============================================================================

@@ -146,19 +146,19 @@ namespace PickUpConstants {
 namespace ClimberConstants {
 	constexpr int kRotateLeftPort = 42;
 	constexpr int kRotateRightPort = 41;
-	constexpr int kExtendLeftPort = 43;
-	constexpr int kExtendRightPort = 44;
+	constexpr int kExtendLeftPort = 44;
+	constexpr int kExtendRightPort = 43;
 
-	constexpr float kMaxExtendPower = .3;
-	constexpr float kMaxRotatePower = .4;
+	constexpr float kMaxExtendPower = .6;
+	constexpr float kMaxRotatePower = .3;
 
-	constexpr double kP = 5e-4; 
-	constexpr double kI = 1e-6; 
-	constexpr double kD = 0;
+	constexpr double kP = .025; //5e-4; 
+	constexpr double kI = 1e-5;    //1e-6; 
+	constexpr double kD = 1;  //0
 	constexpr double kIz = 0; 
 	constexpr double kFF = 0; 
-	constexpr double kMaxOutput = 0.3;
-	constexpr int kMinOutput = -0.3;
+	constexpr double kMaxOutput = 0.5;
+	constexpr double kMinOutput = -0.5;
 	constexpr double kMaxVel = 500; 
 	constexpr double kMinVel = -500; 
 	constexpr double kMaxAcc = 500; 
