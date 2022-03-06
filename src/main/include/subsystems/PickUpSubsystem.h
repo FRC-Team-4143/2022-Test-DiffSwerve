@@ -31,6 +31,7 @@ public:
 	void ShooterOff();
 	void ShooterFaster();
 	void ShooterSlower();
+	void SetShooterSpeed(double shooterSpeed);
 
 	void ShooterFar();
 	void ShooterClose();

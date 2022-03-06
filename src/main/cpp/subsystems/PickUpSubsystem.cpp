@@ -114,6 +114,12 @@ void PickUpSubsystem::ShooterOn() {
 
 // ============================================================================
 
+void PickUpSubsystem::SetShooterSpeed(double shooterSpeed) {
+	m_shooterSpeed = shooterSpeed;
+}
+
+// ============================================================================
+
 void PickUpSubsystem::ShooterOff() {
 	m_shooter.Set(0);
 	m_backSpinShooter.Set(0);

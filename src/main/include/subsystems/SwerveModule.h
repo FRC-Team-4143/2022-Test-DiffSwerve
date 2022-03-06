@@ -20,6 +20,7 @@ class SwerveModule {
       units::inverse<units::squared<units::second>>>;
 
  public:
+  SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus);
   SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
 
   frc::SwerveModuleState GetState();
@@ -58,7 +59,7 @@ class SwerveModule {
 
   std::string m_name;
   frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
-  frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{DriveConstants::kts, DriveConstants::ktv};
+  //frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{DriveConstants::kts, DriveConstants::ktv};
 
     frc2::PIDController m_drivePIDController{
         ModuleConstants::kPModuleDriveController, 0, 0

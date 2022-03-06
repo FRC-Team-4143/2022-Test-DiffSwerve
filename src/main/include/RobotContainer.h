@@ -22,6 +22,7 @@
 #include <frc/Filesystem.h>
 #include <frc/trajectory/TrajectoryUtil.h>
 #include <wpi/fs.h>
+#include "Scripting/ValidateScriptCmd.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -34,7 +35,9 @@ class RobotContainer {
 public:
 	RobotContainer();
 
-	frc2::Command* GetAutonomousCommand();
+	frc2::Command* GetAutonomousCommand2();
+	std::unique_ptr<frc2::Command> GetAutonomousCommand();
+
 
 	DriveSubsystem m_drive;
 	PickUpSubsystem m_pickUp;
@@ -60,7 +63,17 @@ private:
 	frc2::JoystickButton *m_lb;
 
 	void ConfigureButtonBindings();
+	void _ConfigureDashboardControls();
+	void _InitializeScriptEngine();
+
+	frc4143::ValidateScriptCmd _validateScriptCmd;
+
 	frc::Trajectory m_testTrajectory;
 
+	std::unique_ptr<frc2::Command> GetSwerveCommand();
+
 	//bool IsNearWaypoint(Pose2d waypoint, double within);
+
+
+
 };

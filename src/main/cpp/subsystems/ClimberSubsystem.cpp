@@ -22,7 +22,9 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 	m_extendLeftPidController{m_extendLeft.GetPIDController()},
 	m_extendRightPidController{m_extendRight.GetPIDController()},
     m_rotateLeftForwardLimit {m_rotateLeft.GetForwardLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)},
-    m_rotateLeftReverseLimit {m_rotateLeft.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)}
+    m_rotateLeftReverseLimit {m_rotateLeft.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)},
+    m_brakeSolenoidRght {frc::PneumaticsModuleType::CTREPCM, ClimberConstants::kBrakeSolenoidPortRght},
+    m_brakeSolenoidLeft {frc::PneumaticsModuleType::CTREPCM, ClimberConstants::kBrakeSolenoidPortLeft}
 {
     m_rotateLeft.RestoreFactoryDefaults();
     m_rotateRight.RestoreFactoryDefaults();
@@ -114,6 +116,8 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     frc::SmartDashboard::PutNumber("Set Left Position", 0);
     frc::SmartDashboard::PutNumber("Set Right Position", 0);
 
+    m_brakeSolenoidRght.Set(true);
+    m_brakeSolenoidLeft.Set(true);
 }
 // ============================================================================
 

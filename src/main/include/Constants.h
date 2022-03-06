@@ -65,22 +65,25 @@ namespace DriveConstants {
 	constexpr double driveMaxVoltage = 12;
 
 	//DrivePIDConstants
-	constexpr auto ks = .64263_V;
+	constexpr auto ks = .73041_V;
 	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
-	constexpr auto kv = 3.5 * 1_V * 1_s / 1_m;
-	constexpr auto ka = 0 * 1_V * 1_s * 1_s / 1_m;
+	constexpr auto kv = 1.6452 * 1_V * 1_s / 1_m;
+	constexpr auto ka = .31918 * 1_V * 1_s * 1_s / 1_m;
 
 	//TurningPIDConstants
-	constexpr auto kts = .1_V;
+	//constexpr auto kts = .1_V;
 	//constexpr auto ktv = .24_V/(1_rad_per_s);
-	constexpr auto ktv = .33_V/(1_rad_per_s);
-	constexpr auto kta = 0;
+	//constexpr auto ktv = .33_V/(1_rad_per_s);
+	//constexpr auto kta = 0;
 
 	// Example value only - as above, this must be tuned for your drive!
 	//constexpr double kPFrontLeftVel = 0.5;
 	// constexpr double kPRearLeftVel = 0.5;
 	// constexpr double kPFrontRightVel = 0.5;
 	// constexpr double kPRearRightVel = 0.5;
+
+	
+
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -95,8 +98,9 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 0.45/2;
+	constexpr double kPModuleTurningController = 0.3;
 	constexpr double kPModuleDriveController = 0.025/2;
+	constexpr double kmaxTurnOutput = .3;
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
@@ -107,11 +111,10 @@ namespace AutoConstants {
 	units::compound_unit<units::radians,
 	units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(4.5);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
-	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(8);
-	constexpr auto kMaxAngularAcceleration =
-	units::unit_t<radians_per_second_squared_t>(3.142);
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(8); 
+	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.142);
 
 	constexpr double kPXController = 0.5;
 	constexpr double kPYController = 0.5;
@@ -148,6 +151,10 @@ namespace ClimberConstants {
 	constexpr int kRotateRightPort = 41;
 	constexpr int kExtendLeftPort = 44;
 	constexpr int kExtendRightPort = 43;
+
+	constexpr int kBrakeSolenoidPortRght = 3;
+	constexpr int kBrakeSolenoidPortLeft = 7;
+
 
 	constexpr float kMaxExtendPower = .6;
 	constexpr float kMaxRotatePower = .3;

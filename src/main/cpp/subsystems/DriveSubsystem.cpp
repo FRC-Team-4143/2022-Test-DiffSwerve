@@ -8,7 +8,7 @@
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/velocity.h>
-#include <iostream>
+//#include <iostream>
 #include "Constants.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/RobotController.h>
@@ -45,8 +45,8 @@ void DriveSubsystem::Periodic() {
 		if (frc::RobotController::GetUserButton() == 1 && m_counter == 0) {
 			SetWheelOffsets();
 			m_counter = 100;
-			std::cout << "User Button Pressed" << std::endl;
-			std::cout.flush();
+			//std::cout << "User Button Pressed" << std::endl;
+			//std::cout.flush();
 		}
 
 		if (m_counter > 0) {
@@ -144,8 +144,8 @@ void DriveSubsystem::SetWheelOffsets() {
 	m_rearLeft.SetWheelOffset();
 	m_frontRight.SetWheelOffset();
 	m_rearRight.SetWheelOffset();
-  std::cout << "SetWheelOffsets Complete " << std::endl;
-  std::cout.flush();
+  //std::cout << "SetWheelOffsets Complete " << std::endl;
+  //std::cout.flush();
 }
 
 // ================================================================
@@ -155,8 +155,8 @@ void DriveSubsystem::LoadWheelOffsets() {
 	m_rearLeft.LoadWheelOffset();
 	m_frontRight.LoadWheelOffset();
 	m_rearRight.LoadWheelOffset();
-  std::cout << "LoadWheelOffsets Complete " << std::endl;
-  std::cout.flush();
+  //std::cout << "LoadWheelOffsets Complete " << std::endl;
+  //std::cout.flush();
 }
 
 // ================================================================
