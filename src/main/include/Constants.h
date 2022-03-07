@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#pragma once
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
@@ -13,8 +14,6 @@
 #include <units/velocity.h>
 #include <units/voltage.h>
 #include <wpi/numbers>
-
-#pragma once
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -40,7 +39,6 @@ namespace DriveConstants {
 	constexpr int kFrontRightPot = 4;
 	constexpr int kRearLeftPot = 2;
 	constexpr int kRearRightPot = 3;
-
 /*
 	constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
 	constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
@@ -81,10 +79,7 @@ namespace DriveConstants {
 	// constexpr double kPRearLeftVel = 0.5;
 	// constexpr double kPFrontRightVel = 0.5;
 	// constexpr double kPRearRightVel = 0.5;
-
-	
-
-}  // namespace DriveConstants
+} // namespace DriveConstants
 
 namespace ModuleConstants {
 	//constexpr int kEncoderCPR = 1024;
@@ -104,12 +99,12 @@ namespace ModuleConstants {
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
-}  // namespace ModuleConstants
+} // namespace ModuleConstants
 
 namespace AutoConstants {
 	using radians_per_second_squared_t =
-	units::compound_unit<units::radians,
-	units::inverse<units::squared<units::second>>>;
+		units::compound_unit<units::radians,
+		units::inverse<units::squared<units::second>>>;
 
 	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
@@ -120,8 +115,7 @@ namespace AutoConstants {
 	constexpr double kPYController = 0.5;
 	constexpr double kPThetaController = 1.0;
 
-	extern const frc::TrapezoidProfile<units::radians>::Constraints
-	kThetaControllerConstraints;
+	extern const frc::TrapezoidProfile<units::radians>::Constraints kThetaControllerConstraints;
 }
 
 namespace OIConstants {
@@ -171,5 +165,4 @@ namespace ClimberConstants {
 	constexpr double kMaxAcc = 500; 
 	constexpr double kAllErr = 0;
 	constexpr double MaxRPM = 1500;
-
 }

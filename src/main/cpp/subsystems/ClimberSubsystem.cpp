@@ -21,8 +21,8 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 	m_rotateRightPidController{m_rotateRight.GetPIDController()},
 	m_extendLeftPidController{m_extendLeft.GetPIDController()},
 	m_extendRightPidController{m_extendRight.GetPIDController()},
-    m_rotateLeftForwardLimit {m_rotateLeft.GetForwardLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)},
-    m_rotateLeftReverseLimit {m_rotateLeft.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::LimitSwitchPolarity::kNormallyClosed)},
+    m_rotateLeftForwardLimit {m_rotateLeft.GetForwardLimitSwitch(rev::SparkMaxLimitSwitch::Type::kNormallyClosed)},
+    m_rotateLeftReverseLimit {m_rotateLeft.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::Type::kNormallyClosed)},
     m_brakeSolenoidRght {frc::PneumaticsModuleType::CTREPCM, ClimberConstants::kBrakeSolenoidPortRght},
     m_brakeSolenoidLeft {frc::PneumaticsModuleType::CTREPCM, ClimberConstants::kBrakeSolenoidPortLeft}
 {
@@ -149,15 +149,14 @@ void ClimberSubsystem::Periodic() {
         if(m_rightPosition > 0.) m_rightPosition = 0.;
         if(m_rightPosition < -45.) m_rightPosition = -45.;
 
-        
 		//m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
         //m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Left Position", 0), rev::ControlType::kPosition);
-        m_rotateLeftPidController.SetReference(m_leftPosition, rev::ControlType::kPosition);
+        m_rotateLeftPidController.SetReference(m_leftPosition, rev::CANSparkMax::ControlType::kPosition);
 		//m_rotateRight.Set(frc::ApplyDeadband(m_controller->GetRightY(),.3)*ClimberConstants::kMaxRotatePower);
         //m_rotateRightPidController.SetReference(frc::SmartDashboard::GetNumber("Set Right Position", 0), rev::ControlType::kPosition);
-        m_rotateRightPidController.SetReference(m_rightPosition, rev::ControlType::kPosition);
-		m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxExtendPower);
-		m_extendRight.Set(frc::ApplyDeadband(-m_controller->GetRightY(),.3)*ClimberConstants::kMaxExtendPower);
+        m_rotateRightPidController.SetReference(m_rightPosition, rev::CANSparkMax::ControlType::kPosition);
+		m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3) * ClimberConstants::kMaxExtendPower);
+		m_extendRight.Set(frc::ApplyDeadband(-m_controller->GetRightY(),.3) * ClimberConstants::kMaxExtendPower);
 	} else {
 		m_rotateLeft.Set(0);
 		m_rotateRight.Set(0);

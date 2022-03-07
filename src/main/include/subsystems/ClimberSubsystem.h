@@ -1,25 +1,22 @@
 #pragma once
 #include <frc2/command/SubsystemBase.h>
-#include <rev/CANSparkMax.h>
-#include "Constants.h"
-#include <frc/XboxController.h>
 #include <frc/Solenoid.h>
-
+#include <frc/XboxController.h>
+#include <rev/CANSparkMax.h>
 
 class ClimberSubsystem : public frc2::SubsystemBase {
 public:
+
 	ClimberSubsystem(frc::XboxController* controller);
 
 	void Periodic() override;
-
-	void climberEnabled();
-	void climberDisabled();
 
 	void ZeroClimber();
 	double GetLeftRotationPosition();
 	double GetRightRotationPosition();
 
 private:
+
 	frc::XboxController* m_controller;
 
 	rev::CANSparkMax m_rotateLeft;
@@ -38,11 +35,10 @@ private:
 	rev::SparkMaxPIDController m_extendRightPidController;
 
 	rev::SparkMaxLimitSwitch m_rotateLeftForwardLimit;
-    rev::SparkMaxLimitSwitch m_rotateLeftReverseLimit;
+	rev::SparkMaxLimitSwitch m_rotateLeftReverseLimit;
 
 	frc::Solenoid m_brakeSolenoidRght;
 	frc::Solenoid m_brakeSolenoidLeft;
-
 	
 	double m_rightPosition = 0;
 	double m_leftPosition = 0;

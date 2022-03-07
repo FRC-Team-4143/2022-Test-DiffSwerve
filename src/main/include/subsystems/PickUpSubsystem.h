@@ -5,7 +5,6 @@
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
-#include "Constants.h"
 
 class PickUpSubsystem : public frc2::SubsystemBase {
 public:

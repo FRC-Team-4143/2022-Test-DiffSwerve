@@ -38,7 +38,6 @@ public:
 	frc2::Command* GetAutonomousCommand2();
 	std::unique_ptr<frc2::Command> GetAutonomousCommand();
 
-
 	DriveSubsystem m_drive;
 	PickUpSubsystem m_pickUp;
 	ClimberSubsystem m_climber;
@@ -62,18 +61,15 @@ private:
 	frc2::JoystickButton *m_rb;
 	frc2::JoystickButton *m_lb;
 
-	void ConfigureButtonBindings();
-	void _ConfigureDashboardControls();
-	void _InitializeScriptEngine();
+	frc::Trajectory m_testTrajectory;
 
 	frc4143::ValidateScriptCmd _validateScriptCmd;
 
-	frc::Trajectory m_testTrajectory;
+	std::unique_ptr<frc2::Command> _GetDrivePathCommand();
 
-	std::unique_ptr<frc2::Command> GetSwerveCommand();
+	void _ConfigureButtonBindings();
+	void _ConfigureDashboardControls();
+	void _InitializeScriptEngine();
 
 	//bool IsNearWaypoint(Pose2d waypoint, double within);
-
-
-
 };

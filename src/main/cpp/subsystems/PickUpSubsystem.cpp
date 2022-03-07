@@ -11,13 +11,12 @@ PickUpSubsystem::PickUpSubsystem()
 	m_upperSolenoid {frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kUpperForwardSolenoidPort, PickUpConstants::kUpperReverseSolenoidPort},
 	m_lowerSolenoid {frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kLowerForwardSolenoidPort, PickUpConstants::kLowerReverseSolenoidPort},
 	m_compressor {frc::PneumaticsModuleType::CTREPCM},
-	m_shooter1 {PickUpConstants::kShooter1Port,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
-	m_shooter2 {PickUpConstants::kShooter2Port,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+	m_shooter1 {PickUpConstants::kShooter1Port, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+	m_shooter2 {PickUpConstants::kShooter2Port, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooter{m_shooter1, m_shooter2},
-	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort,  rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
 	m_shooterSpeed{1.0}
-	
 {
 	m_shooter2.SetInverted(true);
 }
@@ -87,11 +86,14 @@ void PickUpSubsystem::IndexerOn() {
 	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.75);
 }
 
+// ============================================================================
+
 void PickUpSubsystem::IndexerLoad() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, 0);
 	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
 }
 
+// ============================================================================
 
 void PickUpSubsystem::IndexerRev() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.5);
@@ -143,9 +145,13 @@ void PickUpSubsystem::ShooterFar() {
 	m_shooterSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
 }
 
+// ============================================================================
+
 void PickUpSubsystem::ShooterClose() {
 	m_shooterSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
 }
+
+// ============================================================================
 
 void PickUpSubsystem::ShooterDistToggle() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
@@ -155,3 +161,5 @@ void PickUpSubsystem::ShooterDistToggle() {
 		ShooterClose();
 	}
 }
+
+// ============================================================================

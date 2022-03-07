@@ -17,13 +17,13 @@ using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
     : m_gyro{new AHRS(frc::I2C::Port::kMXP)},
-      m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft"},
+      m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "Default Name"},
 
-      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft"},
+      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", "Default Name"},
 
-      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight"},
+      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "Default Name"},
 
-      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight"},
+      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", "Default Name"},
 
       m_odometry{kDriveKinematics, units::degree_t(-m_gyro->GetYaw()), frc::Pose2d()},
       m_fieldCentric{false} {
