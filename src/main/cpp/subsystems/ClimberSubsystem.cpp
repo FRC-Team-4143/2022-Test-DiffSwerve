@@ -31,6 +31,19 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     m_extendLeft.RestoreFactoryDefaults();
     m_extendRight.RestoreFactoryDefaults();
 
+    m_rotateLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus0, 100); 
+    m_rotateLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
+    m_rotateLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
+    m_rotateRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus0, 100); 
+    m_rotateRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
+    m_rotateRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
+    m_extendLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus0, 100); 
+    m_extendLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
+    m_extendLeft.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
+    m_extendRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus0, 100); 
+    m_extendRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
+    m_extendRight.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
+
     m_rotateLeftEncoder.SetPositionConversionFactor(90/17.57);
     m_rotateRightEncoder.SetPositionConversionFactor(90/17.57);
     m_extendLeftEncoder.SetPositionConversionFactor(100/260);
@@ -100,21 +113,21 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     m_rotateLeft.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
 
 	// display PID coefficients on SmartDashboard
-    frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
-    frc::SmartDashboard::PutNumber("I Gain", ClimberConstants::kI);
-    frc::SmartDashboard::PutNumber("D Gain", ClimberConstants::kD);
-    frc::SmartDashboard::PutNumber("I Zone", ClimberConstants::kIz);
-    frc::SmartDashboard::PutNumber("Feed Forward", ClimberConstants::kFF);
-    frc::SmartDashboard::PutNumber("Max Output", ClimberConstants::kMaxOutput);
-    frc::SmartDashboard::PutNumber("Min Output", ClimberConstants::kMinOutput);
+    //frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
+    //frc::SmartDashboard::PutNumber("I Gain", ClimberConstants::kI);
+    //frc::SmartDashboard::PutNumber("D Gain", ClimberConstants::kD);
+    //frc::SmartDashboard::PutNumber("I Zone", ClimberConstants::kIz);
+    //frc::SmartDashboard::PutNumber("Feed Forward", ClimberConstants::kFF);
+    //frc::SmartDashboard::PutNumber("Max Output", ClimberConstants::kMaxOutput);
+    //frc::SmartDashboard::PutNumber("Min Output", ClimberConstants::kMinOutput);
 
     // display Smart Motion coefficients
-    frc::SmartDashboard::PutNumber("Max Velocity", ClimberConstants::kMaxVel);
-    frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
-    frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
-    frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
-    frc::SmartDashboard::PutNumber("Set Left Position", 0);
-    frc::SmartDashboard::PutNumber("Set Right Position", 0);
+    //frc::SmartDashboard::PutNumber("Max Velocity", ClimberConstants::kMaxVel);
+    //frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
+    //frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
+    //frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
+    //frc::SmartDashboard::PutNumber("Set Left Position", 0);
+    //frc::SmartDashboard::PutNumber("Set Right Position", 0);
 
     m_brakeSolenoidRght.Set(true);
     m_brakeSolenoidLeft.Set(true);
@@ -170,18 +183,18 @@ void ClimberSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber("Extend Right Pos", m_extendRightEncoder.GetPosition());
 
 	// display PID coefficients on SmartDashboard
-    frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
-    frc::SmartDashboard::PutNumber("I Gain", ClimberConstants::kI);
-    frc::SmartDashboard::PutNumber("D Gain", ClimberConstants::kD);
-    frc::SmartDashboard::PutNumber("I Zone", ClimberConstants::kIz);
-    frc::SmartDashboard::PutNumber("Feed Forward", ClimberConstants::kFF);
-    frc::SmartDashboard::PutNumber("Max Output", ClimberConstants::kMaxOutput);
-    frc::SmartDashboard::PutNumber("Min Output", ClimberConstants::kMinOutput);
+    //frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
+    //frc::SmartDashboard::PutNumber("I Gain", ClimberConstants::kI);
+    //frc::SmartDashboard::PutNumber("D Gain", ClimberConstants::kD);
+    //frc::SmartDashboard::PutNumber("I Zone", ClimberConstants::kIz);
+    //frc::SmartDashboard::PutNumber("Feed Forward", ClimberConstants::kFF);
+    //frc::SmartDashboard::PutNumber("Max Output", ClimberConstants::kMaxOutput);
+    //frc::SmartDashboard::PutNumber("Min Output", ClimberConstants::kMinOutput);
 
     // display Smart Motion coefficients
-    frc::SmartDashboard::PutNumber("Max Velocity", ClimberConstants::kMaxVel);
-    frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
-    frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
-    frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
+    //frc::SmartDashboard::PutNumber("Max Velocity", ClimberConstants::kMaxVel);
+    //frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
+    //frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
+    //frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
 
 }

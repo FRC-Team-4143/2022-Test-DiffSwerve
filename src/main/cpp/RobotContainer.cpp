@@ -33,24 +33,6 @@
 
 using namespace DriveConstants;
 
-const uint32_t JOYSTICK_LX_AXIS = 0;
-const uint32_t JOYSTICK_LY_AXIS = 1;
-const uint32_t JOYSTICK_LTRIG_AXIS = 2;
-const uint32_t JOYSTICK_RTRIG_AXIS = 3;
-const uint32_t JOYSTICK_RX_AXIS = 4;
-const uint32_t JOYSTICK_RY_AXIS = 5;
-
-const uint32_t JOYSTICK_BUTTON_A = 1;
-const uint32_t JOYSTICK_BUTTON_B = 2;
-const uint32_t JOYSTICK_BUTTON_X = 3;
-const uint32_t JOYSTICK_BUTTON_Y = 4;
-const uint32_t JOYSTICK_BUTTON_LB = 5;
-const uint32_t JOYSTICK_BUTTON_RB = 6;
-const uint32_t JOYSTICK_BUTTON_BACK = 7;
-const uint32_t JOYSTICK_BUTTON_START = 8;
-const uint32_t JOYSTICK_BUTTON_LEFT = 9;
-const uint32_t JOYSTICK_BUTTON_RIGHT = 10;
-
 // ==========================================================================
 
 RobotContainer::RobotContainer()
@@ -124,38 +106,38 @@ void RobotContainer::_ConfigureButtonBindings() {
 	};
 
 	frc2::FunctionalCommand rollerInCommand{
-		[this]() { m_pickUp.RollerIn(); },
 		[]() {},
+		[this]() { m_pickUp.RollerIn(); },
 		[this](bool) { m_pickUp.RollerOff(); },
 		[]() { return false; },
 		{&m_pickUp}
 	};
 
 	frc2::FunctionalCommand rollerOutCommand{
-		[this]() { m_pickUp.RollerOut(); },
 		[]() {},
+		[this]() { m_pickUp.RollerOut(); },
 		[this](bool) { m_pickUp.RollerOff(); },
 		[]() { return false; },
 		{&m_pickUp}
 	};
 
-		frc2::FunctionalCommand indexerOnCommand{
-		[this]() { m_pickUp.IndexerOn(); },
+	frc2::FunctionalCommand indexerOnCommand{
 		[]() {},
+		[this]() { m_pickUp.IndexerOn(); },
 		[this](bool) { m_pickUp.IndexerOff(); },
 		[]() { return false; }
 	};
 
 	frc2::FunctionalCommand indexerRevCommand{
-		[this]() { m_pickUp.IndexerRev(); },
 		[]() {},
+		[this]() { m_pickUp.IndexerRev(); },
 		[this](bool) { m_pickUp.IndexerOff(); },
 		[]() { return false; }
 	};
 
 	frc2::FunctionalCommand shooterOnCommand{
-		[this]() { m_pickUp.ShooterOn(); },
 		[]() {},
+		[this]() { m_pickUp.ShooterOn(); },
 		[this](bool) { m_pickUp.ShooterOff(); },
 		[]() { return false; },
 	};
@@ -174,14 +156,21 @@ void RobotContainer::_ConfigureButtonBindings() {
 
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
-	(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_BACK))->WhenPressed(shooterFasterCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
-	(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(shooterSlowerCommand);
-
-	(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_B))->WhileHeld(indexerRevCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
-	(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LEFT))->WhenPressed(ToggleDriveMode{&m_drive});
-	(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_Y))->WhenPressed(shooterDistToggleCommand);
+
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kY)
+      .WhenPressed(shooterDistToggleCommand);
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftStick)
+      .WhenPressed(ToggleDriveMode{&m_drive});
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
+      .WhenPressed(indexerRevCommand);
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart)
+      .WhenPressed(shooterSlowerCommand);
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack)
+      .WhenPressed(shooterFasterCommand);
+	//frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kXXX)
+    //  .WhenPressed();
 
 	frc2::Trigger RT{
 		[this]() {
@@ -189,7 +178,7 @@ void RobotContainer::_ConfigureButtonBindings() {
 		}
 	};
 
-	RT.WhileActiveContinous(shooterOnCommand);
+	RT.WhileActiveOnce(shooterOnCommand);
 
 	frc2::Trigger LT{
 		[this]() {
@@ -197,12 +186,10 @@ void RobotContainer::_ConfigureButtonBindings() {
 		}
 	};
 
-	LT.WhileActiveContinous(indexerOnCommand);
+	LT.WhileActiveOnce(indexerOnCommand);
 
-	m_rb = new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB);
-	m_lb = new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_LB);
-	m_rb->WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
-	m_lb->WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
+	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
 
 	frc::SmartDashboard::PutData("Zero Climber", new ZeroClimber(&m_climber));
 	frc::SmartDashboard::PutData("Set WheelOffsets", new SetWheelOffsets(&m_drive));

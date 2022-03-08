@@ -10,7 +10,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/SubsystemBase.h>
-#include <AHRS.h>
+#include <ctre/Phoenix.h>
 #include "SwerveModule.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
@@ -106,7 +106,7 @@ public:
 	void LoadWheelOffsets();
 
 	// The gyro sensor
-	AHRS *m_gyro;
+	WPI_Pigeon2 m_pidgey{0, "Default Name"};
 
 private:
 

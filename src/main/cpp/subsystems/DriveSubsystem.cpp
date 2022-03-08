@@ -13,32 +13,32 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/RobotController.h>
 
+#define CANBUS "Default Name"
+//#define CANBUS "roborio"
+
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_gyro{new AHRS(frc::I2C::Port::kMXP)},
-      m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "Default Name"},
+    : m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", CANBUS},
 
-      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", "Default Name"},
+      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANBUS},
 
-      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "Default Name"},
+      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", CANBUS},
 
-      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", "Default Name"},
+      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANBUS},
 
-      m_odometry{kDriveKinematics, units::degree_t(-m_gyro->GetYaw()), frc::Pose2d()},
+      m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
       m_fieldCentric{false} {
         LoadWheelOffsets();
         frc::SmartDashboard::PutData("Field", &m_field);
-        //m_gyro->Calibrate();
-        //m_gyro->SetYawAxis(frc::ADIS16470_IMU::IMUAxis::kZ);
       }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(units::degree_t(-m_gyro->GetYaw()), m_frontLeft.GetState(),
+  m_odometry.Update(GetHeading(), m_frontLeft.GetState(),
                     m_rearLeft.GetState(), m_frontRight.GetState(),
                     m_rearRight.GetState());
-  frc::SmartDashboard::PutNumber ("Gyro", -m_gyro->GetYaw());
+  frc::SmartDashboard::PutNumber ("Gyro", GetHeading().value());
   frc::SmartDashboard::PutBoolean ("FieldCentric", m_fieldCentric);
   m_field.SetRobotPose(m_odometry.GetPose());
   //Wheel Offset Code;
@@ -59,7 +59,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            units::radians_per_second_t rot) {
   auto states = kDriveKinematics.ToSwerveModuleStates(
       m_fieldCentric ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, units::degree_t(-m_gyro->GetYaw()))
+                          xSpeed, ySpeed, rot, GetHeading())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
@@ -113,15 +113,16 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 units::degree_t DriveSubsystem::GetHeading() const {
-  return units::degree_t(-m_gyro->GetYaw());
+  double currentAngle = m_pidgey.GetYaw();
+  return units::degree_t(-currentAngle);
 }
 
 void DriveSubsystem::ZeroHeading() {
-  m_gyro->ZeroYaw();
+  m_pidgey.SetYaw(0,30);
 }
 
 double DriveSubsystem::GetTurnRate() {
-  return -m_gyro->GetRate();
+  return -m_pidgey.GetRate();
 }
 
 frc::Pose2d DriveSubsystem::GetPose() {
@@ -130,7 +131,6 @@ frc::Pose2d DriveSubsystem::GetPose() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
-  //m_odometry.ResetPosition(pose, m_gyro->GetRotation2d());
 }
 
 void DriveSubsystem::ToggleFieldCentric(){

@@ -93,7 +93,7 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 0.3;
+	constexpr double kPModuleTurningController = 0.4;
 	constexpr double kPModuleDriveController = 0.025/2;
 	constexpr double kmaxTurnOutput = .3;
 
@@ -106,7 +106,7 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(5);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(8); 
 	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.142);

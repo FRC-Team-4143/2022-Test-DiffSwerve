@@ -49,7 +49,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 	m_turningMotor.ConfigFactoryDefault();
     m_encoder.ConfigFactoryDefault();
     m_encoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Signed_PlusMinus180,20);
-	m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
+	//m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
     
     constexpr double MAX_CURRENT = 40.0;
 
@@ -80,7 +80,7 @@ frc::SwerveModuleState SwerveModule::GetState() {
 
 float SwerveModule::GetDriveMotorSpeed() {
     double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
-    * (10.0 / 2048) /*Revs per second*/ * ((14  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi);
+    * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi);
 
     frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
     
@@ -154,8 +154,8 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
     frc::SmartDashboard::PutNumber(m_name + " Drive Feedforward", driveFeedforward.value());
     frc::SmartDashboard::PutNumber(m_name + " Turn Power", turnOutput);
-    frc::SmartDashboard::PutNumber(m_name + " Wanted Angle", state.angle.Radians().value()*(180/wpi::numbers::pi));
-    frc::SmartDashboard::PutNumber(m_name + " Angle Error", state.angle.Radians().value()-encoderValue);
+    //frc::SmartDashboard::PutNumber(m_name + " Wanted Angle", state.angle.Radians().value()*(180/wpi::numbers::pi));
+    //frc::SmartDashboard::PutNumber(m_name + " Angle Error", state.angle.Radians().value()-encoderValue);
 
   
     frc::SmartDashboard::PutNumber (m_name + " SetVoltage", driveVoltage);
