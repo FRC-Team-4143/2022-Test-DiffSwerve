@@ -14,6 +14,7 @@ public:
 	void ZeroClimber();
 	double GetLeftRotationPosition();
 	double GetRightRotationPosition();
+	
 
 private:
 
@@ -42,4 +43,6 @@ private:
 	
 	double m_rightPosition = 0;
 	double m_leftPosition = 0;
+	double m_rightExtensionPos = 0;
+	double m_leftExtensionPos = 0;
 };

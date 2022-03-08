@@ -93,9 +93,9 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 0.4;
-	constexpr double kPModuleDriveController = 0.025/2;
-	constexpr double kmaxTurnOutput = .3;
+	constexpr double kPModuleTurningController = 0.3;
+	constexpr double kPModuleDriveController = 0; //0.025/2;
+	constexpr double kmaxTurnOutput = .5;
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
@@ -106,7 +106,7 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(5);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(4);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(8); 
 	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.142);
@@ -153,16 +153,26 @@ namespace ClimberConstants {
 	constexpr float kMaxExtendPower = .6;
 	constexpr float kMaxRotatePower = .3;
 
-	constexpr double kP = .025; //5e-4; 
-	constexpr double kI = 1e-5;    //1e-6; 
-	constexpr double kD = 1;  //0
-	constexpr double kIz = 0; 
-	constexpr double kFF = 0; 
-	constexpr double kMaxOutput = 0.5;
-	constexpr double kMinOutput = -0.5;
-	constexpr double kMaxVel = 500; 
-	constexpr double kMinVel = -500; 
-	constexpr double kMaxAcc = 500; 
+	constexpr double kPR = .025; //5e-4; 
+	constexpr double kIR = 1e-5;    //1e-6; 
+	constexpr double kDR = 1;  //0
+	constexpr double kIzR = 0; 
+	constexpr double kFFR = 0; 
+	constexpr double kMaxOutputR = 0.5;
+	constexpr double kMinOutputR = -0.5;
+
+	constexpr double kPE = 5e-6; //5e-4; 
+	constexpr double kIE = 1e-6;    //1e-6; 
+	constexpr double kDE = 0;  //0
+	constexpr double kIzE = 0; 
+	constexpr double kFFE = 0.000156; 
+	constexpr double kMaxOutputE = 0.9;
+	constexpr double kMinOutputE = -0.9;
+
+
+	constexpr double kMaxVel = 5500; 
+	constexpr double kMinVel = 0; 
+	constexpr double kMaxAcc = 5000; 
 	constexpr double kAllErr = 0;
-	constexpr double MaxRPM = 1500;
+	constexpr double MaxRPM = 5700;
 }

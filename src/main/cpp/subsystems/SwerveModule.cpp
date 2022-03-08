@@ -133,22 +133,24 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     const auto driveFeedforward{m_driveFeedforward.Calculate(state.speed)};
 
     // Set the motor outputs
-
-    driveVoltage =
-        DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
-        + driveFeedforward.value()
-        + DriveConstants::driveMaxVoltage * turnOutput;
-
-     turnVoltage =
-        -DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
-        - driveFeedforward.value()
-        + DriveConstants::driveMaxVoltage * turnOutput;
-
-    if(!(fabs(state.angle.Radians().value()-encoderValue) < wpi::numbers::pi/4) &&
+    /*if(!(fabs(state.angle.Radians().value()-encoderValue) < wpi::numbers::pi/4) &&
        !(fabs(state.angle.Radians().value()-encoderValue+(wpi::numbers::pi*2)) < wpi::numbers::pi/4) &&
        !(fabs(state.angle.Radians().value()-encoderValue-(wpi::numbers::pi*2)) < wpi::numbers::pi/4)){
-        driveVoltage = 0;
+        driveVoltage = DriveConstants::driveMaxVoltage * turnOutput;
+        turnVoltage = DriveConstants::driveMaxVoltage * turnOutput;
+    } else */ {
+        driveVoltage =
+            DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
+            + driveFeedforward.value()
+            + DriveConstants::driveMaxVoltage * turnOutput;
+
+        turnVoltage =
+            -DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
+            - driveFeedforward.value()
+            + DriveConstants::driveMaxVoltage * turnOutput;
     }
+
+
 
     (m_name + " Current Angle", encoderValue);
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
