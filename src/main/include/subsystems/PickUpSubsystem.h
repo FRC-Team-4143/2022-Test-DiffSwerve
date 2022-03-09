@@ -53,4 +53,6 @@ private:
 	frc::DoubleSolenoid m_shooterSolenoid;
 
 	double m_shooterSpeed;
+	double m_shooterSpeedShort;
+	double m_shooterSpeedLong;
 };

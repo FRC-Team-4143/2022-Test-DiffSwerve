@@ -169,7 +169,7 @@ void RobotContainer::_ConfigureButtonBindings() {
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftStick)
       .WhenPressed(ToggleDriveMode{&m_drive});
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .WhenPressed(indexerRevCommand);
+      .WhileHeld(indexerRevCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart)
       .WhenPressed(shooterSlowerCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack)

@@ -16,7 +16,7 @@ PickUpSubsystem::PickUpSubsystem()
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
-	m_shooterSpeed{1.0}
+	m_shooterSpeed{0.55}, m_shooterSpeedLong{0.55}, m_shooterSpeedShort{0.42}
 {
 	m_index1.SetNeutralMode(NeutralMode::Brake);
 	m_index2.SetNeutralMode(NeutralMode::Brake);
@@ -93,8 +93,8 @@ void PickUpSubsystem::RollerOff() {
 // ============================================================================
 
 void PickUpSubsystem::IndexerOn() {
-	m_index1.Set(TalonSRXControlMode::PercentOutput, 0.5);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.75);
+	m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
 }
 
 // ============================================================================
@@ -141,13 +141,13 @@ void PickUpSubsystem::ShooterOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterFaster() {
-	m_shooterSpeed = std::min(1.0, m_shooterSpeed + 0.025);
+	m_shooterSpeedLong = std::min(1.0, m_shooterSpeedLong + 0.025);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterSlower() {
-	m_shooterSpeed = std::max(0.0, m_shooterSpeed - 0.025);
+	m_shooterSpeedLong = std::max(0.0, m_shooterSpeedLong - 0.025);
 }
 
 // ============================================================================
@@ -167,9 +167,11 @@ void PickUpSubsystem::ShooterClose() {
 void PickUpSubsystem::ShooterDistToggle() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
 		ShooterFar();
+		m_shooterSpeed = m_shooterSpeedLong;
 	}
 	else {
 		ShooterClose();
+		m_shooterSpeed = m_shooterSpeedShort;
 	}
 }
 

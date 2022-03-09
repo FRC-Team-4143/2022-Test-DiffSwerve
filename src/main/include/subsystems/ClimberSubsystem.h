@@ -48,7 +48,7 @@ private:
 	double m_leftExtensionPos = 0;
 	int m_numSteps = 13;
 
-	double m_climbSteps[14][4] = {{0, 0, 0, 0},
+	double m_climbSteps[14][4] ={{0, 0, 0, 0},
 								{22, 0, 265, 265},
 								{32, 0, -10, 265},
 								{25, 0, -10, 265},
