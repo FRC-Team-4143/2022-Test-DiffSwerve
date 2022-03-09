@@ -123,6 +123,13 @@ double ClimberSubsystem::GetRightRotationPosition(){
     return m_rotateRightEncoder.GetPosition();
 }
 
+void ClimberSubsystem::IndexStep(){
+    if(m_step < m_numSteps){
+        m_step++;
+        m_newStep = true;
+    }
+}
+
 void ClimberSubsystem::Periodic() {
     m_rightPosition = frc::SmartDashboard::GetNumber("m_rightPosition", 0);
     m_leftPosition = frc::SmartDashboard::GetNumber("m_leftPosition", 0);
@@ -130,21 +137,36 @@ void ClimberSubsystem::Periodic() {
     m_leftExtensionPos = frc::SmartDashboard::GetNumber("m_leftExtensionPos",0);
 
 	if(m_controller->GetRightBumper()){
-        if(m_controller->GetStartButton()) { m_rightPosition = -22.0; m_leftPosition = 22.0;}
-        if(m_controller->GetBackButton()) { m_rightPosition = 0.0; m_leftPosition = 0.0;}
+        if(m_controller->GetStartButton()) {m_step = 0; m_newStep = true;}
+        if(m_newStep){
+            m_leftPosition = m_climbSteps[m_step][0];
+            m_rightPosition = m_climbSteps[m_step][1];
+            m_leftExtensionPos = m_climbSteps[m_step][2];
+            m_rightExtensionPos = m_climbSteps[m_step][3];
+            m_newStep = false;
+        }
         if(m_controller->GetYButton()) m_leftPosition+=.5;
         if(m_controller->GetXButton()) m_leftPosition-=.5;
-        if(m_leftPosition < 0.) m_leftPosition = 0.;
-        if(m_leftPosition > 45.) m_leftPosition = 45.;
         if(m_controller->GetAButton()) m_rightPosition+=.5;
         if(m_controller->GetBButton()) m_rightPosition-=.5;
-        if(m_rightPosition > 0.) m_rightPosition = 0.;
-        if(m_rightPosition < -45.) m_rightPosition = -45.;
+        if(m_controller->GetRightY()>.3) m_rightExtensionPos-=1.;
+        if(m_controller->GetRightY()<-.3) m_rightExtensionPos+=1.;
+        if(m_controller->GetLeftY()>.3) m_leftExtensionPos-=1.;
+        if(m_controller->GetLeftY()<-.3) m_leftExtensionPos+=1.;
+        if(!m_controller->GetBackButton()){
+            m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
+            m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
+            m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0, 265.0);
+            m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0, 265.0);
+        }
 
-    frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
-    frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
-    frc::SmartDashboard::PutNumber("m_rightExtensionPos",m_rightExtensionPos);
-    frc::SmartDashboard::PutNumber("m_leftExtensionPos",m_leftExtensionPos);
+        frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
+        frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
+        frc::SmartDashboard::PutNumber("m_rightExtensionPos",m_rightExtensionPos);
+        frc::SmartDashboard::PutNumber("m_leftExtensionPos",m_leftExtensionPos);
+        frc::SmartDashboard::PutNumber("m_step", m_step);
+        frc::SmartDashboard::PutNumber("leftArmCurrent", m_extendLeft.GetOutputCurrent());
+        frc::SmartDashboard::PutNumber("rightArmCurrent", m_extendRight.GetOutputCurrent());
 
 		//m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
         //m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Left Position", 0), rev::ControlType::kPosition);

@@ -154,6 +154,11 @@ void RobotContainer::_ConfigureButtonBindings() {
 		[this]() { m_pickUp.ShooterDistToggle(); },
 	};
 
+
+	frc2::InstantCommand nextClimberStepCommand{
+		[this]() { m_climber.IndexStep(); },
+	};
+
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
@@ -169,8 +174,8 @@ void RobotContainer::_ConfigureButtonBindings() {
       .WhenPressed(shooterSlowerCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack)
       .WhenPressed(shooterFasterCommand);
-	//frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kXXX)
-    //  .WhenPressed();
+	frc2::JoystickButton(&m_climberController, frc::XboxController::Button::kLeftBumper)
+  	  .WhenPressed(nextClimberStepCommand);
 
 	frc2::Trigger RT{
 		[this]() {
