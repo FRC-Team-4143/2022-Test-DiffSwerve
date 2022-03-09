@@ -35,6 +35,8 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
+  currentYaw = m_pidgey.GetYaw();
+
   m_odometry.Update(GetHeading(), m_frontLeft.GetState(),
                     m_rearLeft.GetState(), m_frontRight.GetState(),
                     m_rearRight.GetState());
@@ -113,8 +115,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 units::degree_t DriveSubsystem::GetHeading() const {
-  double currentAngle = m_pidgey.GetYaw();
-  return units::degree_t(-currentAngle);
+  return units::degree_t(-currentYaw);
 }
 
 void DriveSubsystem::ZeroHeading() {

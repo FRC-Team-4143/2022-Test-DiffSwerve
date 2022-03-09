@@ -39,10 +39,20 @@ RobotContainer::RobotContainer()
 :	m_pickUp{}, m_climber{&m_climberController},
 	m_DriveCommand{
 		[this] {
+			auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
+			auto y = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),DriveConstants::stickDeadBand));
+			auto rot = -m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), DriveConstants::stickDeadBand));
+
+			//reset on stop
+			if(fabs(x.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftY()) < DriveConstants::stickDeadBand) m_xspeedLimiter.Reset(0);
+			if(fabs(y.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftX()) < DriveConstants::stickDeadBand) m_yspeedLimiter.Reset(0);
+			if(fabs(rot.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetRightX()) < DriveConstants::stickDeadBand) m_rotLimiter.Reset(0);
+			
+
 			m_drive.Drive(
-				units::meters_per_second_t(-m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), 0.2)) * AutoConstants::kMaxSpeed),
-				units::meters_per_second_t(-m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),0.2)) * AutoConstants::kMaxSpeed),
-				units::radians_per_second_t(-m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), 0.2)) * AutoConstants::kMaxAngularSpeed)*.5
+				units::meters_per_second_t(x * AutoConstants::kMaxSpeed),
+				units::meters_per_second_t(y * AutoConstants::kMaxSpeed),
+				units::radians_per_second_t(rot * AutoConstants::kMaxAngularSpeed)*.5
 			);
 		},
 		{&m_drive}

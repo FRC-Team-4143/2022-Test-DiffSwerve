@@ -79,6 +79,8 @@ namespace DriveConstants {
 	// constexpr double kPRearLeftVel = 0.5;
 	// constexpr double kPFrontRightVel = 0.5;
 	// constexpr double kPRearRightVel = 0.5;
+
+	constexpr double stickDeadBand = .1;
 } // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -93,7 +95,7 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 0.3;
+	constexpr double kPModuleTurningController = 1/3.141;
 	constexpr double kPModuleDriveController = 0; //0.025/2;
 	constexpr double kmaxTurnOutput = .5;
 
@@ -150,8 +152,8 @@ namespace ClimberConstants {
 	constexpr int kBrakeSolenoidPortLeft = 7;
 
 
-	constexpr float kMaxExtendPower = .6;
-	constexpr float kMaxRotatePower = .3;
+	//constexpr float kMaxExtendPower = .6;
+	//constexpr float kMaxRotatePower = .3;
 
 	constexpr double kPR = .025; //5e-4; 
 	constexpr double kIR = 1e-5;    //1e-6; 

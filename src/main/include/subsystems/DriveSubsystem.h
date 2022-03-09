@@ -118,6 +118,8 @@ private:
 	SwerveModule m_frontRight;
 	SwerveModule m_rearRight;
 
+	double currentYaw = 0;
+
 	int m_counter = 0;
 
 	// Odometry class for tracking robot pose

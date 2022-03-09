@@ -52,7 +52,7 @@ private:
 	rev::CANSparkMax m_backSpinShooter;
 	frc::DoubleSolenoid m_shooterSolenoid;
 
-	double m_shooterSpeed;
-	double m_shooterSpeedShort;
-	double m_shooterSpeedLong;
+	double m_shooterSpeed=.55;
+	double m_shooterSpeedShort=.35;
+	double m_shooterSpeedLong=.55;
 };

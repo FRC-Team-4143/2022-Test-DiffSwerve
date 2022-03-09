@@ -69,16 +69,20 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 
 // ============================================================================
 
+//called from DriveSubsystem Periodic
+
 frc::SwerveModuleState SwerveModule::GetState() {
-    return {units::meters_per_second_t{GetDriveMotorSpeed()},
+    m_driveSpeed = GetDriveMotorSpeed();
+    m_moduleAngle = (m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi;
+    return {units::meters_per_second_t{m_driveSpeed},
         //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
-        frc::Rotation2d(units::radian_t((m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi))
+        frc::Rotation2d(units::radian_t(m_moduleAngle))
     };
 }
 
 // ============================================================================
 
-float SwerveModule::GetDriveMotorSpeed() {
+double SwerveModule::GetDriveMotorSpeed() {
     double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
     * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi);
 
@@ -90,19 +94,17 @@ float SwerveModule::GetDriveMotorSpeed() {
 // ============================================================================
 
 double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
-    double encoderValue{(m_encoder.GetAbsolutePosition()-m_offset)/360*2*wpi::numbers::pi};
- 
 
     // Optimize the reference state to avoid spinning further than 90 degrees
     const auto state{frc::SwerveModuleState::Optimize(
-        referenceState, units::radian_t(encoderValue)
+        referenceState, units::radian_t(m_moduleAngle)
     )};
 
     // Calculate the drive output from the drive PID controller.
-    const auto driveOutput{m_drivePIDController.Calculate(GetDriveMotorSpeed(), state.speed.value())};
+    const auto driveOutput{m_drivePIDController.Calculate(m_driveSpeed, state.speed.value())};
 
     // Calculate the turning motor output from the turning PID controller.
-    auto turnOutput{m_turningPIDController.Calculate(units::radian_t(encoderValue), state.angle.Radians())};
+    auto turnOutput{m_turningPIDController.Calculate(units::radian_t(m_moduleAngle), state.angle.Radians())};
 
     if (turnOutput > ModuleConstants::kmaxTurnOutput) {
         turnOutput = ModuleConstants::kmaxTurnOutput;
@@ -110,25 +112,6 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     else if (turnOutput < -ModuleConstants::kmaxTurnOutput) {
         turnOutput = -ModuleConstants::kmaxTurnOutput;
     }
-
-/*
-    auto angle = fmod(m_encoder.GetPosition(), 360);
-    if (angle > 180){angle -= 360;}
-    if (angle < -180){angle += 360;}
-
-    // Calculate turning output from steer error
-    auto turn{angle - state.angle.Radians().value()*(180/wpi::numbers::pi)};
-
-    if (std::fabs(turn) < 1) {
-	    turn = 0;
-	}
-    else {
-        //turn *= 2000.0 / 180; // simple gain on steering error
-	    turn *= 1. / 180.;
-	}
-  
-    turnOutput = turn;
-*/
 
     const auto driveFeedforward{m_driveFeedforward.Calculate(state.speed)};
 
@@ -139,20 +122,21 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
         driveVoltage = DriveConstants::driveMaxVoltage * turnOutput;
         turnVoltage = DriveConstants::driveMaxVoltage * turnOutput;
     } else */ {
-        driveVoltage =
-            DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
+        m_driveVoltage =
+            //DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
+            driveOutput
             + driveFeedforward.value()
             + DriveConstants::driveMaxVoltage * turnOutput;
 
-        turnVoltage =
-            -DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
+        m_turnVoltage =
+            -driveOutput
             - driveFeedforward.value()
             + DriveConstants::driveMaxVoltage * turnOutput;
     }
 
 
 
-    (m_name + " Current Angle", encoderValue);
+    frc::SmartDashboard::PutNumber(m_name + " Current Angle", m_moduleAngle);
     frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
     frc::SmartDashboard::PutNumber(m_name + " Drive Feedforward", driveFeedforward.value());
     frc::SmartDashboard::PutNumber(m_name + " Turn Power", turnOutput);
@@ -160,15 +144,17 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     //frc::SmartDashboard::PutNumber(m_name + " Angle Error", state.angle.Radians().value()-encoderValue);
 
   
-    frc::SmartDashboard::PutNumber (m_name + " SetVoltage", driveVoltage);
+    frc::SmartDashboard::PutNumber (m_name + " SetVoltage", m_driveVoltage);
     //frc::SmartDashboard::PutNumber (mfrc::SmartDashboard::PutNumber_name + " driveFeedForward",driveFeedforward.value());
 
-    return std::max(driveVoltage,turnVoltage);
+    return std::max(m_driveVoltage,m_turnVoltage);
 }
 
 void SwerveModule::SetVoltage(double driveMax){
-    m_driveMotor.SetVoltage(units::voltage::volt_t{driveVoltage*driveMax});
-    m_turningMotor.SetVoltage(units::voltage::volt_t{turnVoltage*driveMax});
+    m_driveMotor.Set(ControlMode::PercentOutput, m_driveVoltage*driveMax/DriveConstants::driveMaxVoltage);
+    m_turningMotor.Set(ControlMode::PercentOutput, m_turnVoltage*driveMax/DriveConstants::driveMaxVoltage);
+    //m_driveMotor.SetVoltage(units::voltage::volt_t{m_driveVoltage*driveMax});
+    //m_turningMotor.SetVoltage(units::voltage::volt_t{m_turnVoltage*driveMax});
 }
 
 // ============================================================================

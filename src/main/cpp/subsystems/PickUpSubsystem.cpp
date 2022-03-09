@@ -15,8 +15,7 @@ PickUpSubsystem::PickUpSubsystem()
 	m_shooter2 {PickUpConstants::kShooter2Port, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
-	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
-	m_shooterSpeed{0.55}, m_shooterSpeedLong{0.55}, m_shooterSpeedShort{0.42}
+	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort}
 {
 	m_index1.SetNeutralMode(NeutralMode::Brake);
 	m_index2.SetNeutralMode(NeutralMode::Brake);
