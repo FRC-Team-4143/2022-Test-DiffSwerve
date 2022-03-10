@@ -39,33 +39,15 @@ namespace DriveConstants {
 	constexpr int kFrontRightPot = 4;
 	constexpr int kRearLeftPot = 2;
 	constexpr int kRearRightPot = 3;
-/*
-	constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
-	constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
-	constexpr int kFrontRightTurningEncoderPorts[2]{4, 5};
-	constexpr int kRearRightTurningEncoderPorts[2]{6, 7};
 
-	constexpr bool kFrontLeftTurningEncoderReversed = false;
-	constexpr bool kRearLeftTurningEncoderReversed = true;
-	constexpr bool kFrontRightTurningEncoderReversed = false;
-	constexpr bool kRearRightTurningEncoderReversed = true;
-
-	constexpr int kFrontLeftDriveEncoderPorts[2]{8, 9};
-	constexpr int kRearLeftDriveEncoderPorts[2]{10, 11};
-	constexpr int kFrontRightDriveEncoderPorts[2]{12, 13};
-	constexpr int kRearRightDriveEncoderPorts[2]{14, 15};
-
-	constexpr bool kFrontLeftDriveEncoderReversed = false;
-	constexpr bool kRearLeftDriveEncoderReversed = true;
-	constexpr bool kFrontRightDriveEncoderReversed = false;
-	constexpr bool kRearRightDriveEncoderReversed = true;
-*/
-	constexpr double driveMaxVoltage = 12;
+	//constexpr double driveMaxVoltage = 12;
+	constexpr double driveMaxVoltage = 8;
 
 	//DrivePIDConstants
 	constexpr auto ks = .64705_V;
 	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
-	constexpr auto kv = 3.07 * 1_V * 1_s / 1_m;   //2.2489
+	//constexpr auto kv = 3.07 * 1_V * 1_s / 1_m;   
+	constexpr auto kv = 2.2489 * 1_V * 1_s / 1_m;
 	constexpr auto ka = .26974 * 1_V * 1_s * 1_s / 1_m;
 
 	//TurningPIDConstants
@@ -96,7 +78,7 @@ namespace ModuleConstants {
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
 	constexpr double kPModuleTurningController = 1/3.141;
-	constexpr double kPModuleDriveController = 0.025; //0.025/2;
+	constexpr double kPModuleDriveController = 1; //0.025;
 	constexpr double kmaxTurnOutput = .5;
 
 	//constexpr double kPModuleTurningController = 0.45;

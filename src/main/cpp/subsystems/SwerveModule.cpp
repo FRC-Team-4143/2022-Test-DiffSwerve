@@ -21,14 +21,20 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
     m_encoder.ConfigFactoryDefault();
     m_encoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Signed_PlusMinus180,20);
 	//m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
-    
-    constexpr double MAX_CURRENT = 40.0;
 
-	SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
+    m_driveMotor.ConfigVoltageCompSaturation(DriveConstants::driveMaxVoltage); 
+    m_driveMotor.EnableVoltageCompensation(true);
+    m_turningMotor.ConfigVoltageCompSaturation(DriveConstants::driveMaxVoltage); 
+    m_turningMotor.EnableVoltageCompensation(true);
+ 
+    
+    //constexpr double MAX_CURRENT = 40.0;
+
+	//SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigSupplyCurrentLimit(supply);
 	//m_turningMotor.ConfigSupplyCurrentLimit(supply);
 
-	StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
+	//StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigStatorCurrentLimit(stator);
 	//m_turningMotor.ConfigStatorCurrentLimit(stator);
 
@@ -50,14 +56,20 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
     m_encoder.ConfigFactoryDefault();
     m_encoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Signed_PlusMinus180,20);
 	//m_encoder.SetStatusFramePeriod(CANCoderStatusFrame_SensorData, 5, 20);
-    
-    constexpr double MAX_CURRENT = 40.0;
 
-	SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
+    m_driveMotor.ConfigVoltageCompSaturation(DriveConstants::driveMaxVoltage); 
+    m_driveMotor.EnableVoltageCompensation(true);
+    m_turningMotor.ConfigVoltageCompSaturation(DriveConstants::driveMaxVoltage); 
+    m_turningMotor.EnableVoltageCompensation(true);
+    
+    
+    //constexpr double MAX_CURRENT = 40.0;
+
+	//SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigSupplyCurrentLimit(supply);
 	//m_turningMotor.ConfigSupplyCurrentLimit(supply);
 
-	StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
+	//StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigStatorCurrentLimit(stator);
 	//m_turningMotor.ConfigStatorCurrentLimit(stator);
 
@@ -131,16 +143,11 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
 
 
 
-    frc::SmartDashboard::PutNumber(m_name + " Current Angle", m_moduleAngle);
-    frc::SmartDashboard::PutNumber(m_name + " Drive Power", driveOutput / AutoConstants::kMaxSpeed.value());
-    frc::SmartDashboard::PutNumber(m_name + " Drive Feedforward", driveFeedforward.value());
-    frc::SmartDashboard::PutNumber(m_name + " Turn Power", turnOutput);
-    //frc::SmartDashboard::PutNumber(m_name + " Wanted Angle", state.angle.Radians().value()*(180/wpi::numbers::pi));
-    //frc::SmartDashboard::PutNumber(m_name + " Angle Error", state.angle.Radians().value()-encoderValue);
-
-  
-    frc::SmartDashboard::PutNumber (m_name + " SetVoltage", m_driveVoltage);
-    //frc::SmartDashboard::PutNumber (mfrc::SmartDashboard::PutNumber_name + " driveFeedForward",driveFeedforward.value());
+    frc::SmartDashboard::PutNumber(m_name + " m_moduleAngle", m_moduleAngle);
+    frc::SmartDashboard::PutNumber(m_name + " driveFeedforward", driveFeedforward.value());
+    frc::SmartDashboard::PutNumber(m_name + " turnOutput", turnOutput * DriveConstants::driveMaxVoltage);
+    frc::SmartDashboard::PutNumber(m_name + " m_driveVoltage", m_driveVoltage);
+    frc::SmartDashboard::PutNumber(m_name + " driveOutput", driveOutput);
 
     return std::max(m_driveVoltage,m_turnVoltage);
 }
@@ -161,8 +168,7 @@ void SwerveModule::ResetEncoders() {
 
 void SwerveModule::SetWheelOffset() {
 	auto steerPosition{m_encoder.GetAbsolutePosition()};
-    //std::cout << "ERROR: " << m_name << " steerPosition " << steerPosition << std::endl;
-    //std::cout.flush();
+    fmt::print("ERROR: {} steerPosition {}\n", m_name, steerPosition);
 	frc::Preferences::SetDouble(m_name, steerPosition);
     m_offset = steerPosition;
 }
@@ -171,8 +177,7 @@ void SwerveModule::SetWheelOffset() {
 
 void SwerveModule::LoadWheelOffset() {
 	auto steerPosition{frc::Preferences::GetDouble(m_name)};
-    //std::cout << "ERROR: " << m_name << " steerPosition " << steerPosition << std::endl;
-    //std::cout.flush();
+    fmt::print("ERROR: {} steerPosition {}\n", m_name, steerPosition);
     m_offset = steerPosition;
 }
 

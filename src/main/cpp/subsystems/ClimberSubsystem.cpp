@@ -49,9 +49,6 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
     m_extendLeftEncoder.SetPositionConversionFactor(1);
     m_extendRightEncoder.SetPositionConversionFactor(1);
 
-    //m_rotateLeft.SetInverted(true);
-    //m_extendRight.SetInverted(true);
-
 	m_rotateLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_rotateRight.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_extendLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
@@ -190,20 +187,4 @@ void ClimberSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber("Rotate Right Pos", GetRightRotationPosition());
 	frc::SmartDashboard::PutNumber("Extend Left Pos", m_extendLeftEncoder.GetPosition());
 	frc::SmartDashboard::PutNumber("Extend Right Pos", m_extendRightEncoder.GetPosition());
-
-	// display PID coefficients on SmartDashboard
-    //frc::SmartDashboard::PutNumber("P Gain", ClimberConstants::kP);
-    //frc::SmartDashboard::PutNumber("I Gain", ClimberConstants::kI);
-    //frc::SmartDashboard::PutNumber("D Gain", ClimberConstants::kD);
-    //frc::SmartDashboard::PutNumber("I Zone", ClimberConstants::kIz);
-    //frc::SmartDashboard::PutNumber("Feed Forward", ClimberConstants::kFF);
-    //frc::SmartDashboard::PutNumber("Max Output", ClimberConstants::kMaxOutput);
-    //frc::SmartDashboard::PutNumber("Min Output", ClimberConstants::kMinOutput);
-
-    // display Smart Motion coefficients
-    //frc::SmartDashboard::PutNumber("Max Velocity", ClimberConstants::kMaxVel);
-    //frc::SmartDashboard::PutNumber("Min Velocity", ClimberConstants::kMinVel);
-    //frc::SmartDashboard::PutNumber("Max Acceleration", ClimberConstants::kMaxAcc);
-    //frc::SmartDashboard::PutNumber("Allowed Closed Loop Error", ClimberConstants::kAllErr);
-
 }
