@@ -1,11 +1,5 @@
 #include "subsystems/SwerveModule.h"
-//#include "subsystems/DriveSubsystem.h"
-//#include <frc/geometry/Rotation2d.h>
-//#include <wpi/numbers>
-//#include "Constants.h"
 #include <frc/smartdashboard/SmartDashboard.h>
-//#include <iostream>
-//#include "RobotContainer.h"
 
 // ============================================================================
 
@@ -130,7 +124,6 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
         turnVoltage = DriveConstants::driveMaxVoltage * turnOutput;
     } else */ {
         m_driveVoltage =
-            //DriveConstants::driveMaxVoltage * (driveOutput / AutoConstants::kMaxSpeed.value())
             driveOutput
             + driveFeedforward.value()
             + DriveConstants::driveMaxVoltage * turnOutput;

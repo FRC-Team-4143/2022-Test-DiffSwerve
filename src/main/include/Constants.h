@@ -83,6 +83,9 @@ namespace ModuleConstants {
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
+
+	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
 } // namespace ModuleConstants
 
 namespace AutoConstants {
@@ -90,7 +93,7 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(3);   //4);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
 	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.141);
@@ -122,6 +125,9 @@ namespace PickUpConstants {
 	constexpr int kUpperReverseSolenoidPort = 1;
 	constexpr int kLowerForwardSolenoidPort = 0;
 	constexpr int kLowerReverseSolenoidPort = 6;
+
+	constexpr double kShortSpeed = .35;
+	constexpr double kLongSpeed = .55;
 }
 
 namespace ClimberConstants {

@@ -5,6 +5,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include <rev/CANSparkMax.h>
+#include "Constants.h"
 
 class PickUpSubsystem : public frc2::SubsystemBase {
 public:
@@ -52,7 +53,7 @@ private:
 	rev::CANSparkMax m_backSpinShooter;
 	frc::DoubleSolenoid m_shooterSolenoid;
 
-	double m_shooterSpeed=.55;
-	double m_shooterSpeedShort=.35;
-	double m_shooterSpeedLong=.55;
+	double m_shooterSpeed=PickUpConstants::kLongSpeed;
+	double m_shooterSpeedShort=PickUpConstants::kShortSpeed;
+	double m_shooterSpeedLong=PickUpConstants::kLongSpeed;
 };
