@@ -48,11 +48,14 @@ RobotContainer::RobotContainer()
 			if(fabs(y.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftX()) < DriveConstants::stickDeadBand) m_yspeedLimiter.Reset(0);
 			if(fabs(rot.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetRightX()) < DriveConstants::stickDeadBand) m_rotLimiter.Reset(0);
 			
+			//auto rotMod = (fabs(x.value())>.3 || fabs(y.value()) > .3) ? .5 : 1.0;
+			//frc::SmartDashboard::PutNumber("rotMod", rotMod);
+			auto rotMod = 1.0;
 
 			m_drive.Drive(
 				units::meters_per_second_t(x * AutoConstants::kMaxSpeed),
 				units::meters_per_second_t(y * AutoConstants::kMaxSpeed),
-				units::radians_per_second_t(rot * AutoConstants::kMaxAngularSpeed)*.5
+				units::radians_per_second_t(rot * AutoConstants::kMaxAngularSpeed * rotMod)
 			);
 		},
 		{&m_drive}

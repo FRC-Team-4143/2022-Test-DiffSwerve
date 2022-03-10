@@ -115,7 +115,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 units::degree_t DriveSubsystem::GetHeading() const {
-  return units::degree_t(-currentYaw);
+  return units::degree_t(currentYaw);  // was negated
 }
 
 void DriveSubsystem::ZeroHeading() {

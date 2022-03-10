@@ -106,12 +106,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     // Calculate the turning motor output from the turning PID controller.
     auto turnOutput{m_turningPIDController.Calculate(units::radian_t(m_moduleAngle), state.angle.Radians())};
 
-    if (turnOutput > ModuleConstants::kmaxTurnOutput) {
-        turnOutput = ModuleConstants::kmaxTurnOutput;
-    }
-    else if (turnOutput < -ModuleConstants::kmaxTurnOutput) {
-        turnOutput = -ModuleConstants::kmaxTurnOutput;
-    }
+    turnOutput = std::clamp(turnOutput,-ModuleConstants::kmaxTurnOutput,ModuleConstants::kmaxTurnOutput);
 
     const auto driveFeedforward{m_driveFeedforward.Calculate(state.speed)};
 

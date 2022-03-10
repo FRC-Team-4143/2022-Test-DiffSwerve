@@ -63,10 +63,10 @@ namespace DriveConstants {
 	constexpr double driveMaxVoltage = 12;
 
 	//DrivePIDConstants
-	constexpr auto ks = .73041_V;
+	constexpr auto ks = .64705_V;
 	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
-	constexpr auto kv = 1.6452 * 1_V * 1_s / 1_m;
-	constexpr auto ka = .31918 * 1_V * 1_s * 1_s / 1_m;
+	constexpr auto kv = 3.07 * 1_V * 1_s / 1_m;   //2.2489
+	constexpr auto ka = .26974 * 1_V * 1_s * 1_s / 1_m;
 
 	//TurningPIDConstants
 	//constexpr auto kts = .1_V;
@@ -96,7 +96,7 @@ namespace ModuleConstants {
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
 	constexpr double kPModuleTurningController = 1/3.141;
-	constexpr double kPModuleDriveController = 0; //0.025/2;
+	constexpr double kPModuleDriveController = 0.025; //0.025/2;
 	constexpr double kmaxTurnOutput = .5;
 
 	//constexpr double kPModuleTurningController = 0.45;
@@ -108,10 +108,10 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(4);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(3);   //4);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
-	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(8); 
-	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.142);
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
+	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.141);
 
 	constexpr double kPXController = 0.5;
 	constexpr double kPYController = 0.5;
