@@ -31,6 +31,7 @@ class SwerveModule {
 
   void SetWheelOffset();
   void LoadWheelOffset();
+  void motorsOff();
   double GetDriveMotorSpeed();
 
   void SetVoltage(double driveMax);

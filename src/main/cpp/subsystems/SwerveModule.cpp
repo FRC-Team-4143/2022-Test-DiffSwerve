@@ -157,6 +157,11 @@ void SwerveModule::SetVoltage(double driveMax){
 void SwerveModule::ResetEncoders() {
 }
 
+void SwerveModule::motorsOff () {
+    m_driveMotor.Set(ControlMode::PercentOutput, 0);
+    m_turningMotor.Set(ControlMode::PercentOutput, 0);
+}
+
 // =========================Wheel Offsets======================================
 
 void SwerveModule::SetWheelOffset() {

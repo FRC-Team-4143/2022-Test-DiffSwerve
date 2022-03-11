@@ -104,6 +104,10 @@ public:
 
 	void SetWheelOffsets();
 	void LoadWheelOffsets();
+	void motorsOff();
+
+	void GyroCrab(double x, double y, double desiredAngle);
+	double GyroRotate();
 
 	// The gyro sensor
 	WPI_Pigeon2 m_pidgey{0, "Default Name"};

@@ -78,7 +78,7 @@ namespace ModuleConstants {
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
 	constexpr double kPModuleTurningController = 1/3.141;
-	constexpr double kPModuleDriveController = 1; //0.025;
+	constexpr double kPModuleDriveController = .5; //0.025;
 	constexpr double kmaxTurnOutput = .5;
 
 	//constexpr double kPModuleTurningController = 0.45;

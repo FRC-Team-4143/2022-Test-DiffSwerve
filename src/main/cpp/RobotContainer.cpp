@@ -30,6 +30,7 @@
 #include "Scripting/ScriptParser.h"
 #include "Scripting/ScriptParserElement.h"
 #include "subsystems/DriveSubsystem.h"
+#include "commands/DriveGyro.h"
 
 using namespace DriveConstants;
 
@@ -171,6 +172,8 @@ void RobotContainer::_ConfigureButtonBindings() {
 	frc2::InstantCommand nextClimberStepCommand{
 		[this]() { m_climber.IndexStep(); },
 	};
+
+	
 
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
@@ -445,6 +448,32 @@ void RobotContainer::_InitializeScriptEngine() {
 			"ZeroGyro", {"ZG"},
 			[this](std::vector<float> parameters) {
 				return std::make_unique<ZeroYaw>(&m_drive);
+			}
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"DriveStop", {"DS"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::InstantCommand>(
+					[this]() {
+						m_drive.motorsOff();
+					}
+				);
+			}	
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"DriveGyro", {"DG"},
+			[this](std::vector<float> parameters) {
+				parameters.resize(3);
+				double x{parameters[0]};
+				double y{parameters[1]};
+				double angle{parameters[2]};
+				return std::make_unique<DriveGyro>(&m_drive, x, y, angle);
 			}
 		}
 	);

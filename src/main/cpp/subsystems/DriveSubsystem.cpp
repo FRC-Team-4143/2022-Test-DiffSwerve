@@ -136,6 +136,59 @@ void DriveSubsystem::ToggleFieldCentric(){
   m_fieldCentric=!m_fieldCentric;
 }
 
+void DriveSubsystem::motorsOff(){
+  m_frontLeft.motorsOff();
+  m_rearLeft.motorsOff();
+  m_frontRight.motorsOff();
+  m_rearRight.motorsOff();
+}
+
+void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
+	double currentAngle = GetHeading().value();
+	auto twist = -(desiredAngle - currentAngle);
+
+	while (twist > 180.0) {
+		twist -= 360.0;
+	}
+	while (twist < -180.0) {
+		twist += 360.0;
+	}
+
+	constexpr double GYRO_P = 0.028*6; //original is 0.007
+	constexpr double GYRO_MAX = 0.3*6;
+
+	twist = std::clamp(twist*GYRO_P, -GYRO_MAX, GYRO_MAX);
+	Drive(units::meters_per_second_t(x), units::meters_per_second_t(y), units::radians_per_second_t(twist));
+}
+
+double DriveSubsystem::GyroRotate() {
+	auto yaw = GetHeading().value();
+	float desiredangle = 0;
+
+	if (yaw > 45 && yaw < 135) {
+		desiredangle = 90;
+	}
+	else if ((yaw > 135 && yaw < 179) || (yaw < -135 && yaw > -179)) {
+		desiredangle = 180;
+	}
+	else if (yaw > -135 && yaw < -45) {
+		desiredangle = -90;
+	}
+	else if (yaw < 45 && yaw > -45) {
+		desiredangle = 0;
+	}
+
+	auto twist = desiredangle - yaw;
+	while (twist > 180.0) {
+		twist -= 360.0;
+	}
+	while (twist < -180.0) {
+		twist += 360.0;
+	}
+
+	return twist;
+}
+
 // ================================================================
 
 void DriveSubsystem::SetWheelOffsets() {
