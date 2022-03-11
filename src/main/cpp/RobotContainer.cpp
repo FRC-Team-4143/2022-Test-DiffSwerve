@@ -31,6 +31,15 @@
 #include "Scripting/ScriptParserElement.h"
 #include "subsystems/DriveSubsystem.h"
 #include "commands/DriveGyro.h"
+#include <pathplanner/lib/PathPlanner.h>
+
+using namespace pathplanner;
+
+// This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
+PathPlannerTrajectory examplePath = PathPlanner::loadPath("Example Path", 8_mps, 5_mps_sq);
+
+// Sample the state of the path at 1.2 seconds
+PathPlannerTrajectory::PathPlannerState exampleState = examplePath.sample(1.2_s);
 
 using namespace DriveConstants;
 
