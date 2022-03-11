@@ -23,6 +23,8 @@
 #include <frc/trajectory/TrajectoryUtil.h>
 #include <wpi/fs.h>
 #include "Scripting/ValidateScriptCmd.h"
+#include <pathplanner/lib/PathPlanner.h>
+
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -62,6 +64,7 @@ private:
 	frc2::JoystickButton *m_lb;
 
 	frc::Trajectory m_testTrajectory;
+	pathplanner::PathPlannerTrajectory m_ppTrajectory;
 
 	frc4143::ValidateScriptCmd _validateScriptCmd;
 

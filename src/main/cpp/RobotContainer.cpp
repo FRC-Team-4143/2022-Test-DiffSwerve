@@ -21,6 +21,7 @@
 #include "commands/PickUpCycle.h"
 #include "commands/PickUpCycleBounce.h"
 #include "commands/PWSwerveControllerCommand.h"
+#include "commands/PPSwerveControllerCommand.h"
 #include "commands/SetWheelOffsets.h"
 #include "commands/ToggleDriveMode.h"
 #include "commands/ZeroClimber.h"
@@ -31,15 +32,6 @@
 #include "Scripting/ScriptParserElement.h"
 #include "subsystems/DriveSubsystem.h"
 #include "commands/DriveGyro.h"
-#include <pathplanner/lib/PathPlanner.h>
-
-using namespace pathplanner;
-
-// This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
-PathPlannerTrajectory examplePath = PathPlanner::loadPath("Example Path", 8_mps, 5_mps_sq);
-
-// Sample the state of the path at 1.2 seconds
-PathPlannerTrajectory::PathPlannerState exampleState = examplePath.sample(1.2_s);
 
 using namespace DriveConstants;
 
@@ -71,6 +63,7 @@ RobotContainer::RobotContainer()
 		{&m_drive}
 	},
 	m_testTrajectory{},
+	m_ppTrajectory{},
 	_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
@@ -89,6 +82,9 @@ RobotContainer::RobotContainer()
 	fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
 	deployDirectory = deployDirectory / "output" / "Test1.wpilib.json";
 	m_testTrajectory = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+
+	// This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
+	m_ppTrajectory = pathplanner::PathPlanner::loadPath("Example Path", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
 }
 
 // ==========================================================================
@@ -245,6 +241,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		units::radian_t(wpi::numbers::pi)
 	);
 
+#if 0
 	//frc2::SwerveControllerCommand<4> swerveControllerCommand();
 	PWSwerveControllerCommand<4> swerveControllerCommand{
 		m_testTrajectory,
@@ -258,6 +255,20 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		},
 		{&m_drive}
 	};
+#else
+	PPSwerveControllerCommand<4> swerveControllerCommand{
+		m_ppTrajectory,
+		[this]() { return m_drive.GetPose(); },
+		m_drive.kDriveKinematics,
+		frc2::PIDController(AutoConstants::kPXController, 0, 0),
+		frc2::PIDController(AutoConstants::kPYController, 0, 0),
+		thetaController,
+		[this](auto moduleStates) {
+			m_drive.SetModuleStates(moduleStates);
+		},
+		{&m_drive}
+	};
+#endif
 
 	// Reset odometry to the starting pose of the trajectory.
 	m_drive.ZeroHeading();
