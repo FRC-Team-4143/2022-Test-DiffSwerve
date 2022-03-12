@@ -5,10 +5,10 @@
 // ============================================================================
 
 PickUpSubsystem::PickUpSubsystem()
-:	m_roller {PickUpConstants::kRollerPort},
-	m_rollerpwm {0},
+:	//m_roller {PickUpConstants::kRollerPort},
 	m_index1 {PickUpConstants::kIndex1Port},
 	m_index2 {PickUpConstants::kIndex2Port},
+	m_rollerpwm {0},
 	m_upperSolenoid {frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kUpperForwardSolenoidPort, PickUpConstants::kUpperReverseSolenoidPort},
 	m_lowerSolenoid {frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kLowerForwardSolenoidPort, PickUpConstants::kLowerReverseSolenoidPort},
 	m_compressor {frc::PneumaticsModuleType::CTREPCM},
@@ -75,22 +75,22 @@ void PickUpSubsystem::PickUpToggle() {
 // ============================================================================
 
 void PickUpSubsystem::RollerIn() {
-	m_roller.Set(TalonSRXControlMode::PercentOutput, -1.0);
-	m_rollerpwm.Set(-1.0);
+	//m_roller.Set(TalonSRXControlMode::PercentOutput, -1.0);
+	m_rollerpwm.Set(-.75);
 	PickUpExtend();
 }
 
 // ============================================================================
 
 void PickUpSubsystem::RollerOut() {
-	m_roller.Set(TalonSRXControlMode::PercentOutput, 0.75);
-	m_rollerpwm.Set(.75);
+	//m_roller.Set(TalonSRXControlMode::PercentOutput, 0.75);
+	m_rollerpwm.Set(.5);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::RollerOff() {
-	m_roller.Set(TalonSRXControlMode::PercentOutput, 0);
+	//m_roller.Set(TalonSRXControlMode::PercentOutput, 0);
 	m_rollerpwm.Set(0);
 	PickUpRetract();
 }

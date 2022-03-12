@@ -46,8 +46,8 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 
     m_rotateLeftEncoder.SetPositionConversionFactor(90/17.57);
     m_rotateRightEncoder.SetPositionConversionFactor(90/17.57);
-    m_extendLeftEncoder.SetPositionConversionFactor(9/16);   //changed gears from 1:16 to 1:9
-    m_extendRightEncoder.SetPositionConversionFactor(9/16);
+    m_extendLeftEncoder.SetPositionConversionFactor(1);
+    m_extendRightEncoder.SetPositionConversionFactor(1);
 
 	m_rotateLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_rotateRight.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
@@ -153,8 +153,8 @@ void ClimberSubsystem::Periodic() {
         if(!m_controller->GetBackButton()){
             m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
             m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
-            m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0, 265.0);
-            m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0, 265.0);
+            m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
+            m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0*9/16, 265.0*9/16);
         }
 
         frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);

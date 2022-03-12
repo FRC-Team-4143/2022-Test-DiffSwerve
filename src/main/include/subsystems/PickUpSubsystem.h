@@ -40,7 +40,7 @@ public:
 
 private:
 
-	TalonSRX m_roller;
+	//TalonSRX m_roller;
 	TalonSRX m_index1;
 	TalonSRX m_index2;
 	frc::PWMTalonFX m_rollerpwm;

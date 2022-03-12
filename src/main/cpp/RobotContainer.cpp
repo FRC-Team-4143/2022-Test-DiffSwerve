@@ -92,7 +92,7 @@ RobotContainer::RobotContainer()
 	m_testTrajectory = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
 #else
 	// This will load the file "Example Path.path" and generate it
-	m_ppTrajectory = pathplanner::PathPlanner::loadPath("example", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
+	m_ppTrajectory = pathplanner::PathPlanner::loadPath("gethumanplayerball", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
 #endif
 }
 
@@ -393,7 +393,9 @@ std::unique_ptr<frc2::Command> RobotContainer::_GetDrivePathCommand() {
 			std::initializer_list<frc2::Subsystem*>{&m_drive}
 		)
 	};
-	m_drive.ResetOdometry(m_ppTrajectory.getInitialState()->pose);
+	frc::Pose2d pose(m_ppTrajectory.getInitialState()->pose.Translation(), m_ppTrajectory.getInitialState()->holonomicRotation);
+	m_drive.ResetOdometry(pose);
+	//m_drive.ResetOdometry(m_ppTrajectory.getInitialState());
 #endif
 
 	return cmd;
@@ -428,14 +430,21 @@ void RobotContainer::_InitializeScriptEngine() {
 		frc4143::ScriptParserElement{
 			"StartUp", {"SU"},
 			[this](std::vector<float> parameters) {
-				parameters.resize(1);
+				parameters.resize(2);
 				double speed{parameters[0]};
+				double far {parameters[1]};
 				return std::make_unique<frc2::InstantCommand>(
-					[this, speed]() {
+					[this, speed, far]() {
 						m_pickUp.PickUpExtend();
 						m_pickUp.RollerIn();
 						m_pickUp.IndexerLoad();
-						m_pickUp.ShooterClose();
+						if (far) {
+							m_pickUp.ShooterFar();
+						}
+						else {
+							m_pickUp.ShooterClose();
+						}
+						m_pickUp.ShooterFar();
 						m_pickUp.SetShooterSpeed(speed);
 						m_pickUp.ShooterOn();
 					}
@@ -464,9 +473,30 @@ void RobotContainer::_InitializeScriptEngine() {
 		frc4143::ScriptParserElement{
 			"IndexerOn", {"iOn"},
 			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::FunctionalCommand>(
+					[]() {},
+					[this]() {m_pickUp.IndexerOn();},
+					[this](bool) { m_pickUp.IndexerOff(); },
+					[]() { return false; }
+				);
+			}
+		}
+	);
+
+	frc2::FunctionalCommand shooterOnCommand{
+		[]() {},
+		[this]() { m_pickUp.ShooterOn(); },
+		[this](bool) { m_pickUp.ShooterOff(); },
+		[]() { return false; },
+	};
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"PickUpRetract", {"PR"},
+			[this](std::vector<float> parameters) {
 				return std::make_unique<frc2::InstantCommand>(
 					[this]() {
-						m_pickUp.IndexerOn();
+						m_pickUp.PickUpRetract();
 					}
 				);
 			}

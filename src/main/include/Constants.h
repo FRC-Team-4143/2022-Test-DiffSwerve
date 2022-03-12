@@ -93,13 +93,13 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
-	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(2);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
+	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
 	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.141);
 
-	constexpr double kPXController = 0.5;
-	constexpr double kPYController = 0.5;
+	constexpr double kPXController = 1.;  //0.5
+	constexpr double kPYController = 1.;  //0.5
 	constexpr double kPThetaController = 5.0;
 
 	extern const frc::TrapezoidProfile<units::radians>::Constraints kThetaControllerConstraints;
