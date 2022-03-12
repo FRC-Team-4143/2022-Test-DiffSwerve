@@ -12,19 +12,18 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/RobotController.h>
 
-#define CANBUS "Default Name"
-//#define CANBUS "roborio"
+#define CANIVORE "Default Name"
 
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", CANBUS},
+    : m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "roborio"},
 
-      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANBUS},
+      m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANIVORE},
 
-      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", CANBUS},
+      m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "roborio"},
 
-      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANBUS},
+      m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE},
 
       m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
       m_fieldCentric{false} {

@@ -20,8 +20,15 @@
 #include <utility>
 #include "commands/PickUpCycle.h"
 #include "commands/PickUpCycleBounce.h"
+
+#undef PATHWEAVER
+
+#ifdef PATHWEAVER
 #include "commands/PWSwerveControllerCommand.h"
+#else
 #include "commands/PPSwerveControllerCommand.h"
+#endif
+
 #include "commands/SetWheelOffsets.h"
 #include "commands/ToggleDriveMode.h"
 #include "commands/ZeroClimber.h"
@@ -79,12 +86,14 @@ RobotContainer::RobotContainer()
 	// Turning is controlled by the X axis of the right stick.
 	m_drive.SetDefaultCommand(m_DriveCommand);
 
+#ifdef PATHWEAVER
 	fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
 	deployDirectory = deployDirectory / "output" / "Test1.wpilib.json";
 	m_testTrajectory = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
-
-	// This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
-	m_ppTrajectory = pathplanner::PathPlanner::loadPath("Example Path", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
+#else
+	// This will load the file "Example Path.path" and generate it
+	m_ppTrajectory = pathplanner::PathPlanner::loadPath("example", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
+#endif
 }
 
 // ==========================================================================
@@ -241,7 +250,10 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		units::radian_t(wpi::numbers::pi)
 	);
 
-#if 0
+	// Reset odometry to the starting pose of the trajectory.
+	m_drive.ZeroHeading();
+
+#ifdef PATHWEAVER
 	//frc2::SwerveControllerCommand<4> swerveControllerCommand();
 	PWSwerveControllerCommand<4> swerveControllerCommand{
 		m_testTrajectory,
@@ -255,6 +267,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		},
 		{&m_drive}
 	};
+	m_drive.ResetOdometry(m_testTrajectory.InitialPose());
 #else
 	PPSwerveControllerCommand<4> swerveControllerCommand{
 		m_ppTrajectory,
@@ -268,11 +281,10 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		},
 		{&m_drive}
 	};
+	m_drive.ResetOdometry(m_ppTrajectory.getInitialState()->pose);
 #endif
 
-	// Reset odometry to the starting pose of the trajectory.
-	m_drive.ZeroHeading();
-	m_drive.ResetOdometry(m_testTrajectory.InitialPose());
+
 
 	/*
 	bool IsNearWaypoint(Pose2d waypoint, double within) {
@@ -350,6 +362,7 @@ std::unique_ptr<frc2::Command> RobotContainer::_GetDrivePathCommand() {
 		units::radian_t(wpi::numbers::pi)
 	);
 
+#ifdef PATHWEAVER
 	//frc2::SwerveControllerCommand<4> swerveControllerCommand();
 	auto cmd{
 		std::make_unique<PWSwerveControllerCommand<4>>(
@@ -367,6 +380,21 @@ std::unique_ptr<frc2::Command> RobotContainer::_GetDrivePathCommand() {
 	// Reset odometry to the starting pose of the trajectory.
 	//m_drive.ZeroHeading();
 	m_drive.ResetOdometry(m_testTrajectory.InitialPose());
+#else
+	auto cmd{
+		std::make_unique<PPSwerveControllerCommand<4>>(
+			m_ppTrajectory,
+			[this]() { return m_drive.GetPose(); },
+			m_drive.kDriveKinematics,
+			frc2::PIDController(AutoConstants::kPXController, 0, 0),
+			frc2::PIDController(AutoConstants::kPYController, 0, 0),
+			thetaController,
+			[this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+			std::initializer_list<frc2::Subsystem*>{&m_drive}
+		)
+	};
+	m_drive.ResetOdometry(m_ppTrajectory.getInitialState()->pose);
+#endif
 
 	return cmd;
 }
