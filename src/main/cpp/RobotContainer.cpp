@@ -62,9 +62,9 @@ RobotContainer::RobotContainer()
 			auto rotMod = 1.0;
 
 			m_drive.Drive(
-				units::meters_per_second_t(x * ModuleConstants::kMaxSpeed),
-				units::meters_per_second_t(y * ModuleConstants::kMaxSpeed),
-				units::radians_per_second_t(rot * ModuleConstants::kMaxAngularSpeed * rotMod)
+				units::meters_per_second_t(x * DriveConstants::kMaxSpeed),
+				units::meters_per_second_t(y * DriveConstants::kMaxSpeed),
+				units::radians_per_second_t(rot * DriveConstants::kMaxAngularSpeed * rotMod)
 			);
 		},
 		{&m_drive}

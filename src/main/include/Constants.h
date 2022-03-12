@@ -63,6 +63,9 @@ namespace DriveConstants {
 	// constexpr double kPRearRightVel = 0.5;
 
 	constexpr double stickDeadBand = .1;
+
+	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
 } // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -83,9 +86,6 @@ namespace ModuleConstants {
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
-
-	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
-	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
 } // namespace ModuleConstants
 
 namespace AutoConstants {

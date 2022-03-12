@@ -46,8 +46,8 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 
     m_rotateLeftEncoder.SetPositionConversionFactor(90/17.57);
     m_rotateRightEncoder.SetPositionConversionFactor(90/17.57);
-    m_extendLeftEncoder.SetPositionConversionFactor(1);
-    m_extendRightEncoder.SetPositionConversionFactor(1);
+    m_extendLeftEncoder.SetPositionConversionFactor(9/16);   //changed gears from 1:16 to 1:9
+    m_extendRightEncoder.SetPositionConversionFactor(9/16);
 
 	m_rotateLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	m_rotateRight.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);

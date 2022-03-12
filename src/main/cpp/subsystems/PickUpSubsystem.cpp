@@ -6,6 +6,7 @@
 
 PickUpSubsystem::PickUpSubsystem()
 :	m_roller {PickUpConstants::kRollerPort},
+	m_rollerpwm {0},
 	m_index1 {PickUpConstants::kIndex1Port},
 	m_index2 {PickUpConstants::kIndex2Port},
 	m_upperSolenoid {frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kUpperForwardSolenoidPort, PickUpConstants::kUpperReverseSolenoidPort},
@@ -35,6 +36,8 @@ PickUpSubsystem::PickUpSubsystem()
 
 void PickUpSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber ("Shooter Speed", m_shooterSpeed);
+	frc::SmartDashboard::PutNumber ("ShooterSpeedshort", m_shooterSpeedShort);
+	frc::SmartDashboard::PutNumber ("ShooterSpeedlong", m_shooterSpeedLong);
 }
 
 // ============================================================================
@@ -73,6 +76,7 @@ void PickUpSubsystem::PickUpToggle() {
 
 void PickUpSubsystem::RollerIn() {
 	m_roller.Set(TalonSRXControlMode::PercentOutput, -1.0);
+	m_rollerpwm.Set(-1.0);
 	PickUpExtend();
 }
 
@@ -80,12 +84,14 @@ void PickUpSubsystem::RollerIn() {
 
 void PickUpSubsystem::RollerOut() {
 	m_roller.Set(TalonSRXControlMode::PercentOutput, 0.75);
+	m_rollerpwm.Set(.75);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::RollerOff() {
 	m_roller.Set(TalonSRXControlMode::PercentOutput, 0);
+	m_rollerpwm.Set(0);
 	PickUpRetract();
 }
 
@@ -140,13 +146,19 @@ void PickUpSubsystem::ShooterOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterFaster() {
-	m_shooterSpeedLong = std::min(1.0, m_shooterSpeedLong + 0.025);
+	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
+		m_shooterSpeed = m_shooterSpeedLong = std::min(1.0, m_shooterSpeedLong + 0.025);
+	else
+		m_shooterSpeed = m_shooterSpeedShort = std::min(1.0, m_shooterSpeedShort + 0.025);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterSlower() {
-	m_shooterSpeedLong = std::max(0.0, m_shooterSpeedLong - 0.025);
+	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
+		m_shooterSpeed = m_shooterSpeedLong = std::max(0.0, m_shooterSpeedLong - 0.025);
+	else
+		m_shooterSpeed = m_shooterSpeedShort = std::max(0.0, m_shooterSpeedShort - 0.025);
 }
 
 // ============================================================================
