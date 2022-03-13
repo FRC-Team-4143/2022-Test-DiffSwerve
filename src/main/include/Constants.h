@@ -24,6 +24,8 @@
  * they are needed.
  */
 
+// ==========================================================================
+
 namespace DriveConstants {
 	constexpr int kFrontLeftDriveMotorPort = 22;
 	constexpr int kRearLeftDriveMotorPort = 24;
@@ -43,13 +45,6 @@ namespace DriveConstants {
 	//constexpr double driveMaxVoltage = 12;
 	constexpr double driveMaxVoltage = 8;
 
-	//DrivePIDConstants
-	constexpr auto ks = .64705_V;
-	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
-	//constexpr auto kv = 3.07 * 1_V * 1_s / 1_m;   
-	constexpr auto kv = 2.2489 * 1_V * 1_s / 1_m;
-	constexpr auto ka = .26974 * 1_V * 1_s * 1_s / 1_m;
-
 	//TurningPIDConstants
 	//constexpr auto kts = .1_V;
 	//constexpr auto ktv = .24_V/(1_rad_per_s);
@@ -65,8 +60,10 @@ namespace DriveConstants {
 	constexpr double stickDeadBand = .1;
 
 	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
-	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2 * wpi::numbers::pi); 
 } // namespace DriveConstants
+
+// ==========================================================================
 
 namespace ModuleConstants {
 	//constexpr int kEncoderCPR = 1024;
@@ -80,13 +77,22 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 1/3.141;
+	constexpr double kPModuleTurningController = 1 / wpi::numbers::pi;
 	constexpr double kPModuleDriveController = .5; //0.025;
 	constexpr double kmaxTurnOutput = .5;
+
+	//DrivePIDConstants
+	constexpr auto ks = .64705_V;
+	//constexpr auto kv = 2.5 * 1_V * 1_s / 1_m;
+	//constexpr auto kv = 3.07 * 1_V * 1_s / 1_m;   
+	constexpr auto kv = 2.2489 * 1_V * 1_s / 1_m;
+	constexpr auto ka = .26974 * 1_V * 1_s * 1_s / 1_m;
 
 	//constexpr double kPModuleTurningController = 0.45;
 	//constexpr double kPModuleDriveController = 0.025;
 } // namespace ModuleConstants
+
+// ==========================================================================
 
 namespace AutoConstants {
 	using radians_per_second_squared_t =
@@ -95,8 +101,8 @@ namespace AutoConstants {
 
 	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
 	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(3);
-	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2*3.141); 
-	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(3.141);
+	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2 * wpi::numbers::pi); 
+	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(wpi::numbers::pi);
 
 	constexpr double kPXController = 1.;  //0.5
 	constexpr double kPYController = 1.;  //0.5
@@ -105,10 +111,14 @@ namespace AutoConstants {
 	extern const frc::TrapezoidProfile<units::radians>::Constraints kThetaControllerConstraints;
 }
 
+// ==========================================================================
+
 namespace OIConstants {
 	constexpr int kDriverControllerPort = 0;
 	constexpr int kClimberControllerPort = 1;
 }
+
+// ==========================================================================
 
 namespace PickUpConstants {
 	constexpr int kRollerPort = 31;
@@ -118,6 +128,7 @@ namespace PickUpConstants {
 	constexpr int kShooter1Port = 34;
 	constexpr int kShooter2Port = 35;
 	constexpr int kBackSpinShooterPort = 36;
+
 	constexpr int kShooterForwardSolenoidPort = 4;
 	constexpr int kShooterReverseSolenoidPort = 2;
 
@@ -126,9 +137,11 @@ namespace PickUpConstants {
 	constexpr int kLowerForwardSolenoidPort = 0;
 	constexpr int kLowerReverseSolenoidPort = 6;
 
-	constexpr double kShortSpeed = .35;
-	constexpr double kLongSpeed = .55;
+	constexpr double kShortSpeed = 0.35;
+	constexpr double kLongSpeed = 0.55;
 }
+
+// ==========================================================================
 
 namespace ClimberConstants {
 	constexpr int kRotateLeftPort = 42;
@@ -166,3 +179,5 @@ namespace ClimberConstants {
 	constexpr double kAllErr = 0;
 	constexpr double MaxRPM = 5700;
 }
+
+// ==========================================================================

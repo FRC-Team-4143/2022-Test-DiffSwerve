@@ -1,5 +1,4 @@
 #pragma once
-
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -15,69 +14,75 @@
 #include "Constants.h"
 
 class SwerveModule {
-  using radians_per_second_squared_t =
-      units::compound_unit<units::radians,
-      units::inverse<units::squared<units::second>>>;
+	using radians_per_second_squared_t =
+		units::compound_unit<
+			units::radians,
+			units::inverse<units::squared<units::second>>
+		>;
 
- public:
-  SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus);
-  SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
+public:
 
-  frc::SwerveModuleState GetState();
+	SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus);
+	SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
 
-  double SetDesiredState(const frc::SwerveModuleState& state);
+	frc::SwerveModuleState GetState();
 
-  void ResetEncoders();
+	double SetDesiredState(const frc::SwerveModuleState& state);
 
-  void SetWheelOffset();
-  void LoadWheelOffset();
-  void motorsOff();
-  double GetDriveMotorSpeed();
+	void ResetEncoders();
 
-  void SetVoltage(double driveMax);
+	void SetWheelOffset();
+	void LoadWheelOffset();
+	void motorsOff();
+	double GetDriveMotorSpeed();
 
- private:
-  // We have to use meters here instead of radians due to the fact that
-  // ProfiledPIDController's constraints only take in meters per second and
-  // meters per second squared.
-/*
-  static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
-      units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
-  static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
-        units::unit_t<radians_per_second_squared_t>{
-        wpi::numbers::pi * 2.0 * 100.0
-*/
-    static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
-      units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
-  static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
-        units::unit_t<radians_per_second_squared_t>{
-        wpi::numbers::pi * 2.0 * 100.0
-    }; // radians per second squared
+	void SetVoltage(double driveMax);
 
-  WPI_TalonFX m_driveMotor;
-  WPI_TalonFX m_turningMotor;
-  WPI_CANCoder m_encoder;
+private:
 
-  std::string m_name;
-  frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
-  //frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{DriveConstants::kts, DriveConstants::ktv};
+	// We have to use meters here instead of radians due to the fact that
+	// ProfiledPIDController's constraints only take in meters per second and
+	// meters per second squared.
+	/*
+	static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
+	units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
+	static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
+	units::unit_t<radians_per_second_squared_t>{
+	wpi::numbers::pi * 2.0 * 100.0
+	*/
+	static constexpr units::radians_per_second_t kModuleMaxAngularVelocity =
+		units::radians_per_second_t(wpi::numbers::pi * 100.0);  // radians per second
 
-    frc2::PIDController m_drivePIDController{
-        ModuleConstants::kPModuleDriveController, 0, 0
-    };
+	static constexpr units::unit_t<radians_per_second_squared_t> kModuleMaxAngularAcceleration =
+		units::unit_t<radians_per_second_squared_t>{
+			wpi::numbers::pi * 2.0 * 100.0
+		}; // radians per second squared
 
-    frc::ProfiledPIDController<units::radians> m_turningPIDController{
-        ModuleConstants::kPModuleTurningController,
-        0.0,
-        0.0,
-        {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}
-    };
+	WPI_TalonFX m_driveMotor;
+	WPI_TalonFX m_turningMotor;
+	WPI_CANCoder m_encoder;
 
-    double m_offset;
+	std::string m_name;
 
-    double m_driveVoltage;
-    double m_turnVoltage;
+	frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{ModuleConstants::ks, ModuleConstants::kv, ModuleConstants::ka};
+	//frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{DriveConstants::kts, DriveConstants::ktv};
 
-    double m_driveSpeed;
-    double m_moduleAngle;
+	frc2::PIDController m_drivePIDController{
+		ModuleConstants::kPModuleDriveController, 0, 0
+	};
+
+	frc::ProfiledPIDController<units::radians> m_turningPIDController{
+		ModuleConstants::kPModuleTurningController,
+		0.0,
+		0.0,
+		{kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}
+		};
+
+	double m_offset;
+
+	double m_driveVoltage;
+	double m_turnVoltage;
+
+	double m_driveSpeed;
+	double m_moduleAngle;
 };

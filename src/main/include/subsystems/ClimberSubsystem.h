@@ -11,13 +11,13 @@ public:
 
 	void Periodic() override;
 
-	void ZeroClimber();
-	double GetLeftRotationPosition();
-	double GetRightRotationPosition();
-	
 	void IndexStep();
+	void ZeroClimber();
 
 private:
+
+	double _GetLeftRotationPosition();
+	double _GetRightRotationPosition();
 
 	frc::XboxController* m_controller;
 
@@ -48,21 +48,22 @@ private:
 	double m_leftExtensionPos = 0;
 	int m_numSteps = 13;
 
-	double m_climbSteps[14][4] ={{0, 0, 0, 0},
-								{22, 0, 265*9/16, 265*9/16},
-								{32, 0, -10*9/16, 265*9/16},
-								{25, 0, -10*9/16, 265*9/16},
-								{25, 0, 130*9/16, 165*9/16},
-								{0, -22, 100*9/16, 165*9/16},
-								{0, -32, 265*9/16, -10*9/16},
-								{0, -22, 265*9/16, -10*9/16},
-								{0, -22, 0*9/16, 165*9/16},
-								{0, -22, 50*9/16, 0},
-								{10, 0, 50*9/16, 0},
-								{10, 0, 0, 50*9/16},
-								{0, 0, 0, 50*9/16},
-								{0, 0, 0, 0}
-								};
+	double m_climbSteps[14][4] = {
+		{0, 0, 0, 0},
+		{22, 0, 265*9/16, 265*9/16},
+		{32, 0, -10*9/16, 265*9/16},
+		{25, 0, -10*9/16, 265*9/16},
+		{25, 0, 130*9/16, 165*9/16},
+		{0, -22, 100*9/16, 165*9/16},
+		{0, -32, 265*9/16, -10*9/16},
+		{0, -22, 265*9/16, -10*9/16},
+		{0, -22, 0*9/16, 165*9/16},
+		{0, -22, 50*9/16, 0},
+		{10, 0, 50*9/16, 0},
+		{10, 0, 0, 50*9/16},
+		{0, 0, 0, 50*9/16},
+		{0, 0, 0, 0}
+	};
 
 	int m_step = 0;
 	bool m_newStep = false;

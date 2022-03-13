@@ -1,7 +1,8 @@
 #include "commands/DriveGyro.h"
 
-
-DriveGyro::DriveGyro(DriveSubsystem* subsystem, double x, double y, double angle) : m_drive(subsystem), m_x(x), m_y(y), m_angle(angle) {
+DriveGyro::DriveGyro(DriveSubsystem* subsystem, double x, double y, double angle)
+:	m_drive(subsystem), m_x(x), m_y(y), m_angle(angle)
+{
 	AddRequirements(subsystem);
 }
 
@@ -14,7 +15,7 @@ void DriveGyro::Execute() {
 }
 
 void DriveGyro::End(bool) {
-	m_drive->motorsOff();
+	m_drive->MotorsOff();
 }
 
 bool DriveGyro::IsFinished() {

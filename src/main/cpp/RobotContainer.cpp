@@ -1,12 +1,10 @@
 #include "RobotContainer.h"
-#include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/Trigger.h>
 #include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/InstantCommand.h>
@@ -18,6 +16,7 @@
 #include <units/angle.h>
 #include <units/velocity.h>
 #include <utility>
+#include "commands/DriveGyro.h"
 #include "commands/PickUpCycle.h"
 #include "commands/PickUpCycleBounce.h"
 
@@ -33,12 +32,9 @@
 #include "commands/ToggleDriveMode.h"
 #include "commands/ZeroClimber.h"
 #include "commands/ZeroYaw.h"
-#include "Constants.h"
 #include "Scripting/ScriptEngine.h"
 #include "Scripting/ScriptParser.h"
 #include "Scripting/ScriptParserElement.h"
-#include "subsystems/DriveSubsystem.h"
-#include "commands/DriveGyro.h"
 
 using namespace DriveConstants;
 
@@ -46,7 +42,7 @@ using namespace DriveConstants;
 
 RobotContainer::RobotContainer()
 :	m_pickUp{}, m_climber{&m_climberController},
-	m_DriveCommand{
+	m_driveCommand{
 		[this] {
 			auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
 			auto y = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),DriveConstants::stickDeadBand));
@@ -71,7 +67,7 @@ RobotContainer::RobotContainer()
 	},
 	m_testTrajectory{},
 	m_ppTrajectory{},
-	_validateScriptCmd{}
+	m_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
 
@@ -84,7 +80,7 @@ RobotContainer::RobotContainer()
 	// Set up default drive command
 	// The left stick controls translation of the robot.
 	// Turning is controlled by the X axis of the right stick.
-	m_drive.SetDefaultCommand(m_DriveCommand);
+	m_drive.SetDefaultCommand(m_driveCommand);
 
 #ifdef PATHWEAVER
 	fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
@@ -182,12 +178,9 @@ void RobotContainer::_ConfigureButtonBindings() {
 		[this]() { m_pickUp.ShooterDistToggle(); },
 	};
 
-
 	frc2::InstantCommand nextClimberStepCommand{
 		[this]() { m_climber.IndexStep(); },
 	};
-
-	
 
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
@@ -195,33 +188,31 @@ void RobotContainer::_ConfigureButtonBindings() {
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_X))->WhileHeld(indexerOnCommand);
 
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kY)
-      .WhenPressed(shooterDistToggleCommand);
+		.WhenPressed(shooterDistToggleCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftStick)
-      .WhenPressed(ToggleDriveMode{&m_drive});
+		.WhenPressed(ToggleDriveMode{&m_drive});
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
-      .WhileHeld(indexerRevCommand);
+		.WhileHeld(indexerRevCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kStart)
-      .WhenPressed(shooterSlowerCommand);
+		.WhenPressed(shooterSlowerCommand);
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kBack)
-      .WhenPressed(shooterFasterCommand);
+		.WhenPressed(shooterFasterCommand);
 	frc2::JoystickButton(&m_climberController, frc::XboxController::Button::kLeftBumper)
-  	  .WhenPressed(nextClimberStepCommand);
+		.WhenPressed(nextClimberStepCommand);
 
-	frc2::Trigger RT{
-		[this]() {
-			return m_driverController.GetRightTriggerAxis() != 0;
-		}
-	};
-
-	RT.WhileActiveOnce(shooterOnCommand);
-
-	frc2::Trigger LT{
+	frc2::Trigger leftTrigger{
 		[this]() {
 			return m_driverController.GetLeftTriggerAxis() != 0;
 		}
 	};
+	leftTrigger.WhileActiveOnce(indexerOnCommand);
 
-	LT.WhileActiveOnce(indexerOnCommand);
+	frc2::Trigger rightTrigger{
+		[this]() {
+			return m_driverController.GetRightTriggerAxis() != 0;
+		}
+	};
+	rightTrigger.WhileActiveOnce(shooterOnCommand);
 
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
@@ -232,8 +223,8 @@ void RobotContainer::_ConfigureButtonBindings() {
 }
 
 // ==========================================================================
-
-frc2::Command* RobotContainer::GetAutonomousCommand2() {
+#if 0
+frc2::Command* RobotContainer::GetAutonomousCommandOld() {
 	// Set up config for trajectory
 	frc::TrajectoryConfig config(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
 
@@ -342,7 +333,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand2() {
 		}
 	};
 }
-
+#endif
 // ==========================================================================
 
 std::unique_ptr<frc2::Command> RobotContainer::_GetDrivePathCommand() {
@@ -405,7 +396,7 @@ std::unique_ptr<frc2::Command> RobotContainer::_GetDrivePathCommand() {
 
 void RobotContainer::_ConfigureDashboardControls() {
 	// Add a button on the dashboard for validating the script.
-	frc::Shuffleboard::GetTab("Autonomous").Add(_validateScriptCmd);
+	frc::Shuffleboard::GetTab("Autonomous").Add(m_validateScriptCmd);
 }
 
 // ==========================================================================
@@ -536,7 +527,7 @@ void RobotContainer::_InitializeScriptEngine() {
 			[this](std::vector<float> parameters) {
 				return std::make_unique<frc2::InstantCommand>(
 					[this]() {
-						m_drive.motorsOff();
+						m_drive.MotorsOff();
 					}
 				);
 			}	

@@ -89,15 +89,13 @@ public:
 	 */
 	void ResetOdometry(frc::Pose2d pose);
 
-	void ToggleFieldCentric();
-
 	// 2020 robot
 	//units::meter_t kTrackWidth = 0.52_m; // Distance between centers of right and left wheels on robot
 	//units::meter_t kWheelBase = 0.78_m; // Distance between centers of front and back wheels on robot
 
 	// 2022 robot
-	units::meter_t kTrackWidth = 0.432_m; // Distance between centers of right and left wheels on robot
-	units::meter_t kWheelBase = 0.686_m; // Distance between centers of front and back wheels on robot
+	const units::meter_t kTrackWidth = 0.432_m; // Distance between centers of right and left wheels on robot
+	const units::meter_t kWheelBase = 0.686_m; // Distance between centers of front and back wheels on robot
 
 	frc::SwerveDriveKinematics<4> kDriveKinematics{
 		frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -106,17 +104,23 @@ public:
 		frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)
 	};
 
-	void SetWheelOffsets();
-	void LoadWheelOffsets();
-	void motorsOff();
+	void MotorsOff();
+	void ToggleFieldCentric();
 
 	void GyroCrab(double x, double y, double desiredAngle);
 	double GyroRotate();
 
-	// The gyro sensor
-	WPI_Pigeon2 m_pidgey{0, "Default Name"};
+	void SetWheelOffsets();
+	void LoadWheelOffsets();
+
 
 private:
+
+	frc::Translation2d _GetPositionFromRealSense();
+	units::degree_t _GetYawFromRealSense();
+
+	// The gyro sensor
+	WPI_Pigeon2 m_pidgey{0, "Default Name"};
 
 	// Components (e.g. motor controllers and sensors) should generally be
 	// declared private and exposed only through public methods.
@@ -126,7 +130,7 @@ private:
 	SwerveModule m_frontRight;
 	SwerveModule m_rearRight;
 
-	double currentYaw = 0;
+	double m_currentYaw = 0;
 
 	int m_counter = 0;
 
@@ -135,18 +139,25 @@ private:
 	frc::SwerveDriveOdometry<4> m_odometry;
 
 	frc::SwerveDrivePoseEstimator<4> m_poseEstimator{
-      frc::Rotation2d(), frc::Pose2d(), kDriveKinematics,
-      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
+		frc::Rotation2d(), frc::Pose2d(), kDriveKinematics,
+		{0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}
+	};
 
 	bool m_fieldCentric;
 	frc::Field2d m_field;
 
-    std::shared_ptr<nt::NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("/RealSensePose");
-    nt::NetworkTableEntry xEntry = table->GetEntry("x");
-    nt::NetworkTableEntry ryEntry = table->GetEntry("ry");
-    nt::NetworkTableEntry zEntry = table->GetEntry("z");
+	std::shared_ptr<nt::NetworkTable> table{nt::NetworkTableInstance::GetDefault().GetTable("/RealSensePose")};
+	nt::NetworkTableEntry m_xEntry{table->GetEntry("x")};
+	nt::NetworkTableEntry m_rwEntry{table->GetEntry("rw")};
+	nt::NetworkTableEntry m_rxEntry{table->GetEntry("rx")};
+	nt::NetworkTableEntry m_ryEntry{table->GetEntry("ry")};
+	nt::NetworkTableEntry m_rzEntry{table->GetEntry("rz")};
+	nt::NetworkTableEntry m_zEntry{table->GetEntry("z")};
 
 	double m_resetRSx;
 	double m_resetRSz;
+	double m_resetRSrw;
+	double m_resetRSrx;
 	double m_resetRSry;
+	double m_resetRSrz;
 };
