@@ -10,7 +10,11 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/SubsystemBase.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
 #include <ctre/Phoenix.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include "SwerveModule.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
@@ -130,6 +134,19 @@ private:
 	// 4 defines the number of modules
 	frc::SwerveDriveOdometry<4> m_odometry;
 
+	frc::SwerveDrivePoseEstimator<4> m_poseEstimator{
+      frc::Rotation2d(), frc::Pose2d(), kDriveKinematics,
+      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
+
 	bool m_fieldCentric;
 	frc::Field2d m_field;
+
+    std::shared_ptr<nt::NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("/RealSensePose");
+    nt::NetworkTableEntry xEntry = table->GetEntry("x");
+    nt::NetworkTableEntry ryEntry = table->GetEntry("ry");
+    nt::NetworkTableEntry zEntry = table->GetEntry("z");
+
+	double m_resetRSx;
+	double m_resetRSz;
+	double m_resetRSry;
 };

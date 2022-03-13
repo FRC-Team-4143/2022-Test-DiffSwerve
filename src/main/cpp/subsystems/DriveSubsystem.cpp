@@ -38,6 +38,24 @@ void DriveSubsystem::Periodic() {
   m_odometry.Update(GetHeading(), m_frontLeft.GetState(),
                     m_rearLeft.GetState(), m_frontRight.GetState(),
                     m_rearRight.GetState());
+
+  m_poseEstimator.Update(GetHeading(), m_frontLeft.GetState(),
+                    m_rearLeft.GetState(), m_frontRight.GetState(),
+                    m_rearRight.GetState());
+
+  m_poseEstimator.AddVisionMeasurement(
+      frc::Pose2d(units::meter_t(xEntry.GetDouble(0)-m_resetRSx),units::meter_t(zEntry.GetDouble(0)-m_resetRSz),
+      frc::Rotation2d(units::degree_t(ryEntry.GetDouble(0)-m_resetRSry))),
+      frc::Timer::GetFPGATimestamp() - 0.05_s);
+
+  frc::SmartDashboard::PutNumber("m_odometry_x", m_odometry.GetPose().X().value());
+  frc::SmartDashboard::PutNumber("m_odometry_y", m_odometry.GetPose().Y().value());
+  frc::SmartDashboard::PutNumber("m_odometry_r", m_odometry.GetPose().Rotation().Degrees().value());
+
+  frc::SmartDashboard::PutNumber("m_poseEstimator_x", m_poseEstimator.GetEstimatedPosition().X().value());
+  frc::SmartDashboard::PutNumber("m_poseEstimator_y", m_poseEstimator.GetEstimatedPosition().Y().value());
+  frc::SmartDashboard::PutNumber("m_poseEstimator_r", m_poseEstimator.GetEstimatedPosition().Rotation().Degrees().value());
+
   frc::SmartDashboard::PutNumber ("Gyro", GetHeading().value());
   frc::SmartDashboard::PutBoolean ("FieldCentric", m_fieldCentric);
   m_field.SetRobotPose(m_odometry.GetPose());
@@ -129,6 +147,10 @@ frc::Pose2d DriveSubsystem::GetPose() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
+  m_poseEstimator.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
+  m_resetRSx = xEntry.GetDouble(0);
+  m_resetRSz = zEntry.GetDouble(0);
+  m_resetRSry = ryEntry.GetDouble(0);
 }
 
 void DriveSubsystem::ToggleFieldCentric(){
