@@ -9,6 +9,7 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/RunCommand.h>
+#include "Scripting/PathManager.h"
 #include "Scripting/ValidateScriptCmd.h"
 #include "subsystems/ClimberSubsystem.h"
 #include "subsystems/DriveSubsystem.h"
@@ -38,9 +39,9 @@ public:
 	PickUpSubsystem m_pickUp;
 	ClimberSubsystem m_climber;
 
-	frc2::RunCommand m_driveCommand;
-
 private:
+
+	frc2::RunCommand m_driveCommand;
 
 	frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
 	frc::XboxController m_climberController{OIConstants::kClimberControllerPort};
@@ -55,6 +56,8 @@ private:
 
 	frc::Trajectory m_testTrajectory;
 	pathplanner::PathPlannerTrajectory m_ppTrajectory;
+
+	PathManager m_pathManager;
 
 	frc4143::ValidateScriptCmd m_validateScriptCmd;
 

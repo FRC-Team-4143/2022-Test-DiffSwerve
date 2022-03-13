@@ -67,6 +67,7 @@ RobotContainer::RobotContainer()
 	},
 	m_testTrajectory{},
 	m_ppTrajectory{},
+	m_pathManager{AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration},
 	m_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
@@ -89,6 +90,8 @@ RobotContainer::RobotContainer()
 #else
 	// This will load the file "Example Path.path" and generate it
 	m_ppTrajectory = pathplanner::PathPlanner::loadPath("gethumanplayerball", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
+
+	m_pathManager.AddPath("gethumanplayerball");
 #endif
 }
 
@@ -422,8 +425,8 @@ void RobotContainer::_InitializeScriptEngine() {
 			"StartUp", {"SU"},
 			[this](std::vector<float> parameters) {
 				parameters.resize(2);
-				double speed{parameters[0]};
-				double far {parameters[1]};
+				auto speed{parameters[0]};
+				auto far {!!parameters[1]};
 				return std::make_unique<frc2::InstantCommand>(
 					[this, speed, far]() {
 						m_pickUp.PickUpExtend();
@@ -466,7 +469,7 @@ void RobotContainer::_InitializeScriptEngine() {
 			[this](std::vector<float> parameters) {
 				return std::make_unique<frc2::FunctionalCommand>(
 					[]() {},
-					[this]() {m_pickUp.IndexerOn();},
+					[this]() { m_pickUp.IndexerOn(); },
 					[this](bool) { m_pickUp.IndexerOff(); },
 					[]() { return false; }
 				);
@@ -496,9 +499,61 @@ void RobotContainer::_InitializeScriptEngine() {
 
 	parser->Add(
 		frc4143::ScriptParserElement{
-			"DrivePathWeaver", {"DP"},
+			"DrivePath", {"DP"},
 			[this](std::vector<float> parameters) {
 				return _GetDrivePathCommand();
+			}
+		}
+	);
+
+	// DrivePath2
+	// DP2(index, resetOdometry)
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"DrivePath2", {"DP2"},
+			[this](std::vector<float> parameters) {
+				parameters.resize(2);
+				auto index{parameters[0]};
+				auto resetOdometry{!!parameters[1]};
+
+				frc::ProfiledPIDController<units::radians> thetaController{
+					AutoConstants::kPThetaController, 0, 0,
+					AutoConstants::kThetaControllerConstraints
+				};
+
+				thetaController.EnableContinuousInput(
+					units::radian_t(-wpi::numbers::pi),
+					units::radian_t(wpi::numbers::pi)
+				);
+
+				return m_pathManager.GetPathCommand(
+					&m_drive,
+					frc2::PIDController(AutoConstants::kPXController, 0, 0),
+					frc2::PIDController(AutoConstants::kPYController, 0, 0),
+					thetaController, index, resetOdometry
+				);
+			}
+		}
+	);
+
+	// ResetOdometry
+	// RO(xMeters, yMeters, degrees)
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"ResetOdometry", {"RO"},
+			[this](std::vector<float> parameters) {
+				parameters.resize(3);
+				auto x{units::meter_t{parameters[0]}};
+				auto y{units::meter_t{parameters[1]}};
+				auto theta{units::degree_t{parameters[2]}};
+
+				frc::Pose2d pose{x, y, frc::Rotation2d{theta}};
+
+				return std::make_unique<frc2::InstantCommand>(
+					[this, pose]() {
+						m_drive.ResetOdometry(pose);
+					}
+				);
 			}
 		}
 	);
@@ -539,9 +594,9 @@ void RobotContainer::_InitializeScriptEngine() {
 			"DriveGyro", {"DG"},
 			[this](std::vector<float> parameters) {
 				parameters.resize(3);
-				double x{parameters[0]};
-				double y{parameters[1]};
-				double angle{parameters[2]};
+				auto x{parameters[0]};
+				auto y{parameters[1]};
+				auto angle{parameters[2]};
 				return std::make_unique<DriveGyro>(&m_drive, x, y, angle);
 			}
 		}
