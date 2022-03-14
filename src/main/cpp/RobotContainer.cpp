@@ -92,6 +92,9 @@ RobotContainer::RobotContainer()
 	m_ppTrajectory = pathplanner::PathPlanner::loadPath("gethumanplayerball", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
 
 	m_pathManager.AddPath("gethumanplayerball");
+	m_pathManager.AddPath("rightsideball");
+	m_pathManager.AddPath("rightsideball2");
+	m_pathManager.AddPath("rightsideball3");
 #endif
 }
 
@@ -429,8 +432,8 @@ void RobotContainer::_InitializeScriptEngine() {
 				auto far {!!parameters[1]};
 				return std::make_unique<frc2::InstantCommand>(
 					[this, speed, far]() {
-						m_pickUp.PickUpExtend();
-						m_pickUp.RollerIn();
+						//m_pickUp.PickUpExtend();
+						//m_pickUp.RollerIn();
 						m_pickUp.IndexerLoad();
 						if (far) {
 							m_pickUp.ShooterFar();
@@ -438,7 +441,6 @@ void RobotContainer::_InitializeScriptEngine() {
 						else {
 							m_pickUp.ShooterClose();
 						}
-						m_pickUp.ShooterFar();
 						m_pickUp.SetShooterSpeed(speed);
 						m_pickUp.ShooterOn();
 					}
@@ -496,6 +498,21 @@ void RobotContainer::_InitializeScriptEngine() {
 			}
 		}
 	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"PickUpExtend", {"PE"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::InstantCommand>(
+					[this]() {
+						m_pickUp.PickUpExtend();
+						m_pickUp.RollerIn();
+					}
+				);
+			}
+		}
+	);
+
 
 	parser->Add(
 		frc4143::ScriptParserElement{
