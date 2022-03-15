@@ -137,8 +137,10 @@ namespace PickUpConstants {
 	constexpr int kLowerForwardSolenoidPort = 0;
 	constexpr int kLowerReverseSolenoidPort = 6;
 
-	constexpr double kShortSpeed = 0.35;
-	constexpr double kLongSpeed = 0.55;
+	constexpr double kShortSpeed = 0.6;
+	constexpr double kLongSpeed = 0.625;
+	constexpr double kShortSpeedSlow = 0.35;
+	constexpr double kLongSpeedSlow = 0.55;
 }
 
 // ==========================================================================

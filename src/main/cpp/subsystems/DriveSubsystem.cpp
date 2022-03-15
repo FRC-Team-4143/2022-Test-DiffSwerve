@@ -17,16 +17,18 @@ using namespace DriveConstants;
 
 // ==========================================================================
 
-DriveSubsystem::DriveSubsystem()
+DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 :	m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "roborio"},
 	m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANIVORE},
 	m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "roborio"},
 	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE},
 	m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
-	m_fieldCentric{false}
+	m_fieldCentric{false},
+	m_controller(controller)
 {
 	LoadWheelOffsets();
 	frc::SmartDashboard::PutData("Field", &m_field);
+	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
 }
 
 // ==========================================================================
@@ -91,6 +93,11 @@ void DriveSubsystem::Drive(
 	units::meters_per_second_t ySpeed,
 	units::radians_per_second_t rot)
 {
+	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
+	if (m_controller->GetRightTriggerAxis() != 0 && abs(limeLightTX) >= 1) {
+		rot = units::radians_per_second_t(limeLightTX/(-30)*1);
+	}
+
 	auto states = kDriveKinematics.ToSwerveModuleStates(
 		m_fieldCentric ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
 			xSpeed, ySpeed, rot, GetHeading())

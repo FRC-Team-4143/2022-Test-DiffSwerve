@@ -1,10 +1,11 @@
 #include "subsystems/PickUpSubsystem.h"
 #include "Constants.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <networktables/NetworkTable.h>
 
 // ============================================================================
 
-PickUpSubsystem::PickUpSubsystem()
+PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 :	//m_roller {PickUpConstants::kRollerPort},
 	m_index1 {PickUpConstants::kIndex1Port},
 	m_index2 {PickUpConstants::kIndex2Port},
@@ -16,7 +17,8 @@ PickUpSubsystem::PickUpSubsystem()
 	m_shooter2 {PickUpConstants::kShooter2Port, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
-	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort}
+	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
+	m_controller{controller}
 {
 	m_index1.SetNeutralMode(NeutralMode::Brake);
 	m_index2.SetNeutralMode(NeutralMode::Brake);
@@ -30,14 +32,16 @@ PickUpSubsystem::PickUpSubsystem()
 	m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus0, 100); 
     m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
     m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
+	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+	m_limelightTable->PutNumber("ledMode", 1);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber ("Shooter Speed", m_shooterSpeed);
-	frc::SmartDashboard::PutNumber ("ShooterSpeedshort", m_shooterSpeedShort);
-	frc::SmartDashboard::PutNumber ("ShooterSpeedlong", m_shooterSpeedLong);
+	frc::SmartDashboard::PutNumber ("ShooterSpeedshortSlow", m_shooterSpeedShortSlow);
+	frc::SmartDashboard::PutNumber ("ShooterSpeedlongSlow", m_shooterSpeedLongSlow);
 }
 
 // ============================================================================
@@ -126,8 +130,28 @@ void PickUpSubsystem::IndexerOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOn() {
-	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	if (m_controller->GetRightTriggerAxis() > .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
+		m_shooterSpeed = m_shooterSpeedShortSlow;
+		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	}
+	else if (m_controller->GetRightTriggerAxis() > 0 && m_controller->GetRightTriggerAxis() <= .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
+		m_shooterSpeed = m_shooterSpeedShortFast;
+		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	}
+	else if (m_controller->GetRightTriggerAxis() > .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward) {
+		m_shooterSpeed = m_shooterSpeedLongSlow;
+		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	}
+	else if (m_controller->GetRightTriggerAxis() > 0 && m_controller->GetRightTriggerAxis() <= .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward) {
+		m_shooterSpeed = m_shooterSpeedLongFast;
+		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	}
+	else {
+		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+
+	}
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-12});
+	m_limelightTable->PutNumber("ledMode", 0);
 }
 
 // ============================================================================
@@ -141,24 +165,26 @@ void PickUpSubsystem::SetShooterSpeed(double shooterSpeed) {
 void PickUpSubsystem::ShooterOff() {
 	m_shooter.Set(0);
 	m_backSpinShooter.Set(0);
+	m_limelightTable->PutNumber("ledMode", 1);
+
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterFaster() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
-		m_shooterSpeed = m_shooterSpeedLong = std::min(1.0, m_shooterSpeedLong + 0.025);
+		m_shooterSpeed = m_shooterSpeedLongSlow = std::min(1.0, m_shooterSpeedLongSlow + 0.025);
 	else
-		m_shooterSpeed = m_shooterSpeedShort = std::min(1.0, m_shooterSpeedShort + 0.025);
+		m_shooterSpeed = m_shooterSpeedShortSlow = std::min(1.0, m_shooterSpeedShortSlow + 0.025);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterSlower() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
-		m_shooterSpeed = m_shooterSpeedLong = std::max(0.0, m_shooterSpeedLong - 0.025);
+		m_shooterSpeed = m_shooterSpeedLongSlow = std::max(0.0, m_shooterSpeedLongSlow - 0.025);
 	else
-		m_shooterSpeed = m_shooterSpeedShort = std::max(0.0, m_shooterSpeedShort - 0.025);
+		m_shooterSpeed = m_shooterSpeedShortSlow = std::max(0.0, m_shooterSpeedShortSlow - 0.025);
 }
 
 // ============================================================================
@@ -178,11 +204,11 @@ void PickUpSubsystem::ShooterClose() {
 void PickUpSubsystem::ShooterDistToggle() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
 		ShooterFar();
-		m_shooterSpeed = m_shooterSpeedLong;
+		m_shooterSpeed = m_shooterSpeedLongSlow;
 	}
 	else {
 		ShooterClose();
-		m_shooterSpeed = m_shooterSpeedShort;
+		m_shooterSpeed = m_shooterSpeedShortSlow;
 	}
 }
 

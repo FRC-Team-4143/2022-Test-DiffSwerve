@@ -7,10 +7,14 @@
 #include <rev/CANSparkMax.h>
 #include <frc/motorcontrol/PWMTalonFX.h>
 #include "Constants.h"
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
+#include <frc/XboxController.h>
 
 class PickUpSubsystem : public frc2::SubsystemBase {
 public:
-	PickUpSubsystem();
+	PickUpSubsystem(frc::XboxController* controller);
 
 	void Periodic() override;
 
@@ -56,7 +60,14 @@ private:
 	rev::CANSparkMax m_backSpinShooter;
 	frc::DoubleSolenoid m_shooterSolenoid;
 
-	double m_shooterSpeed=PickUpConstants::kLongSpeed;
-	double m_shooterSpeedShort=PickUpConstants::kShortSpeed;
-	double m_shooterSpeedLong=PickUpConstants::kLongSpeed;
+	double m_shooterSpeed=PickUpConstants::kLongSpeedSlow;
+	double m_shooterSpeedShortFast=PickUpConstants::kShortSpeed;
+	double m_shooterSpeedLongFast=PickUpConstants::kLongSpeed;
+	double m_shooterSpeedShortSlow=PickUpConstants::kShortSpeedSlow;
+	double m_shooterSpeedLongSlow=PickUpConstants::kLongSpeedSlow;
+
+	std::shared_ptr<nt::NetworkTable> m_limelightTable;
+
+	frc::XboxController* m_controller;
+
 };

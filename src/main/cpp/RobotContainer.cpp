@@ -41,7 +41,7 @@ using namespace DriveConstants;
 // ==========================================================================
 
 RobotContainer::RobotContainer()
-:	m_pickUp{}, m_climber{&m_climberController},
+:	m_drive{&m_driverController}, m_pickUp{&m_climberController}, m_climber{&m_climberController},
 	m_driveCommand{
 		[this] {
 			auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
@@ -471,7 +471,7 @@ void RobotContainer::_InitializeScriptEngine() {
 			[this](std::vector<float> parameters) {
 				return std::make_unique<frc2::FunctionalCommand>(
 					[]() {},
-					[this]() { m_pickUp.IndexerOn(); },
+					[this]() { m_pickUp.IndexerOn();},
 					[this](bool) { m_pickUp.IndexerOff(); },
 					[]() { return false; }
 				);

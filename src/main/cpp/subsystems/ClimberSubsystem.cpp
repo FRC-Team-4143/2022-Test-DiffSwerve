@@ -102,6 +102,7 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 	m_brakeSolenoidLeft.Set(true);
 }
 
+bool aButtonState = false;
 // ============================================================================
 
 void ClimberSubsystem::Periodic() {
@@ -111,6 +112,23 @@ void ClimberSubsystem::Periodic() {
 	m_leftExtensionPos = frc::SmartDashboard::GetNumber("m_leftExtensionPos",0 );
 
 	if (m_controller->GetRightBumper()) {
+
+		if (m_controller->GetAButtonPressed() && !aButtonState)	{
+			aButtonState = m_controller->GetAButtonPressed();
+			m_rotateLeftPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR/2);
+			m_rotateRightPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR/2);
+			m_extendLeftPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE/2);
+			m_extendRightPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE/2);
+		}
+		
+		else if (!m_controller->GetAButtonPressed() && aButtonState) {
+			aButtonState = false;
+			m_rotateLeftPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR);
+			m_rotateRightPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR);
+			m_extendLeftPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE);
+			m_extendRightPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE);
+		}
+
 		if (m_controller->GetStartButton()) { m_step = 0; m_newStep = true; }
 		if (m_newStep) {
 			m_leftPosition = m_climbSteps[m_step][0];
@@ -132,7 +150,7 @@ void ClimberSubsystem::Periodic() {
 		if (m_controller->GetRightY() > 0.3) m_rightExtensionPos -= 1.0;
 		if (m_controller->GetRightY() < -0.3) m_rightExtensionPos += 1.0;
 
-		if (!m_controller->GetBackButton()) {
+		if (m_controller->GetLeftTriggerAxis() != 0) {
 			m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
 			m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);

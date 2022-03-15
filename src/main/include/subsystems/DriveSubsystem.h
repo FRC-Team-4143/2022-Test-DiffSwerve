@@ -16,11 +16,12 @@
 #include <ctre/Phoenix.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include "SwerveModule.h"
+#include <frc/XboxController.h>
 
 class DriveSubsystem : public frc2::SubsystemBase {
 public:
 
-	DriveSubsystem();
+	DriveSubsystem(frc::XboxController* controller);
 
 	/**
 	 * Will be called periodically whenever the CommandScheduler runs.
@@ -160,4 +161,10 @@ private:
 	double m_resetRSrx;
 	double m_resetRSry;
 	double m_resetRSrz;
+
+	frc::XboxController* m_controller;
+
+	std::shared_ptr<nt::NetworkTable> m_limelightTable;
+
+
 };
