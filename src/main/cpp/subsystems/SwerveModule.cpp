@@ -90,7 +90,7 @@ frc::SwerveModuleState SwerveModule::GetState() {
 
 double SwerveModule::GetDriveMotorSpeed() {
     double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
-    * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi);
+    * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi * 1.07);
 
     frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
     

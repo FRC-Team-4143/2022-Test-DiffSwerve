@@ -114,8 +114,6 @@ void ClimberSubsystem::Periodic() {
 	m_rightExtensionPos = frc::SmartDashboard::GetNumber("m_rightExtensionPos",0 );
 	m_leftExtensionPos = frc::SmartDashboard::GetNumber("m_leftExtensionPos",0 );
 
-	frc::SmartDashboard::PutNumber("Climber Controller POV", m_controller->GetPOV());
-
 	if (m_controller->GetRightBumper()) {
 
 			if(!fastSafeMode){
@@ -149,7 +147,7 @@ void ClimberSubsystem::Periodic() {
 		if (m_controller->GetRightY() > 0.3) m_rightExtensionPos -= 1.0;
 		if (m_controller->GetRightY() < -0.3) m_rightExtensionPos += 1.0;
 
-		if (m_controller->GetLeftTriggerAxis() != 0) {
+		if (m_controller->GetLeftTriggerAxis() < 0.1) {
 			m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
 			m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
@@ -202,7 +200,7 @@ void ClimberSubsystem::Periodic() {
 		if (m_controller->GetRightY() > 0.3) m_rightExtensionPos -= 1.0;
 		if (m_controller->GetRightY() < -0.3) m_rightExtensionPos += 1.0;
 
-		if (m_controller->GetLeftTriggerAxis() != 0) {
+		if (m_controller->GetLeftTriggerAxis() < 0.1) {
 			m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
 			m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);

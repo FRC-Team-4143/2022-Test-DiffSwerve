@@ -41,7 +41,7 @@ using namespace DriveConstants;
 // ==========================================================================
 
 RobotContainer::RobotContainer()
-:	m_drive{&m_driverController}, m_pickUp{&m_climberController}, m_climber{&m_climberController},
+:	m_drive{&m_driverController}, m_pickUp{&m_driverController}, m_climber{&m_climberController},
 	m_driveCommand{
 		[this] {
 			auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
@@ -71,8 +71,6 @@ RobotContainer::RobotContainer()
 	m_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
-	fmt::print("RobotContainer ctor\n");
-
 	_InitializeScriptEngine();
 	_ConfigureDashboardControls();
 	_ConfigureButtonBindings();
@@ -96,8 +94,9 @@ RobotContainer::RobotContainer()
 	m_pathManager.AddPath("rightsideball");
 	m_pathManager.AddPath("rightsideball2");
 	m_pathManager.AddPath("rightsideball3");
-	m_pathManager.AddPath("midBall");
-	m_pathManager.AddPath("topBall");
+	m_pathManager.AddPath("leftsideball");
+	//m_pathManager.AddPath("midBall");
+	//m_pathManager.AddPath("topBall");
 
 #endif
 }

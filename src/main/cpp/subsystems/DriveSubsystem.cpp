@@ -192,8 +192,8 @@ frc::Pose2d DriveSubsystem::GetPose() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 
-	SetOffsetHeading((pose.Rotation()).Degrees().value());
-	m_currentYaw = m_pidgey.GetYaw();
+	m_currentYaw = pose.Rotation().Degrees().value();
+	SetOffsetHeading(m_currentYaw);
 
 	m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 	m_poseEstimator.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
@@ -226,7 +226,10 @@ void DriveSubsystem::ToggleFieldCentric() {
 
 void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 	double currentAngle = GetHeading().value();
-	auto twist = -(desiredAngle - currentAngle);
+	while ( currentAngle > 180.) currentAngle -= 360.;
+	while ( currentAngle < -180.) currentAngle += 360.;
+
+	auto twist = (desiredAngle - currentAngle);
 
 	while (twist > 180.0) {
 		twist -= 360.0;
@@ -235,7 +238,7 @@ void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 		twist += 360.0;
 	}
 
-	constexpr double GYRO_P = 0.028*6; //original is 0.007
+	constexpr double GYRO_P = 0.01*6; //original is 0.007
 	constexpr double GYRO_MAX = 0.3*6;
 
 	twist = std::clamp(twist*GYRO_P, -GYRO_MAX, GYRO_MAX);

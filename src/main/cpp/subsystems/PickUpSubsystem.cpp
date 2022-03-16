@@ -132,6 +132,7 @@ void PickUpSubsystem::IndexerOff() {
 void PickUpSubsystem::ShooterOn() {
 
 	double triggerAxis = m_controller->GetRightTriggerAxis();
+	frc::SmartDashboard::PutNumber ("Right Trigger Value", triggerAxis);
 	auto solenoidState = m_shooterSolenoid.Get();
 	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
 
