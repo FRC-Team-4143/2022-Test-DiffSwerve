@@ -102,8 +102,13 @@ void PickUpSubsystem::RollerOff() {
 // ============================================================================
 
 void PickUpSubsystem::IndexerOn() {
-	m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+	if(m_controller->GetLeftTriggerAxis() <= 0.5){
+		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
+		m_index2.Set(TalonSRXControlMode::PercentOutput, 0);
+	} else{
+		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
+		m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+	}
 }
 
 // ============================================================================
