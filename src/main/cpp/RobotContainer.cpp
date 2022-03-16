@@ -71,6 +71,7 @@ RobotContainer::RobotContainer()
 	m_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
+	fmt::print("RobotContainer ctor\n");
 
 	_InitializeScriptEngine();
 	_ConfigureDashboardControls();

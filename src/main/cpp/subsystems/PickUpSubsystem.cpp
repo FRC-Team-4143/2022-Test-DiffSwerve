@@ -130,19 +130,24 @@ void PickUpSubsystem::IndexerOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOn() {
-	if (m_controller->GetRightTriggerAxis() > .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
+
+	double triggerAxis = m_controller->GetRightTriggerAxis();
+	auto solenoidState = m_shooterSolenoid.Get();
+	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
+
+	if (triggerAxis > .8 && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (m_controller->GetRightTriggerAxis() > 0 && m_controller->GetRightTriggerAxis() <= .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kReverse) {
+	else if (triggerAxis > 0 && triggerAxis <= .8 && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (m_controller->GetRightTriggerAxis() > .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward) {
+	else if (triggerAxis > .8 && isForward) {
 		m_shooterSpeed = m_shooterSpeedLongSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (m_controller->GetRightTriggerAxis() > 0 && m_controller->GetRightTriggerAxis() <= .8 && m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward) {
+	else if (triggerAxis > 0 && triggerAxis <= .8 && isForward) {
 		m_shooterSpeed = m_shooterSpeedLongFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
