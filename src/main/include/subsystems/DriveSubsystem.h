@@ -65,9 +65,14 @@ public:
 	units::degree_t GetHeading() const;
 
 	/**
-	 * Zeroes the heading of the robot.
+	 * Zeroes the heading of the robot to Zero.
 	 */
 	void ZeroHeading();
+
+	/**
+	 * Sets the heading of the robot to offset parameter.
+	 */
+	void SetOffsetHeading(int heading);
 
 	/**
 	 * Returns the turn rate of the robot.

@@ -35,8 +35,11 @@ std::unique_ptr<frc2::Command> PathManager::GetPathCommand(
 	// Get the trajectory.
 	auto& trajectory{m_loadedPaths.at(pathIndex)};
 
+
+
 	// Build the PathPlanner command.
 	auto pathCmd{
+	
 		std::make_unique<PPSwerveControllerCommand<4>>(
 			trajectory,
 			[driveSubsystem]() { return driveSubsystem->GetPose(); },
@@ -65,12 +68,6 @@ std::unique_ptr<frc2::Command> PathManager::GetPathCommand(
 	}
 
 	return pathCmd;
-}
-
-// ==========================================================================
-
-void PathManager::ResetOdometry(DriveSubsystem *driveSubsystem, frc::Pose2d pose) {
-	driveSubsystem->ResetOdometry(pose);
 }
 
 // ==========================================================================

@@ -19,6 +19,9 @@ private:
 	double _GetLeftRotationPosition();
 	double _GetRightRotationPosition();
 
+	bool slowSafeMode;
+	bool fastSafeMode;
+
 	frc::XboxController* m_controller;
 
 	rev::CANSparkMax m_rotateLeft;

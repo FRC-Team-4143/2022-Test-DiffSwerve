@@ -95,6 +95,9 @@ RobotContainer::RobotContainer()
 	m_pathManager.AddPath("rightsideball");
 	m_pathManager.AddPath("rightsideball2");
 	m_pathManager.AddPath("rightsideball3");
+	m_pathManager.AddPath("midBall");
+	m_pathManager.AddPath("topBall");
+
 #endif
 }
 

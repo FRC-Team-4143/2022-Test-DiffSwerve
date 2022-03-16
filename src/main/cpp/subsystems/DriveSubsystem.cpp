@@ -172,6 +172,12 @@ void DriveSubsystem::ZeroHeading() {
 
 // ==========================================================================
 
+void DriveSubsystem::SetOffsetHeading(int heading){
+	m_pidgey.SetYaw(heading, 30);
+}
+
+// ==========================================================================
+
 double DriveSubsystem::GetTurnRate() {
 	return m_pidgey.GetRate();
 }
@@ -185,6 +191,10 @@ frc::Pose2d DriveSubsystem::GetPose() {
 // ==========================================================================
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
+
+	SetOffsetHeading((pose.Rotation()).Degrees().value());
+	m_currentYaw = m_pidgey.GetYaw();
+
 	m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 	m_poseEstimator.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 
@@ -194,6 +204,7 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 	m_resetRSrx = m_rxEntry.GetDouble(0);
 	m_resetRSry = m_ryEntry.GetDouble(0);
 	m_resetRSrz = m_rzEntry.GetDouble(0);
+
 }
 
 // ==========================================================================

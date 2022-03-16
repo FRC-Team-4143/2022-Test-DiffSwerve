@@ -100,9 +100,12 @@ ClimberSubsystem::ClimberSubsystem(frc::XboxController* controller)
 
 	m_brakeSolenoidRght.Set(true);
 	m_brakeSolenoidLeft.Set(true);
+
+	slowSafeMode = false;
+	fastSafeMode = false;
 }
 
-bool aButtonState = false;
+bool slowClimbButtonState = false;
 // ============================================================================
 
 void ClimberSubsystem::Periodic() {
@@ -111,23 +114,19 @@ void ClimberSubsystem::Periodic() {
 	m_rightExtensionPos = frc::SmartDashboard::GetNumber("m_rightExtensionPos",0 );
 	m_leftExtensionPos = frc::SmartDashboard::GetNumber("m_leftExtensionPos",0 );
 
+	frc::SmartDashboard::PutNumber("Climber Controller POV", m_controller->GetPOV());
+
 	if (m_controller->GetRightBumper()) {
 
-		if (m_controller->GetAButtonPressed() && !aButtonState)	{
-			aButtonState = m_controller->GetAButtonPressed();
-			m_rotateLeftPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR/2);
-			m_rotateRightPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR/2);
-			m_extendLeftPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE/2);
-			m_extendRightPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE/2);
-		}
-		
-		else if (!m_controller->GetAButtonPressed() && aButtonState) {
-			aButtonState = false;
-			m_rotateLeftPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR);
-			m_rotateRightPidController.SetOutputRange(ClimberConstants::kMinOutputR, ClimberConstants::kMaxOutputR);
-			m_extendLeftPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE);
-			m_extendRightPidController.SetOutputRange(ClimberConstants::kMinOutputE, ClimberConstants::kMaxOutputE);
-		}
+			if(!fastSafeMode){
+			m_rotateLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+			m_rotateRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+			m_extendLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+			m_extendRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel);
+
+			fastSafeMode = true;
+			slowSafeMode = false;
+			}
 
 		if (m_controller->GetStartButton()) { m_step = 0; m_newStep = true; }
 		if (m_newStep) {
@@ -165,22 +164,71 @@ void ClimberSubsystem::Periodic() {
 		frc::SmartDashboard::PutNumber("leftArmCurrent", m_extendLeft.GetOutputCurrent());
 		frc::SmartDashboard::PutNumber("rightArmCurrent", m_extendRight.GetOutputCurrent());
 
-		//m_rotateLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3)*ClimberConstants::kMaxRotatePower);
-		//m_rotateLeftPidController.SetReference(frc::SmartDashboard::GetNumber("Set Left Position", 0), rev::ControlType::kPosition);
 		m_rotateLeftPidController.SetReference(m_leftPosition, rev::CANSparkMax::ControlType::kPosition);
-		//m_rotateRight.Set(frc::ApplyDeadband(m_controller->GetRightY(),.3)*ClimberConstants::kMaxRotatePower);
-		//m_rotateRightPidController.SetReference(frc::SmartDashboard::GetNumber("Set Right Position", 0), rev::ControlType::kPosition);
 		m_rotateRightPidController.SetReference(m_rightPosition, rev::CANSparkMax::ControlType::kPosition);
 
 		m_extendLeftPidController.SetReference(m_leftExtensionPos, rev::CANSparkMax::ControlType::kSmartMotion);
 		m_extendRightPidController.SetReference(m_rightExtensionPos, rev::CANSparkMax::ControlType::kSmartMotion);
-		//m_extendLeft.Set(frc::ApplyDeadband(m_controller->GetLeftY(),.3) * ClimberConstants::kMaxExtendPower);
-		//m_extendRight.Set(frc::ApplyDeadband(-m_controller->GetRightY(),.3) * ClimberConstants::kMaxExtendPower);
+
+	} else if(m_controller->GetRightTriggerAxis()>0.5){
+
+			if(!slowSafeMode){
+			m_rotateLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel/2);
+			m_rotateRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel/2);
+			m_extendLeftPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel/2);
+			m_extendRightPidController.SetSmartMotionMaxVelocity(ClimberConstants::kMaxVel/2);
+			slowSafeMode = true;
+			fastSafeMode = false;
+			}
+		
+		if (m_controller->GetStartButton()) { m_step = 0; m_newStep = true; }
+		if (m_newStep) {
+			m_leftPosition = m_climbSteps[m_step][0];
+			m_rightPosition = m_climbSteps[m_step][1];
+			m_leftExtensionPos = m_climbSteps[m_step][2];
+			m_rightExtensionPos = m_climbSteps[m_step][3];
+			m_newStep = false;
+		}
+
+		if (m_controller->GetYButton()) m_leftPosition += 0.5;
+		if (m_controller->GetXButton()) m_leftPosition -= 0.5;
+
+		if (m_controller->GetAButton()) m_rightPosition += 0.5;
+		if (m_controller->GetBButton()) m_rightPosition -= 0.5;
+
+		if (m_controller->GetLeftY() > 0.3) m_leftExtensionPos -= 1.0;
+		if (m_controller->GetLeftY() < -0.3) m_leftExtensionPos += 1.0;
+
+		if (m_controller->GetRightY() > 0.3) m_rightExtensionPos -= 1.0;
+		if (m_controller->GetRightY() < -0.3) m_rightExtensionPos += 1.0;
+
+		if (m_controller->GetLeftTriggerAxis() != 0) {
+			m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
+			m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
+			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
+			m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0*9/16, 265.0*9/16);
+		}
+
+		frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
+		frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
+		frc::SmartDashboard::PutNumber("m_rightExtensionPos",m_rightExtensionPos);
+		frc::SmartDashboard::PutNumber("m_leftExtensionPos",m_leftExtensionPos);
+		frc::SmartDashboard::PutNumber("m_step", m_step);
+		frc::SmartDashboard::PutNumber("leftArmCurrent", m_extendLeft.GetOutputCurrent());
+		frc::SmartDashboard::PutNumber("rightArmCurrent", m_extendRight.GetOutputCurrent());
+
+		m_rotateLeftPidController.SetReference(m_leftPosition, rev::CANSparkMax::ControlType::kPosition);
+		m_rotateRightPidController.SetReference(m_rightPosition, rev::CANSparkMax::ControlType::kPosition);
+
+		m_extendLeftPidController.SetReference(m_leftExtensionPos, rev::CANSparkMax::ControlType::kSmartMotion);
+		m_extendRightPidController.SetReference(m_rightExtensionPos, rev::CANSparkMax::ControlType::kSmartMotion);
 	} else {
 		m_rotateLeft.Set(0);
 		m_rotateRight.Set(0);
 		m_extendLeft.Set(0);
 		m_extendRight.Set(0);
+		slowSafeMode = false;
+		fastSafeMode = false;
 	}
 
 	frc::SmartDashboard::PutNumber("Rotate Left Pos", _GetLeftRotationPosition());
@@ -205,6 +253,12 @@ void ClimberSubsystem::ZeroClimber(){
 	m_rotateRightEncoder.SetPosition(0);
 	m_extendLeftEncoder.SetPosition(0);
 	m_extendRightEncoder.SetPosition(0);
+	m_step = 0; 
+	m_leftPosition = m_climbSteps[m_step][0];
+	m_rightPosition = m_climbSteps[m_step][1];
+	m_leftExtensionPos = m_climbSteps[m_step][2];
+	m_rightExtensionPos = m_climbSteps[m_step][3];
+	m_newStep = false;
 }
 
 // ============================================================================
