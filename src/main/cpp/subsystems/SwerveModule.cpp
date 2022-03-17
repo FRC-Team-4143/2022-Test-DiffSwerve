@@ -92,7 +92,7 @@ double SwerveModule::GetDriveMotorSpeed() {
     double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
     * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi * 1.07);
 
-    frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
+    //frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
     
     return speed;
 }
@@ -135,13 +135,13 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     }
 
 
-
+/*
     frc::SmartDashboard::PutNumber(m_name + " m_moduleAngle", m_moduleAngle);
     frc::SmartDashboard::PutNumber(m_name + " driveFeedforward", driveFeedforward.value());
     frc::SmartDashboard::PutNumber(m_name + " turnOutput", turnOutput * DriveConstants::driveMaxVoltage);
     frc::SmartDashboard::PutNumber(m_name + " m_driveVoltage", m_driveVoltage);
     frc::SmartDashboard::PutNumber(m_name + " driveOutput", driveOutput);
-
+*/
     return std::max(m_driveVoltage,m_turnVoltage);
 }
 

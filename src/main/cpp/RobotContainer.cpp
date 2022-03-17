@@ -90,11 +90,17 @@ RobotContainer::RobotContainer()
 	// This will load the file "Example Path.path" and generate it
 	m_ppTrajectory = pathplanner::PathPlanner::loadPath("gethumanplayerball", AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration);
 
-	m_pathManager.AddPath("gethumanplayerball");
-	m_pathManager.AddPath("rightsideball");
-	m_pathManager.AddPath("rightsideball2");
-	m_pathManager.AddPath("rightsideball3");
-	m_pathManager.AddPath("leftsideball");
+	m_pathManager.AddPath("gethumanplayerball");  	//0
+	m_pathManager.AddPath("rightsideball"); 	 	//1
+	m_pathManager.AddPath("rightsideball2");  		//2
+	m_pathManager.AddPath("rightsideball3");  		//3
+	m_pathManager.AddPath("leftsideball");  		//4
+	m_pathManager.AddPath("cornerRightBall"); 		//5
+	m_pathManager.AddPath("bigballs1");  			//6
+	m_pathManager.AddPath("bigballs2");  			//7
+	m_pathManager.AddPath("bigballs3");  			//8
+
+
 	//m_pathManager.AddPath("midBall");
 	//m_pathManager.AddPath("topBall");
 

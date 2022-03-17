@@ -33,7 +33,7 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
     m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus1, 500); 
     m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
 	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
-	m_limelightTable->PutNumber("ledMode", 1);
+	m_limelightTable->PutNumber("ledMode", 0);
 }
 
 // ============================================================================
@@ -102,7 +102,7 @@ void PickUpSubsystem::RollerOff() {
 // ============================================================================
 
 void PickUpSubsystem::IndexerOn() {
-	if(m_controller->GetLeftTriggerAxis() <= 0.5){
+	if(m_controller->GetLeftTriggerAxis() <= 0.5 && m_controller->GetLeftTriggerAxis() > 0.05){
 		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
 		m_index2.Set(TalonSRXControlMode::PercentOutput, 0);
 	} else{
@@ -137,23 +137,23 @@ void PickUpSubsystem::IndexerOff() {
 void PickUpSubsystem::ShooterOn() {
 
 	double triggerAxis = m_controller->GetRightTriggerAxis();
-	frc::SmartDashboard::PutNumber ("Right Trigger Value", triggerAxis);
+	bool aButton = m_controller->GetAButton();
 	auto solenoidState = m_shooterSolenoid.Get();
 	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
 
-	if (triggerAxis > .8 && !isForward) {
+	if (triggerAxis > 0 && !aButton && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (triggerAxis > 0 && triggerAxis <= .8 && !isForward) {
+	else if (triggerAxis > 0 && aButton && triggerAxis <= .8 && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (triggerAxis > .8 && isForward) {
+	else if (triggerAxis > 0 && !aButton && isForward) {
 		m_shooterSpeed = m_shooterSpeedLongSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (triggerAxis > 0 && triggerAxis <= .8 && isForward) {
+	else if (triggerAxis > 0 && aButton && triggerAxis <= .8 && isForward) {
 		m_shooterSpeed = m_shooterSpeedLongFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
@@ -176,7 +176,7 @@ void PickUpSubsystem::SetShooterSpeed(double shooterSpeed) {
 void PickUpSubsystem::ShooterOff() {
 	m_shooter.Set(0);
 	m_backSpinShooter.Set(0);
-	m_limelightTable->PutNumber("ledMode", 1);
+	//m_limelightTable->PutNumber("ledMode", 1);
 
 }
 

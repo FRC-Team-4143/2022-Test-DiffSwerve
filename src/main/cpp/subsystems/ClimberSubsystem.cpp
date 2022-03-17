@@ -109,11 +109,12 @@ bool slowClimbButtonState = false;
 // ============================================================================
 
 void ClimberSubsystem::Periodic() {
+	/*
 	m_rightPosition = frc::SmartDashboard::GetNumber("m_rightPosition", 0 );
 	m_leftPosition = frc::SmartDashboard::GetNumber("m_leftPosition", 0 );
 	m_rightExtensionPos = frc::SmartDashboard::GetNumber("m_rightExtensionPos",0 );
 	m_leftExtensionPos = frc::SmartDashboard::GetNumber("m_leftExtensionPos",0 );
-
+	*/
 	if (m_controller->GetRightBumper()) {
 
 			if(!fastSafeMode){
@@ -153,14 +154,16 @@ void ClimberSubsystem::Periodic() {
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
 			m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0*9/16, 265.0*9/16);
 		}
-
+/*
 		frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
 		frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
 		frc::SmartDashboard::PutNumber("m_rightExtensionPos",m_rightExtensionPos);
 		frc::SmartDashboard::PutNumber("m_leftExtensionPos",m_leftExtensionPos);
-		frc::SmartDashboard::PutNumber("m_step", m_step);
+
 		frc::SmartDashboard::PutNumber("leftArmCurrent", m_extendLeft.GetOutputCurrent());
 		frc::SmartDashboard::PutNumber("rightArmCurrent", m_extendRight.GetOutputCurrent());
+*/
+		frc::SmartDashboard::PutNumber("m_step", m_step);
 
 		m_rotateLeftPidController.SetReference(m_leftPosition, rev::CANSparkMax::ControlType::kPosition);
 		m_rotateRightPidController.SetReference(m_rightPosition, rev::CANSparkMax::ControlType::kPosition);
@@ -206,14 +209,15 @@ void ClimberSubsystem::Periodic() {
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
 			m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0*9/16, 265.0*9/16);
 		}
-
+/*
 		frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
 		frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
 		frc::SmartDashboard::PutNumber("m_rightExtensionPos",m_rightExtensionPos);
 		frc::SmartDashboard::PutNumber("m_leftExtensionPos",m_leftExtensionPos);
-		frc::SmartDashboard::PutNumber("m_step", m_step);
 		frc::SmartDashboard::PutNumber("leftArmCurrent", m_extendLeft.GetOutputCurrent());
 		frc::SmartDashboard::PutNumber("rightArmCurrent", m_extendRight.GetOutputCurrent());
+*/
+		frc::SmartDashboard::PutNumber("m_step", m_step);
 
 		m_rotateLeftPidController.SetReference(m_leftPosition, rev::CANSparkMax::ControlType::kPosition);
 		m_rotateRightPidController.SetReference(m_rightPosition, rev::CANSparkMax::ControlType::kPosition);
@@ -228,11 +232,12 @@ void ClimberSubsystem::Periodic() {
 		slowSafeMode = false;
 		fastSafeMode = false;
 	}
-
+/*
 	frc::SmartDashboard::PutNumber("Rotate Left Pos", _GetLeftRotationPosition());
 	frc::SmartDashboard::PutNumber("Rotate Right Pos", _GetRightRotationPosition());
 	frc::SmartDashboard::PutNumber("Extend Left Pos", m_extendLeftEncoder.GetPosition());
 	frc::SmartDashboard::PutNumber("Extend Right Pos", m_extendRightEncoder.GetPosition());
+*/
 }
 
 // ============================================================================

@@ -29,6 +29,7 @@ DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 	LoadWheelOffsets();
 	frc::SmartDashboard::PutData("Field", &m_field);
 	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+	frc::SmartDashboard::PutBoolean("Disable Limelight", false);
 }
 
 // ==========================================================================
@@ -59,7 +60,7 @@ void DriveSubsystem::Periodic() {
 		frc::Pose2d{rsPosition, rsYaw},
 		frc::Timer::GetFPGATimestamp() - 0.05_s
 	);
-
+/*
 	frc::SmartDashboard::PutNumber("m_odometry_x", m_odometry.GetPose().X().value());
 	frc::SmartDashboard::PutNumber("m_odometry_y", m_odometry.GetPose().Y().value());
 	frc::SmartDashboard::PutNumber("m_odometry_r", m_odometry.GetPose().Rotation().Degrees().value());
@@ -67,7 +68,7 @@ void DriveSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber("m_poseEstimator_x", m_poseEstimator.GetEstimatedPosition().X().value());
 	frc::SmartDashboard::PutNumber("m_poseEstimator_y", m_poseEstimator.GetEstimatedPosition().Y().value());
 	frc::SmartDashboard::PutNumber("m_poseEstimator_r", m_poseEstimator.GetEstimatedPosition().Rotation().Degrees().value());
-
+*/
 	frc::SmartDashboard::PutNumber("Gyro", GetHeading().value());
 	frc::SmartDashboard::PutBoolean("FieldCentric", m_fieldCentric);
 	frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
@@ -94,8 +95,11 @@ void DriveSubsystem::Drive(
 	units::radians_per_second_t rot)
 {
 	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
-	if (m_controller->GetRightTriggerAxis() != 0 && abs(limeLightTX) >= 1) {
-		rot = units::radians_per_second_t(limeLightTX/(-30)*1);
+	if (m_controller->GetRightTriggerAxis() != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0))  {
+		if (abs(limeLightTX) >= 1) 
+			rot = units::radians_per_second_t(limeLightTX/(-30)*1);
+		else if (abs(limeLightTX)> 0)
+			rot = units::radians_per_second_t(-abs(limeLightTX)/limeLightTX*.01);
 	}
 
 	auto states = kDriveKinematics.ToSwerveModuleStates(
