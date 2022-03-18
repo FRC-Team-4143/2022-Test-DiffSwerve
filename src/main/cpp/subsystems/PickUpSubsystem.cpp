@@ -18,7 +18,13 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 	m_shooter{m_shooter1, m_shooter2},
 	m_backSpinShooter{PickUpConstants::kBackSpinShooterPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
 	m_shooterSolenoid{frc::PneumaticsModuleType::CTREPCM, PickUpConstants::kShooterForwardSolenoidPort, PickUpConstants::kShooterReverseSolenoidPort},
-	m_controller{controller}
+	m_controller{controller},
+	m_shooter1Encoder{m_shooter1.GetEncoder()},
+	m_shooter2Encoder{m_shooter2.GetEncoder()},
+	m_backSpinShooterEncoder{m_backSpinShooter.GetEncoder()},
+	m_shooter1PIDController{m_shooter1.GetPIDController()},
+	m_shooter2PIDController{m_shooter2.GetPIDController()},
+	m_backSpinPIDController{m_backSpinShooter.GetPIDController()}
 {
 	m_index1.SetNeutralMode(NeutralMode::Brake);
 	m_index2.SetNeutralMode(NeutralMode::Brake);
@@ -34,6 +40,12 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
     m_backSpinShooter.SetPeriodicFramePeriod(rev::CANSparkMaxLowLevel::PeriodicFrame::kStatus2, 500);
 	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
 	m_limelightTable->PutNumber("ledMode", 0);
+	m_shooter1PIDController.SetP(6e-5);
+	m_shooter2PIDController.SetP(6e-5);
+	m_backSpinPIDController.SetP(6e-5);
+	m_shooter1PIDController.SetFF(1.5e-5);
+	m_shooter2PIDController.SetFF(1.5e-5);
+	m_backSpinPIDController.SetFF(1.5e-5);
 }
 
 // ============================================================================
@@ -42,6 +54,9 @@ void PickUpSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber ("Shooter Speed", m_shooterSpeed);
 	frc::SmartDashboard::PutNumber ("ShooterSpeedshortSlow", m_shooterSpeedShortSlow);
 	frc::SmartDashboard::PutNumber ("ShooterSpeedlongSlow", m_shooterSpeedLongSlow);
+	frc::SmartDashboard::PutNumber ("Shooter1 RPM", m_shooter1Encoder.GetVelocity());
+	frc::SmartDashboard::PutNumber ("Shooter2 RPM", m_shooter2Encoder.GetVelocity());
+	frc::SmartDashboard::PutNumber ("BackSpinShooter RPM", m_backSpinShooterEncoder.GetVelocity());
 }
 
 // ============================================================================

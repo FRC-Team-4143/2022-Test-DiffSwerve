@@ -70,4 +70,12 @@ private:
 
 	frc::XboxController* m_controller;
 
+	rev::SparkMaxRelativeEncoder m_shooter1Encoder;
+	rev::SparkMaxRelativeEncoder m_shooter2Encoder;
+	rev::SparkMaxRelativeEncoder m_backSpinShooterEncoder;
+	rev::SparkMaxPIDController m_shooter1PIDController;
+	rev::SparkMaxPIDController m_shooter2PIDController;
+	rev::SparkMaxPIDController m_backSpinPIDController;
+
+
 };
