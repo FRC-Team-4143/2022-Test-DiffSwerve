@@ -243,12 +243,24 @@ void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 	}
 
 	constexpr double GYRO_P = 0.01*6; //original is 0.007
-	constexpr double GYRO_MAX = 0.3*6;
+	constexpr double GYRO_MAX = 0.25*6;
 
 	twist = std::clamp(twist*GYRO_P, -GYRO_MAX, GYRO_MAX);
 
 	Drive(units::meters_per_second_t(x), units::meters_per_second_t(y), units::radians_per_second_t(twist));
 }
+
+// ==========================================================================
+
+void DriveSubsystem::DriveLime() {
+	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
+	double rot = 0;
+	if (abs(limeLightTX) >= 1) 
+			rot = (limeLightTX/(-30)*1);
+
+	Drive(units::meters_per_second_t(0), units::meters_per_second_t(0), units::radians_per_second_t(rot));
+}
+
 
 // ==========================================================================
 

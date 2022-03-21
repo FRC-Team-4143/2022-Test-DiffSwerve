@@ -209,6 +209,7 @@ void ClimberSubsystem::Periodic() {
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);
 			m_leftExtensionPos = std::clamp(m_leftExtensionPos, -10.0*9/16, 265.0*9/16);
 		}
+
 /*
 		frc::SmartDashboard::PutNumber("m_rightPosition", m_rightPosition);
 		frc::SmartDashboard::PutNumber("m_leftPosition", m_leftPosition);
@@ -245,6 +246,15 @@ void ClimberSubsystem::Periodic() {
 void ClimberSubsystem::IndexStep(){
 	if (m_step < m_numSteps) {
 		m_step++;
+		m_newStep = true;
+	}
+}
+
+// ============================================================================
+
+void ClimberSubsystem::BackStep(){
+	if(m_step > 0){
+		m_step = m_step - 1;
 		m_newStep = true;
 	}
 }

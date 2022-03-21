@@ -114,6 +114,7 @@ public:
 	void ToggleFieldCentric();
 
 	void GyroCrab(double x, double y, double desiredAngle);
+	void DriveLime();
 	double GyroRotate();
 
 	void SetWheelOffsets();

@@ -17,6 +17,7 @@
 #include <units/velocity.h>
 #include <utility>
 #include "commands/DriveGyro.h"
+#include "commands/DriveLime.h"
 #include "commands/PickUpCycle.h"
 #include "commands/PickUpCycleBounce.h"
 
@@ -99,6 +100,7 @@ RobotContainer::RobotContainer()
 	m_pathManager.AddPath("bigballs1");  			//6
 	m_pathManager.AddPath("bigballs2");  			//7
 	m_pathManager.AddPath("bigballs3");  			//8
+	m_pathManager.AddPath("leftsideballDG");		//9
 
 
 	//m_pathManager.AddPath("midBall");
@@ -197,6 +199,10 @@ void RobotContainer::_ConfigureButtonBindings() {
 		[this]() { m_climber.IndexStep(); },
 	};
 
+	frc2::InstantCommand previousClimberStepCommand{
+		[this]() { m_climber.BackStep(); },
+	};
+
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_A))->WhileHeld(rollerInCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_START))->WhenPressed(pickUpRetractCommand);
 	//(new frc2::JoystickButton(&m_driverController, JOYSTICK_BUTTON_RB))->WhenPressed(shooterFasterCommand);
@@ -214,6 +220,8 @@ void RobotContainer::_ConfigureButtonBindings() {
 		.WhenPressed(shooterFasterCommand);
 	frc2::JoystickButton(&m_climberController, frc::XboxController::Button::kLeftBumper)
 		.WhenPressed(nextClimberStepCommand);
+	frc2::JoystickButton(&m_climberController, frc::XboxController::Button::kBack)
+		.WhenPressed(previousClimberStepCommand);
 
 	frc2::Trigger leftTrigger{
 		[this]() {
@@ -624,6 +632,19 @@ void RobotContainer::_InitializeScriptEngine() {
 				auto y{parameters[1]};
 				auto angle{parameters[2]};
 				return std::make_unique<DriveGyro>(&m_drive, x, y, angle);
+			}
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"DriveLime", {"DL"},
+			[this](std::vector<float> parameters) {
+				parameters.resize(3);
+				auto x{parameters[0]};
+				auto y{parameters[1]};
+				auto angle{parameters[2]};
+				return std::make_unique<DriveLime>(&m_drive);
 			}
 		}
 	);
