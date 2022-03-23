@@ -5,10 +5,11 @@ PickUpCycle::PickUpCycle(PickUpSubsystem* subsystem,frc::XboxController* control
 }
 
 void PickUpCycle::Initialize() {
-	m_pickUp->PickUpExtend();
 	m_pickUp->RollerIn();
+	m_pickUp->PickUpBounce();
 	m_pickUp->IndexerLoad();
 	counter = 0;
+	counter2 = 0;
 }
 
 void PickUpCycle::Execute() {
@@ -16,9 +17,10 @@ void PickUpCycle::Execute() {
 		counter++;
 		m_pickUp->PickUpRetract();
 	} else {
-		m_pickUp->PickUpExtend();
 		counter = 0;
+		if (counter2 > 15) m_pickUp->PickUpExtend();
 	}
+	counter2++;
 }
 
 void PickUpCycle::End(bool) {

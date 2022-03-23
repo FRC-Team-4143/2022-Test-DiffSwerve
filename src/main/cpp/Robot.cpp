@@ -52,6 +52,11 @@ void Robot::TeleopInit() {
 		m_autonomousCommand->Cancel();
 		m_autonomousCommand = nullptr;
 	}
+	m_container.m_pickUp.ShooterFar();
+	m_container.m_pickUp.ShooterOff();
+	m_container.m_pickUp.PickUpRetract();
+	m_container.m_pickUp.RollerOff();
+	m_container.m_pickUp.IndexerOff();
 }
 
 /**

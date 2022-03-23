@@ -19,5 +19,6 @@ public:
 private:
 	PickUpSubsystem* m_pickUp;
 	int counter;
+	int counter2;
 	frc::XboxController* m_controller;
 };

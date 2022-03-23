@@ -43,7 +43,8 @@ namespace DriveConstants {
 	constexpr int kRearRightPot = 3;
 
 	//constexpr double driveMaxVoltage = 12;
-	constexpr double driveMaxVoltage = 8;
+	constexpr double driveMaxVoltage = 10;
+	//constexpr double driveMaxVoltage = 8;
 
 	//TurningPIDConstants
 	//constexpr auto kts = .1_V;
@@ -59,7 +60,7 @@ namespace DriveConstants {
 
 	constexpr double stickDeadBand = .1;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(3);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(4);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2 * wpi::numbers::pi); 
 } // namespace DriveConstants
 
@@ -171,8 +172,8 @@ namespace ClimberConstants {
 	constexpr double kDE = 0;  //0
 	constexpr double kIzE = 0; 
 	constexpr double kFFE = 0.000156; 
-	constexpr double kMaxOutputE = 0.9;
-	constexpr double kMinOutputE = -0.9;
+	constexpr double kMaxOutputE = 1.0;
+	constexpr double kMinOutputE = -1.0;
 
 
 	constexpr double kMaxVel = 5500; 

@@ -17,6 +17,8 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include "SwerveModule.h"
 #include <frc/XboxController.h>
+#include "DiffSwerveModule.h"
+#include "ISwerveModule.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
 public:
@@ -132,10 +134,17 @@ private:
 	// Components (e.g. motor controllers and sensors) should generally be
 	// declared private and exposed only through public methods.
 
+/*
 	SwerveModule m_frontLeft;
-	SwerveModule m_rearLeft;
+	DiffSwerveModule m_rearLeft;
 	SwerveModule m_frontRight;
-	SwerveModule m_rearRight;
+	DiffSwerveModule m_rearRight;
+*/
+
+	DiffSwerveModule m_frontLeft;
+	DiffSwerveModule m_rearLeft;
+	DiffSwerveModule m_frontRight;
+	DiffSwerveModule m_rearRight;
 
 	double m_currentYaw = 0;
 

@@ -235,7 +235,7 @@ void RobotContainer::_ConfigureButtonBindings() {
 			return m_driverController.GetRightTriggerAxis() != 0;
 		}
 	};
-	rightTrigger.WhileActiveOnce(shooterOnCommand);
+	rightTrigger.WhileActiveContinous(shooterOnCommand);
 
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
@@ -524,6 +524,7 @@ void RobotContainer::_InitializeScriptEngine() {
 					[this]() {
 						m_pickUp.PickUpExtend();
 						m_pickUp.RollerIn();
+						m_pickUp.IndexerLoad();
 					}
 				);
 			}

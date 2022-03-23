@@ -80,6 +80,11 @@ void PickUpSubsystem::PickUpExtend() {
 	m_lowerSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
 }
 
+void PickUpSubsystem::PickUpExtendStart() {
+	m_upperSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+	m_lowerSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
+}
+
 // ============================================================================
 
 void PickUpSubsystem::PickUpToggle() {
@@ -155,12 +160,22 @@ void PickUpSubsystem::ShooterOn() {
 	bool aButton = m_controller->GetAButton();
 	auto solenoidState = m_shooterSolenoid.Get();
 	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
+	auto tx = m_limelightTable->GetNumber("tx", 0);
+
+	if (fabs(tx) < 2 && tx != 0) {
+		IndexerOn();
+	}
+
+	/*
+	auto ty = m_limelightTable->GetNumber("ty",0)
+	m_shooterSpeed = f(ty);
+	*/
 
 	if (triggerAxis > 0 && !aButton && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (triggerAxis > 0 && aButton && triggerAxis <= .8 && !isForward) {
+	else if (triggerAxis > 0 && (aButton || triggerAxis <= .8) && !isForward) {
 		m_shooterSpeed = m_shooterSpeedShortFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
@@ -168,7 +183,7 @@ void PickUpSubsystem::ShooterOn() {
 		m_shooterSpeed = m_shooterSpeedLongSlow;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
-	else if (triggerAxis > 0 && aButton && triggerAxis <= .8 && isForward) {
+	else if (triggerAxis > 0 && (aButton || triggerAxis <= .8) && isForward) {
 		m_shooterSpeed = m_shooterSpeedLongFast;
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	}
@@ -176,8 +191,8 @@ void PickUpSubsystem::ShooterOn() {
 		m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 
 	}
-	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-12});
-	m_limelightTable->PutNumber("ledMode", 0);
+	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
+	//m_limelightTable->PutNumber("ledMode", 0);
 }
 
 // ============================================================================
@@ -192,6 +207,7 @@ void PickUpSubsystem::ShooterOff() {
 	m_shooter.Set(0);
 	m_backSpinShooter.Set(0);
 	//m_limelightTable->PutNumber("ledMode", 1);
+	IndexerOff();
 
 }
 

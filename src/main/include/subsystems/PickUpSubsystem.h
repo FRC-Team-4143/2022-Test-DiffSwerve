@@ -19,6 +19,7 @@ public:
 	void Periodic() override;
 
 	void PickUpExtend();
+	void PickUpExtendStart();
 	void PickUpBounce();
 	void PickUpRetract();
 	void PickUpToggle();

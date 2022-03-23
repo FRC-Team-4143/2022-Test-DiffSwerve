@@ -1,9 +1,9 @@
-#include "subsystems/SwerveModule.h"
+#include "subsystems/DiffSwerveModule.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
 // ============================================================================
 
-SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus)
+DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus)
 :   m_driveMotor(driveMotorChannel, CANbus),
     m_turningMotor(turningMotorChannel, CANbus),
     m_encoder(encoderChannel, CANbus),
@@ -38,7 +38,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
     m_turningMotor.SetNeutralMode(NeutralMode::Coast);
 }
 
-SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name)
+DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name)
 :   m_driveMotor(driveMotorChannel),
     m_turningMotor(turningMotorChannel),
     m_encoder(encoderChannel),
@@ -77,7 +77,7 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel, int e
 
 //called from DriveSubsystem Periodic
 
-frc::SwerveModuleState SwerveModule::GetState() {
+frc::SwerveModuleState DiffSwerveModule::GetState() {
     m_driveSpeed = GetDriveMotorSpeed();
     m_moduleAngle = (m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi;
     return {units::meters_per_second_t{m_driveSpeed},
@@ -88,8 +88,8 @@ frc::SwerveModuleState SwerveModule::GetState() {
 
 // ============================================================================
 
-double SwerveModule::GetDriveMotorSpeed() {
-    double speed = (m_driveMotor.GetSelectedSensorVelocity()) 
+double DiffSwerveModule::GetDriveMotorSpeed() {
+    double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
     * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi * 1.07);
 
     //frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
@@ -99,7 +99,7 @@ double SwerveModule::GetDriveMotorSpeed() {
 
 // ============================================================================
 
-double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
+double DiffSwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
 
     // Optimize the reference state to avoid spinning further than 90 degrees
     const auto state{frc::SwerveModuleState::Optimize(
@@ -125,10 +125,13 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     } else */ {
         m_driveVoltage =
             driveOutput
-            + driveFeedforward.value();
+            + driveFeedforward.value()
+            + DriveConstants::driveMaxVoltage * turnOutput;
 
         m_turnVoltage =
-             DriveConstants::driveMaxVoltage * turnOutput;
+            -driveOutput
+            - driveFeedforward.value()
+            + DriveConstants::driveMaxVoltage * turnOutput;
     }
 
 
@@ -142,7 +145,7 @@ double SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceStat
     return std::max(m_driveVoltage,m_turnVoltage);
 }
 
-void SwerveModule::SetVoltage(double driveMax){
+void DiffSwerveModule::SetVoltage(double driveMax){
     m_driveMotor.Set(ControlMode::PercentOutput, m_driveVoltage*driveMax/DriveConstants::driveMaxVoltage);
     m_turningMotor.Set(ControlMode::PercentOutput, m_turnVoltage*driveMax/DriveConstants::driveMaxVoltage);
     //m_driveMotor.SetVoltage(units::voltage::volt_t{m_driveVoltage*driveMax});
@@ -151,17 +154,17 @@ void SwerveModule::SetVoltage(double driveMax){
 
 // ============================================================================
 
-void SwerveModule::ResetEncoders() {
+void DiffSwerveModule::ResetEncoders() {
 }
 
-void SwerveModule::motorsOff () {
+void DiffSwerveModule::motorsOff () {
     m_driveMotor.Set(ControlMode::PercentOutput, 0);
     m_turningMotor.Set(ControlMode::PercentOutput, 0);
 }
 
 // =========================Wheel Offsets======================================
 
-void SwerveModule::SetWheelOffset() {
+void DiffSwerveModule::SetWheelOffset() {
 	auto steerPosition{m_encoder.GetAbsolutePosition()};
     fmt::print("ERROR: {} steerPosition {}\n", m_name, steerPosition);
 	frc::Preferences::SetDouble(m_name, steerPosition);
@@ -170,7 +173,7 @@ void SwerveModule::SetWheelOffset() {
 
 // ============================================================================
 
-void SwerveModule::LoadWheelOffset() {
+void DiffSwerveModule::LoadWheelOffset() {
 	auto steerPosition{frc::Preferences::GetDouble(m_name)};
     fmt::print("ERROR: {} steerPosition {}\n", m_name, steerPosition);
     m_offset = steerPosition;
