@@ -137,7 +137,7 @@ private:
 	// declared private and exposed only through public methods.
 
 	DiffSwerveModule m_frontLeft;
-	SwerveModule m_rearLeft;
+	DiffSwerveModule m_rearLeft;
 	DiffSwerveModule m_frontRight;
 	DiffSwerveModule m_rearRight;
 
