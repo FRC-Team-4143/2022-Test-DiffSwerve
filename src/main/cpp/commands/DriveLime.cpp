@@ -19,5 +19,10 @@ void DriveLime::End(bool) {
 }
 
 bool DriveLime::IsFinished() {
+	
+	if (fabs(m_drive->m_limelightTable->GetNumber("tx",3)) < 2){
+		return true;
+	}
+
 	return false;
 }

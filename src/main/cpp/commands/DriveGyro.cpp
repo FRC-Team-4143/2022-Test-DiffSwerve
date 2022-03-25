@@ -19,5 +19,9 @@ void DriveGyro::End(bool) {
 }
 
 bool DriveGyro::IsFinished() {
+
+	if (fabs(m_drive->GetHeading().value() - m_angle) < 2 )
+		return true;
+
 	return false;
 }

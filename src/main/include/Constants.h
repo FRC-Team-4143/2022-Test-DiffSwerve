@@ -78,7 +78,8 @@ namespace ModuleConstants {
 	// Assumes the encoders are directly mounted on the wheel shafts
 	//(wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
-	constexpr double kPModuleTurningController = 1 / wpi::numbers::pi;
+	constexpr double kPModuleTurningController = 1. / wpi::numbers::pi;
+	constexpr double kPSwerveModuleTurningController = 2. / wpi::numbers::pi;
 	constexpr double kPModuleDriveController = .5; //0.025;
 	constexpr double kmaxTurnOutput = .5;
 
@@ -100,8 +101,8 @@ namespace AutoConstants {
 		units::compound_unit<units::radians,
 		units::inverse<units::squared<units::second>>>;
 
-	constexpr auto kMaxSpeed = units::meters_per_second_t(2);
-	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(2);
+	constexpr auto kMaxSpeed = units::meters_per_second_t(2.5);
+	constexpr auto kMaxAcceleration = units::meters_per_second_squared_t(2.5);
 	constexpr auto kMaxAngularSpeed = units::radians_per_second_t(2 * wpi::numbers::pi); 
 	constexpr auto kMaxAngularAcceleration = units::unit_t<radians_per_second_squared_t>(wpi::numbers::pi);
 
@@ -139,9 +140,9 @@ namespace PickUpConstants {
 	constexpr int kLowerReverseSolenoidPort = 6;
 
 	constexpr double kShortSpeed = 0.6;
-	constexpr double kLongSpeed = 0.625;
+	constexpr double kLongSpeed = 0.475;
 	constexpr double kShortSpeedSlow = 0.35;
-	constexpr double kLongSpeedSlow = 0.55;
+	constexpr double kLongSpeedSlow = 0.4;
 }
 
 // ==========================================================================

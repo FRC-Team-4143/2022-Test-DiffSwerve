@@ -18,7 +18,7 @@ void PickUpCycle::Execute() {
 		m_pickUp->PickUpRetract();
 	} else {
 		counter = 0;
-		if (counter2 > 15) m_pickUp->PickUpExtend();
+		if (counter2 > 8) m_pickUp->PickUpExtend();
 	}
 	counter2++;
 }

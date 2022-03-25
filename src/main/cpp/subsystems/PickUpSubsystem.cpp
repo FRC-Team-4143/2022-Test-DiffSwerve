@@ -55,7 +55,7 @@ void PickUpSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber ("ShooterSpeedshortSlow", m_shooterSpeedShortSlow);
 	frc::SmartDashboard::PutNumber ("ShooterSpeedlongSlow", m_shooterSpeedLongSlow);
 	frc::SmartDashboard::PutNumber ("Shooter1 RPM", m_shooter1Encoder.GetVelocity());
-	frc::SmartDashboard::PutNumber ("Shooter2 RPM", m_shooter2Encoder.GetVelocity());
+	//frc::SmartDashboard::PutNumber ("Shooter2 RPM", m_shooter2Encoder.GetVelocity());
 	frc::SmartDashboard::PutNumber ("BackSpinShooter RPM", m_backSpinShooterEncoder.GetVelocity());
 }
 
@@ -155,6 +155,7 @@ void PickUpSubsystem::IndexerOff() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOn() {
+	counter++;
 
 	double triggerAxis = m_controller->GetRightTriggerAxis();
 	bool aButton = m_controller->GetAButton();
@@ -162,7 +163,7 @@ void PickUpSubsystem::ShooterOn() {
 	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
 	auto tx = m_limelightTable->GetNumber("tx", 0);
 
-	if (fabs(tx) < 2 && tx != 0) {
+	if (fabs(tx) < 2 && tx != 0&& !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && counter > 24) {
 		IndexerOn();
 	}
 
@@ -204,6 +205,7 @@ void PickUpSubsystem::SetShooterSpeed(double shooterSpeed) {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOff() {
+	counter = 0;
 	m_shooter.Set(0);
 	m_backSpinShooter.Set(0);
 	//m_limelightTable->PutNumber("ledMode", 1);

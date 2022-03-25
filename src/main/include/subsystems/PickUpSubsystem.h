@@ -78,5 +78,7 @@ private:
 	rev::SparkMaxPIDController m_shooter2PIDController;
 	rev::SparkMaxPIDController m_backSpinPIDController;
 
+	int counter = 0;
+
 
 };

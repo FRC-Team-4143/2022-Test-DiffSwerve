@@ -28,7 +28,7 @@ DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 {
 	LoadWheelOffsets();
 	frc::SmartDashboard::PutData("Field", &m_field);
-	m_limelightTable= nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+	m_limelightTable = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
 	frc::SmartDashboard::PutBoolean("Disable Limelight", false);
 }
 
@@ -242,8 +242,8 @@ void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 		twist += 360.0;
 	}
 
-	constexpr double GYRO_P = 0.01*6; //original is 0.007
-	constexpr double GYRO_MAX = 0.25*6;
+	constexpr double GYRO_P = 0.005*6; //original is 0.007
+	constexpr double GYRO_MAX = 0.6*6;
 
 	twist = std::clamp(twist*GYRO_P, -GYRO_MAX, GYRO_MAX);
 

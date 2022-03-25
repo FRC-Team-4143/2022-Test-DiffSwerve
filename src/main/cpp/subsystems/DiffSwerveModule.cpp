@@ -20,13 +20,12 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
     m_driveMotor.EnableVoltageCompensation(true);
     m_turningMotor.ConfigVoltageCompSaturation(DriveConstants::driveMaxVoltage); 
     m_turningMotor.EnableVoltageCompensation(true);
- 
     
-    //constexpr double MAX_CURRENT = 40.0;
+    constexpr double MAX_CURRENT = 80.0;
 
-	//SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
-	//m_driveMotor.ConfigSupplyCurrentLimit(supply);
-	//m_turningMotor.ConfigSupplyCurrentLimit(supply);
+	SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
+	m_driveMotor.ConfigSupplyCurrentLimit(supply);
+	m_turningMotor.ConfigSupplyCurrentLimit(supply);
 
 	//StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigStatorCurrentLimit(stator);
@@ -57,11 +56,11 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
     m_turningMotor.EnableVoltageCompensation(true);
     
     
-    //constexpr double MAX_CURRENT = 40.0;
+    constexpr double MAX_CURRENT = 100.0;
 
-	//SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
-	//m_driveMotor.ConfigSupplyCurrentLimit(supply);
-	//m_turningMotor.ConfigSupplyCurrentLimit(supply);
+	SupplyCurrentLimitConfiguration supply{true, MAX_CURRENT, MAX_CURRENT, 10};
+	m_driveMotor.ConfigSupplyCurrentLimit(supply);
+	m_turningMotor.ConfigSupplyCurrentLimit(supply);
 
 	//StatorCurrentLimitConfiguration stator{true, MAX_CURRENT, MAX_CURRENT, 10};
 	//m_driveMotor.ConfigStatorCurrentLimit(stator);
@@ -92,7 +91,7 @@ double DiffSwerveModule::GetDriveMotorSpeed() {
     double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
     * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi * 1.07);
 
-    //frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
+    frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
     
     return speed;
 }
@@ -115,6 +114,24 @@ double DiffSwerveModule::SetDesiredState(const frc::SwerveModuleState& reference
     turnOutput = std::clamp(turnOutput,-ModuleConstants::kmaxTurnOutput,ModuleConstants::kmaxTurnOutput);
 
     const auto driveFeedforward{m_driveFeedforward.Calculate(state.speed)};
+
+    auto feedForward = driveFeedforward.value();
+
+    /*
+    if(feedForward - m_lastDriveVoltage > 0.5 && feedForward > 0 )
+        feedForward = m_lastDriveVoltage + 0.5;
+    
+    if(feedForward - m_lastDriveVoltage < -0.5 && feedForward < 0)
+        feedForward = m_lastDriveVoltage - 0.5;
+
+    if(feedForward > 0 && m_lastDriveVoltage < 0)
+        feedForward = 0;
+
+    if(feedForward < 0 && m_lastDriveVoltage > 0)
+        feedForward = 0;
+
+    m_lastDriveVoltage = feedForward;
+    */
 
     // Set the motor outputs
     /*if(!(fabs(state.angle.Radians().value()-encoderValue) < wpi::numbers::pi/4) &&

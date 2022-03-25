@@ -50,6 +50,7 @@ private:
 	frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{.5 / 1_s};
 	frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{.5 / 1_s};
 	frc::SlewRateLimiter<units::scalar> m_rotLimiter{.5 / 1_s};
+	frc::SlewRateLimiter<units::scalar> m_powerLimiter{1. / 1_s};
 
 	frc2::JoystickButton *m_rb;
 	frc2::JoystickButton *m_lb;

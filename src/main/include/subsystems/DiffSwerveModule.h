@@ -85,4 +85,5 @@ private:
 
 	double m_driveSpeed;
 	double m_moduleAngle;
+	double m_lastDriveVoltage = 0;
 };

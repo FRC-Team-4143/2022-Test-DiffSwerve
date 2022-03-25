@@ -22,8 +22,8 @@ class SwerveModule {
 
 public:
 
-	SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus);
-	SwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
+	SwerveModule(int turningMotorChannel, int driveMotorChannel, int encoderChannel, std::string name, std::string CANbus);
+	SwerveModule(int turningMotorChannel, int driveMotorChannel, int encoderChannel, std::string name);
 
 	frc::SwerveModuleState GetState();
 
@@ -72,7 +72,7 @@ private:
 	};
 
 	frc::ProfiledPIDController<units::radians> m_turningPIDController{
-		ModuleConstants::kPModuleTurningController,
+		ModuleConstants::kPSwerveModuleTurningController,
 		0.0,
 		0.0,
 		{kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}

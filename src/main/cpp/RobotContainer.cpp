@@ -45,13 +45,22 @@ RobotContainer::RobotContainer()
 :	m_drive{&m_driverController}, m_pickUp{&m_driverController}, m_climber{&m_climberController},
 	m_driveCommand{
 		[this] {
-			auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
-			auto y = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),DriveConstants::stickDeadBand));
+			//auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
+			//auto y = -m_yspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftX(),DriveConstants::stickDeadBand));
+			auto x = -frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand);
+			auto y = -frc::ApplyDeadband(m_driverController.GetLeftX(),DriveConstants::stickDeadBand);
 			auto rot = -m_rotLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetRightX(), DriveConstants::stickDeadBand));
 
+			double stickMagnitude = std::clamp(sqrt(pow(x, 2) + pow(y, 2)), -1., 1.);
+			double power = 0;
+			if(stickMagnitude != 0)
+				power = m_powerLimiter.Calculate(stickMagnitude) / stickMagnitude;
+			else
+				m_powerLimiter.Reset(0);
+
 			//reset on stop
-			if(fabs(x.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftY()) < DriveConstants::stickDeadBand) m_xspeedLimiter.Reset(0);
-			if(fabs(y.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftX()) < DriveConstants::stickDeadBand) m_yspeedLimiter.Reset(0);
+			//if(fabs(x.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftY()) < DriveConstants::stickDeadBand) m_xspeedLimiter.Reset(0);
+			//if(fabs(y.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetLeftX()) < DriveConstants::stickDeadBand) m_yspeedLimiter.Reset(0);
 			if(fabs(rot.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetRightX()) < DriveConstants::stickDeadBand) m_rotLimiter.Reset(0);
 			
 			//auto rotMod = (fabs(x.value())>.3 || fabs(y.value()) > .3) ? .5 : 1.0;
@@ -59,8 +68,8 @@ RobotContainer::RobotContainer()
 			auto rotMod = 1.0;
 
 			m_drive.Drive(
-				units::meters_per_second_t(x * DriveConstants::kMaxSpeed),
-				units::meters_per_second_t(y * DriveConstants::kMaxSpeed),
+				units::meters_per_second_t(x * DriveConstants::kMaxSpeed * power),
+				units::meters_per_second_t(y * DriveConstants::kMaxSpeed * power),
 				units::radians_per_second_t(rot * DriveConstants::kMaxAngularSpeed * rotMod)
 			);
 		},
@@ -641,10 +650,6 @@ void RobotContainer::_InitializeScriptEngine() {
 		frc4143::ScriptParserElement{
 			"DriveLime", {"DL"},
 			[this](std::vector<float> parameters) {
-				parameters.resize(3);
-				auto x{parameters[0]};
-				auto y{parameters[1]};
-				auto angle{parameters[2]};
 				return std::make_unique<DriveLime>(&m_drive);
 			}
 		}
