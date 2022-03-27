@@ -57,6 +57,7 @@ void PickUpSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber ("Shooter1 RPM", m_shooter1Encoder.GetVelocity());
 	//frc::SmartDashboard::PutNumber ("Shooter2 RPM", m_shooter2Encoder.GetVelocity());
 	frc::SmartDashboard::PutNumber ("BackSpinShooter RPM", m_backSpinShooterEncoder.GetVelocity());
+	frc::SmartDashboard::PutNumber("ty LimeLight", m_limelightTable->GetNumber("ty",0));
 }
 
 // ============================================================================
@@ -194,6 +195,31 @@ void PickUpSubsystem::ShooterOn() {
 	}
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
 	//m_limelightTable->PutNumber("ledMode", 0);
+	}
+
+// ============================================================================
+
+void PickUpSubsystem::ShooterOnLimeLight() {
+	counter++;
+
+	auto solenoidState = m_shooterSolenoid.Get();
+	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
+	auto tx = m_limelightTable->GetNumber("tx", 0);
+	double ty = m_limelightTable->GetNumber("ty", 0);
+
+	if (fabs(tx) < 2 && tx != 0&& !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && counter > 24) {
+		IndexerOn();
+	}
+
+	//if (isForward){
+		m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+	//}
+	//else {
+	//	m_shooterSpeed = (ty);
+	//}
+
+	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
 }
 
 // ============================================================================

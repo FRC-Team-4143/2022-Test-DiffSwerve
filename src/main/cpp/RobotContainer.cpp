@@ -110,6 +110,11 @@ RobotContainer::RobotContainer()
 	m_pathManager.AddPath("bigballs2");  			//7
 	m_pathManager.AddPath("bigballs3");  			//8
 	m_pathManager.AddPath("leftsideballDG");		//9
+	m_pathManager.AddPath("4Ball2");				//10
+	m_pathManager.AddPath("BackUp");				//11
+	m_pathManager.AddPath("devious1");				//12
+	m_pathManager.AddPath("devious2");				//13
+
 
 
 	//m_pathManager.AddPath("midBall");
@@ -185,6 +190,13 @@ void RobotContainer::_ConfigureButtonBindings() {
 		[]() { return false; }
 	};
 
+	frc2::FunctionalCommand shooterOnLimeLightCommand{
+		[]() {},
+		[this]() { m_pickUp.ShooterOnLimeLight(); },
+		[this](bool) { m_pickUp.ShooterOff(); },
+		[]() { return false; },
+	};
+
 	frc2::FunctionalCommand shooterOnCommand{
 		[]() {},
 		[this]() { m_pickUp.ShooterOn(); },
@@ -244,7 +256,7 @@ void RobotContainer::_ConfigureButtonBindings() {
 			return m_driverController.GetRightTriggerAxis() != 0;
 		}
 	};
-	rightTrigger.WhileActiveContinous(shooterOnCommand);
+	rightTrigger.WhileActiveContinous(shooterOnLimeLightCommand);
 
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper).WhenPressed(PickUpCycle{&m_pickUp,&m_driverController});
 	frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kLeftBumper).WhenPressed(PickUpCycleBounce{&m_pickUp,&m_driverController});
@@ -651,6 +663,24 @@ void RobotContainer::_InitializeScriptEngine() {
 			"DriveLime", {"DL"},
 			[this](std::vector<float> parameters) {
 				return std::make_unique<DriveLime>(&m_drive);
+			}
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"RollerOff", {"rOff"},
+			[this](std::vector<float> parameters) {
+				parameters.resize(1);
+				units::time::second_t duration{parameters[0]};
+				return std::make_unique<frc2::SequentialCommandGroup>(
+					*std::make_unique<frc2::WaitCommand>(duration),
+					*std::make_unique<frc2::InstantCommand>(
+						[this]() {
+						m_pickUp.RollerOff();
+						}
+					)
+				);
 			}
 		}
 	);

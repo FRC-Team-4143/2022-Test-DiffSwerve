@@ -34,6 +34,7 @@ public:
 	void IndexerLoad();
 
 	void ShooterOn();
+	void ShooterOnLimeLight();
 	void ShooterOff();
 	void ShooterFaster();
 	void ShooterSlower();
@@ -67,9 +68,9 @@ private:
 	double m_shooterSpeedShortSlow=PickUpConstants::kShortSpeedSlow;
 	double m_shooterSpeedLongSlow=PickUpConstants::kLongSpeedSlow;
 
-	std::shared_ptr<nt::NetworkTable> m_limelightTable;
-
 	frc::XboxController* m_controller;
+
+	std::shared_ptr<nt::NetworkTable> m_limelightTable;
 
 	rev::SparkMaxRelativeEncoder m_shooter1Encoder;
 	rev::SparkMaxRelativeEncoder m_shooter2Encoder;
