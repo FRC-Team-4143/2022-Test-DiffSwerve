@@ -34,6 +34,7 @@ public:
 	void IndexerLoad();
 
 	void ShooterOn();
+	void ShooterOnManual();
 	void ShooterOnLimeLight();
 	void ShooterOff();
 	void ShooterFaster();

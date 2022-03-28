@@ -155,7 +155,7 @@ void PickUpSubsystem::IndexerOff() {
 
 // ============================================================================
 
-void PickUpSubsystem::ShooterOn() {
+void PickUpSubsystem::ShooterOnManual() {
 	counter++;
 
 	double triggerAxis = m_controller->GetRightTriggerAxis();
@@ -202,8 +202,6 @@ void PickUpSubsystem::ShooterOn() {
 void PickUpSubsystem::ShooterOnLimeLight() {
 	counter++;
 
-	auto solenoidState = m_shooterSolenoid.Get();
-	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
 	auto tx = m_limelightTable->GetNumber("tx", 0);
 	double ty = m_limelightTable->GetNumber("ty", 0);
 
@@ -211,15 +209,22 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 		IndexerOn();
 	}
 
-	//if (isForward){
-		m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
-	//}
-	//else {
-	//	m_shooterSpeed = (ty);
-	//}
+	m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
+}
+
+void PickUpSubsystem::ShooterOn() {
+	auto solenoidState = m_shooterSolenoid.Get();
+	auto isForward = frc::DoubleSolenoid::Value::kForward == solenoidState;
+
+	if (frc::SmartDashboard::GetBoolean("Disable Limelight", 0) || !isForward) {
+		ShooterOnManual();
+	}
+	if (!frc::SmartDashboard::GetBoolean("Disable Limelight", 0)) {
+		ShooterOnLimeLight();
+	}
 }
 
 // ============================================================================
