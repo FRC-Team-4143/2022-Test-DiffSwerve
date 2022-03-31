@@ -204,6 +204,14 @@ void ClimberSubsystem::Periodic() {
 		if (m_controller->GetRightY() < -0.3) m_rightExtensionPos += 1.0;
 
 		if (m_controller->GetLeftTriggerAxis() < 0.1) {
+			if (m_rightPosition > 0 && m_leftPosition < 45) {
+				m_leftPosition += m_rightPosition;
+				m_rightPosition = 0;
+			}
+			if (m_leftPosition < 0.0 && m_rightPosition > -45.0) {
+				m_rightPosition += m_leftPosition;
+				m_leftPosition = 0.0;
+			}
 			m_rightPosition = std::clamp(m_rightPosition, -45.0, 0.0);
 			m_leftPosition = std::clamp(m_leftPosition, 0.0, 45.0);
 			m_rightExtensionPos = std::clamp(m_rightExtensionPos, -10.0*9/16, 265.0*9/16);

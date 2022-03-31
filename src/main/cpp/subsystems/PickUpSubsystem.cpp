@@ -46,6 +46,7 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 	m_shooter1PIDController.SetFF(1.5e-5);
 	m_shooter2PIDController.SetFF(1.5e-5);
 	m_backSpinPIDController.SetFF(1.5e-5);
+	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.36));
 }
 
 // ============================================================================
@@ -124,11 +125,11 @@ void PickUpSubsystem::RollerOff() {
 
 void PickUpSubsystem::IndexerOn() {
 	if(m_controller->GetLeftTriggerAxis() <= 0.5 && m_controller->GetLeftTriggerAxis() > 0.05){
-		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
+		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.85);
 		m_index2.Set(TalonSRXControlMode::PercentOutput, 0);
 	} else{
-		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.75);
-		m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+		m_index1.Set(TalonSRXControlMode::PercentOutput, 0.85);
+		m_index2.Set(TalonSRXControlMode::PercentOutput, 0.7);
 	}
 }
 
@@ -136,14 +137,14 @@ void PickUpSubsystem::IndexerOn() {
 
 void PickUpSubsystem::IndexerLoad() {
 	m_index1.Set(TalonSRXControlMode::PercentOutput, 0);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.5);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, 0.7);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::IndexerRev() {
-	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.5);
-	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.75);
+	m_index1.Set(TalonSRXControlMode::PercentOutput, -0.7);
+	m_index2.Set(TalonSRXControlMode::PercentOutput, -0.85);
 }
 
 // ============================================================================
@@ -209,7 +210,9 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 		IndexerOn();
 	}
 
-	m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.36);
+	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+	m_shooterSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
