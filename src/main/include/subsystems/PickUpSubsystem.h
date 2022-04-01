@@ -36,6 +36,7 @@ public:
 	void ShooterOn();
 	void ShooterOnManual();
 	void ShooterOnLimeLight();
+	void ShooterOnLimeLightAuto();
 	void ShooterOff();
 	void ShooterFaster();
 	void ShooterSlower();

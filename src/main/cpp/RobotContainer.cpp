@@ -489,6 +489,19 @@ void RobotContainer::_InitializeScriptEngine() {
 
 	parser->Add(
 		frc4143::ScriptParserElement{
+			"ShooterLimeLight", {"SL"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::InstantCommand>(
+					[this]() {
+						m_pickUp.ShooterOnLimeLightAuto();
+					}
+				);
+			}
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
 			"Stop", {},
 			[this](std::vector<float> parameters) {
 				return std::make_unique<frc2::InstantCommand>(
@@ -546,6 +559,21 @@ void RobotContainer::_InitializeScriptEngine() {
 						m_pickUp.PickUpExtend();
 						m_pickUp.RollerIn();
 						m_pickUp.IndexerLoad();
+					}
+				);
+			}
+		}
+	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"PickUpExtendNoFeed", {"PENF"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::InstantCommand>(
+					[this]() {
+						m_pickUp.PickUpExtend();
+						m_pickUp.RollerIn();
+						m_pickUp.IndexerOff();
 					}
 				);
 			}

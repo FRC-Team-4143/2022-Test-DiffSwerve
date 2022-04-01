@@ -171,13 +171,17 @@ units::degree_t DriveSubsystem::GetHeading() const {
 // ==========================================================================
 
 void DriveSubsystem::ZeroHeading() {
-	m_pidgey.SetYaw(0,30);
+	if(m_pidgey.SetYaw(0,8))
+	if(m_pidgey.SetYaw(0,8))
+		m_pidgey.SetYaw(0,8);
 }
 
 // ==========================================================================
 
 void DriveSubsystem::SetOffsetHeading(int heading){
-	m_pidgey.SetYaw(heading, 30);
+	if(m_pidgey.SetYaw(heading, 8))
+	if(m_pidgey.SetYaw(heading, 8))
+	   m_pidgey.SetYaw(heading, 8);
 }
 
 // ==========================================================================

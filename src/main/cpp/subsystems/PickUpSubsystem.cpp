@@ -46,7 +46,7 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 	m_shooter1PIDController.SetFF(1.5e-5);
 	m_shooter2PIDController.SetFF(1.5e-5);
 	m_backSpinPIDController.SetFF(1.5e-5);
-	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.36));
+	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.33));
 }
 
 // ============================================================================
@@ -210,10 +210,25 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 		IndexerOn();
 	}
 
-    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.36);
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.33);
 	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 	m_shooterSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 
+	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
+	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
+}
+
+void PickUpSubsystem::ShooterOnLimeLightAuto() {
+
+	double ty = m_limelightTable->GetNumber("ty", 0);
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.33);
+	double limeLightSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+
+	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+	if (m_shooterSpeed*1.2 > limeLightSpeed && m_shooterSpeed*0.8 < limeLightSpeed) {
+	m_shooterSpeed = limeLightSpeed;
+	}
+	
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
 }

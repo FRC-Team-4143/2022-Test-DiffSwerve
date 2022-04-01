@@ -18,6 +18,7 @@
 #include "SwerveModule.h"
 #include <frc/XboxController.h>
 #include "DiffSwerveModule.h"
+#include "PinnedDiffSwerveModule.h"
 #include "ISwerveModule.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
