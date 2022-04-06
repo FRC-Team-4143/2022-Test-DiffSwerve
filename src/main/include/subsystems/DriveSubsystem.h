@@ -20,6 +20,9 @@
 #include "DiffSwerveModule.h"
 #include "PinnedDiffSwerveModule.h"
 #include "ISwerveModule.h"
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
+
 
 class DriveSubsystem : public frc2::SubsystemBase {
 public:
@@ -134,6 +137,7 @@ private:
 	// The gyro sensor
 	WPI_Pigeon2 m_pidgey{0, "Default Name"};
 
+
 	// Components (e.g. motor controllers and sensors) should generally be
 	// declared private and exposed only through public methods.
 
@@ -175,6 +179,5 @@ private:
 
 	frc::XboxController* m_controller;
 
-
-
+	frc::Pose2d m_lastPose;
 };

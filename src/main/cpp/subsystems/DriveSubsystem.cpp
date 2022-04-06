@@ -10,6 +10,8 @@
 #include <units/angular_velocity.h>
 #include <units/velocity.h>
 #include "Constants.h"
+#include <wpi/numbers>
+#include <math.h>
 
 #define CANIVORE "Default Name"
 
@@ -24,7 +26,8 @@ DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE},
 	m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
 	m_fieldCentric{false},
-	m_controller(controller)
+	m_controller(controller),
+	m_lastPose{m_odometry.GetPose()}
 {
 	LoadWheelOffsets();
 	frc::SmartDashboard::PutData("Field", &m_field);
@@ -35,23 +38,54 @@ DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 // ==========================================================================
 
 void DriveSubsystem::Periodic() {
+	auto frontLeftState = m_frontLeft.GetState();
+	auto rearLeftState = m_rearLeft.GetState();
+	auto frontRightState = m_frontRight.GetState();
+	auto rearRightState = m_rearRight.GetState();
+
 	m_currentYaw = m_pidgey.GetYaw();
 
 	m_odometry.Update(
 		GetHeading(),
-		m_frontLeft.GetState(),
-		m_rearLeft.GetState(),
-		m_frontRight.GetState(),
-		m_rearRight.GetState()
+		frontLeftState,
+		rearLeftState,
+		frontRightState,
+		rearRightState
 	);
 
 	m_poseEstimator.Update(
 		GetHeading(),
-		m_frontLeft.GetState(),
-		m_rearLeft.GetState(),
-		m_frontRight.GetState(),
-		m_rearRight.GetState()
+		frontLeftState,
+		rearLeftState,
+		frontRightState,
+		rearRightState
 	);
+/*
+	frc::Pose2d currentPose = m_odometry.GetPose();
+	auto ds = m_lastPose - currentPose;
+	auto heading = currentPose.Rotation().Radians().value();
+	auto xVel = ds.X().value()/.02;
+	auto yVel = ds.Y().value()/.02;
+	auto rVel = ds.Rotation().Radians().value()/.02;
+
+	auto lxVel = xVel * sin(heading) + yVel * cos(wpi::numbers::pi - heading);
+	auto lyVel = xVel * cos(heading) + yVel * sin(90 - heading);
+*/
+	auto [vx, vy, angularVelocity] = kDriveKinematics.ToChassisSpeeds(frontLeftState, rearLeftState, frontRightState, rearRightState);
+
+	auto ty = m_limelightTable->GetNumber("ty",0);
+	auto tx = m_limelightTable->GetNumber("tx",0);
+/*
+	auto airTime = 
+	auto dist = 
+	auto totDist = dist + vx*airTime;
+
+
+
+	auto offset = arctan(vy*airTime/totDist);
+	auto realDist = vy*airTime/sin(offset*180/math::numbers::pi);
+*/
+	//m_lastPose = currentPose;
 
 	auto rsPosition{_GetPositionFromRealSense()};
 	auto rsYaw{_GetYawFromRealSense()};
@@ -72,6 +106,9 @@ void DriveSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber("Gyro", GetHeading().value());
 	frc::SmartDashboard::PutBoolean("FieldCentric", m_fieldCentric);
 	frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
+	frc::SmartDashboard::PutNumber("vx" ,vx.value());
+	frc::SmartDashboard::PutNumber("Angular Velocity", angularVelocity.value());
+	frc::SmartDashboard::PutNumber("vy", vy.value());
 
 	m_field.SetRobotPose(m_odometry.GetPose());
 
