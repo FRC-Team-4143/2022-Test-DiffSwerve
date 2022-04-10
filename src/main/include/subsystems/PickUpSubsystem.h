@@ -11,6 +11,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <frc/XboxController.h>
+#include "DriveSubsystem.h"
 
 class PickUpSubsystem : public frc2::SubsystemBase {
 public:
@@ -45,6 +46,9 @@ public:
 	void ShooterFar();
 	void ShooterClose();
 	void ShooterDistToggle();
+
+	void SetDist(double value);
+	void SetOffset(double value);
 
 private:
 
@@ -83,5 +87,6 @@ private:
 
 	int counter = 0;
 
-
+	double m_offset;
+	double m_realDist;
 };

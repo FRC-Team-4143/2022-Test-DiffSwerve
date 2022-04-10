@@ -126,7 +126,15 @@ public:
 	void SetWheelOffsets();
 	void LoadWheelOffsets();
 
+	double GetDist();
+	double GetOffset();
+
 	std::shared_ptr<nt::NetworkTable> m_limelightTable;
+
+	DiffSwerveModule m_frontLeft;
+	DiffSwerveModule m_rearLeft;
+	DiffSwerveModule m_frontRight;
+	DiffSwerveModule m_rearRight;
 
 
 private:
@@ -141,11 +149,7 @@ private:
 	// Components (e.g. motor controllers and sensors) should generally be
 	// declared private and exposed only through public methods.
 
-	DiffSwerveModule m_frontLeft;
-	DiffSwerveModule m_rearLeft;
-	DiffSwerveModule m_frontRight;
-	DiffSwerveModule m_rearRight;
-
+	
 	double m_currentYaw = 0;
 
 	int m_counter = 0;
@@ -180,4 +184,10 @@ private:
 	frc::XboxController* m_controller;
 
 	frc::Pose2d m_lastPose;
+
+	double m_realDist;
+	double m_offset;
+	double txOffset;
+	double m_expectedOffset;
+	double m_zero;
 };

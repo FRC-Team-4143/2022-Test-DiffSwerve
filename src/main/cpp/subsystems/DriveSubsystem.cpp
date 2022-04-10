@@ -34,7 +34,7 @@ DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
 	m_limelightTable = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
 	frc::SmartDashboard::PutBoolean("Disable Limelight", false);
 }
-
+ 
 // ==========================================================================
 
 void DriveSubsystem::Periodic() {
@@ -43,7 +43,38 @@ void DriveSubsystem::Periodic() {
 	auto frontRightState = m_frontRight.GetState();
 	auto rearRightState = m_rearRight.GetState();
 
-	m_currentYaw = m_pidgey.GetYaw();
+	auto [vx, vy, angularVelocity] = kDriveKinematics.ToChassisSpeeds(frontLeftState, rearLeftState, frontRightState, rearRightState);
+
+	double ty = m_limelightTable->GetNumber("ty",0);
+	double tx = m_limelightTable->GetNumber("tx",0);
+	double tv = m_limelightTable->GetNumber("tv",0);
+
+
+/*
+	double airTime = 0.8149467 + 0.003095104*ty + 0.001401973*pow(ty,2);  //seconds
+	//converts dist to meters from inches
+	double dist = 0.0254*(67.77761 - 1.716064*ty + 0.2305231*pow(ty,2));  //meters
+*/
+	double dist = 2.62 + -0.177*ty + .00823*pow(ty,2);
+	double airTime = 0.671 + 0.0418*dist + 0.0186*pow(dist,2);
+
+	if (tv == 0) {dist = 3; airTime = 1;}
+
+	double totDist = dist + -vx.value()*airTime;  //meters
+
+	m_expectedOffset = 1/.02 * atan2(-vy.value()*.02, dist);  //Radians per Second
+	m_expectedOffset *= .65;   /// adjust to change lag of shot
+
+	m_offset = atan2(-vy.value()*airTime, totDist);   //radians
+
+	m_offset *= 180./wpi::numbers::pi;  // degrees
+
+	m_offset = std::clamp(m_offset, -25., 25.);
+
+	m_realDist = totDist;
+	//double m_realDist = -vy.value()*airTime/sin(m_offset);
+
+	m_currentYaw = m_pidgey.GetYaw() - m_zero;
 
 	m_odometry.Update(
 		GetHeading(),
@@ -52,7 +83,7 @@ void DriveSubsystem::Periodic() {
 		frontRightState,
 		rearRightState
 	);
-
+/*
 	m_poseEstimator.Update(
 		GetHeading(),
 		frontLeftState,
@@ -60,6 +91,7 @@ void DriveSubsystem::Periodic() {
 		frontRightState,
 		rearRightState
 	);
+*/
 /*
 	frc::Pose2d currentPose = m_odometry.GetPose();
 	auto ds = m_lastPose - currentPose;
@@ -71,29 +103,17 @@ void DriveSubsystem::Periodic() {
 	auto lxVel = xVel * sin(heading) + yVel * cos(wpi::numbers::pi - heading);
 	auto lyVel = xVel * cos(heading) + yVel * sin(90 - heading);
 */
-	auto [vx, vy, angularVelocity] = kDriveKinematics.ToChassisSpeeds(frontLeftState, rearLeftState, frontRightState, rearRightState);
-
-	auto ty = m_limelightTable->GetNumber("ty",0);
-	auto tx = m_limelightTable->GetNumber("tx",0);
-/*
-	auto airTime = 
-	auto dist = 
-	auto totDist = dist + vx*airTime;
-
-
-
-	auto offset = arctan(vy*airTime/totDist);
-	auto realDist = vy*airTime/sin(offset*180/math::numbers::pi);
-*/
-	//m_lastPose = currentPose;
+	//m per s
+	
 
 	auto rsPosition{_GetPositionFromRealSense()};
 	auto rsYaw{_GetYawFromRealSense()};
-
+/*
 	m_poseEstimator.AddVisionMeasurement(
 		frc::Pose2d{rsPosition, rsYaw},
 		frc::Timer::GetFPGATimestamp() - 0.05_s
 	);
+*/
 /*
 	frc::SmartDashboard::PutNumber("m_odometry_x", m_odometry.GetPose().X().value());
 	frc::SmartDashboard::PutNumber("m_odometry_y", m_odometry.GetPose().Y().value());
@@ -107,8 +127,14 @@ void DriveSubsystem::Periodic() {
 	frc::SmartDashboard::PutBoolean("FieldCentric", m_fieldCentric);
 	frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
 	frc::SmartDashboard::PutNumber("vx" ,vx.value());
-	frc::SmartDashboard::PutNumber("Angular Velocity", angularVelocity.value());
 	frc::SmartDashboard::PutNumber("vy", vy.value());
+	frc::SmartDashboard::PutNumber("Angular Velocity", angularVelocity.value());
+	frc::SmartDashboard::PutNumber("m_offset", m_offset);
+	frc::SmartDashboard::PutNumber("actualrealDist", m_realDist);
+	frc::SmartDashboard::PutNumber("expectedOFfset", m_expectedOffset);
+	frc::SmartDashboard::PutNumber("airTime", airTime);
+
+	
 
 	m_field.SetRobotPose(m_odometry.GetPose());
 
@@ -132,13 +158,25 @@ void DriveSubsystem::Drive(
 	units::radians_per_second_t rot)
 {
 	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
-	if (m_controller->GetRightTriggerAxis() != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0))  {
-		if (abs(limeLightTX) >= 1) 
-			rot = units::radians_per_second_t(limeLightTX/(-30)*1);
-		else if (abs(limeLightTX)> 0)
-			rot = units::radians_per_second_t(-abs(limeLightTX)/limeLightTX*.01);
-	}
+	auto limeLightTV = m_limelightTable->GetNumber("tv", 0.0);
+    double limeLightP = frc::SmartDashboard::GetNumber("limeLightP", -.03);
+	double tolerance = frc::SmartDashboard::GetNumber("limelightTolerance", 3);
 
+	double ffoffset = .1;
+	//                
+	double newTX = 0;                                                                                                                                                  double txOffset = 0.7223274*m_offset + 1.029443;
+	if(limeLightTV > 0)
+		newTX = limeLightTX - m_offset;
+
+	
+	if (m_controller->GetRightTriggerAxis() != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && limeLightTV != 0)  {
+		if (fabs(newTX) > tolerance)
+			rot =  units::radians_per_second_t(newTX*(limeLightP) + m_expectedOffset);
+		else if(fabs(m_expectedOffset) > .1) 
+			rot = units::radians_per_second_t(m_expectedOffset);
+		else
+			rot = units::radians_per_second_t(0);
+	}
 	auto states = kDriveKinematics.ToSwerveModuleStates(
 		m_fieldCentric ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
 			xSpeed, ySpeed, rot, GetHeading())
@@ -208,17 +246,15 @@ units::degree_t DriveSubsystem::GetHeading() const {
 // ==========================================================================
 
 void DriveSubsystem::ZeroHeading() {
-	if(m_pidgey.SetYaw(0,8))
-	if(m_pidgey.SetYaw(0,8))
-		m_pidgey.SetYaw(0,8);
+//		m_pidgey.SetYaw(0,8);
+m_zero = m_pidgey.GetYaw();
 }
 
 // ==========================================================================
 
 void DriveSubsystem::SetOffsetHeading(int heading){
-	if(m_pidgey.SetYaw(heading, 8))
-	if(m_pidgey.SetYaw(heading, 8))
-	   m_pidgey.SetYaw(heading, 8);
+//	   m_pidgey.SetYaw(heading, 8);
+m_zero = m_pidgey.GetYaw() - heading;
 }
 
 // ==========================================================================
@@ -296,7 +332,7 @@ void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 void DriveSubsystem::DriveLime() {
 	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
 	double rot = 0;
-	if (abs(limeLightTX) >= 1) 
+	if (fabs(limeLightTX) >= 1) 
 			rot = (limeLightTX/(-30)*1);
 
 	Drive(units::meters_per_second_t(0), units::meters_per_second_t(0), units::radians_per_second_t(rot));
@@ -379,3 +415,11 @@ units::degree_t DriveSubsystem::_GetYawFromRealSense() {
 }
 
 // ================================================================
+
+double DriveSubsystem::GetDist(){
+	return m_realDist;
+}
+
+double DriveSubsystem::GetOffset(){
+	return m_offset;
+}

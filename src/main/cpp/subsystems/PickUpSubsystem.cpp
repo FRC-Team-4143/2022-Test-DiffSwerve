@@ -59,6 +59,7 @@ void PickUpSubsystem::Periodic() {
 	//frc::SmartDashboard::PutNumber ("Shooter2 RPM", m_shooter2Encoder.GetVelocity());
 	frc::SmartDashboard::PutNumber ("BackSpinShooter RPM", m_backSpinShooterEncoder.GetVelocity());
 	frc::SmartDashboard::PutNumber("ty LimeLight", m_limelightTable->GetNumber("ty",0));
+	frc::SmartDashboard::PutNumber("realDist", m_realDist);
 }
 
 // ============================================================================
@@ -102,7 +103,7 @@ void PickUpSubsystem::PickUpToggle() {
 
 void PickUpSubsystem::RollerIn() {
 	//m_roller.Set(TalonSRXControlMode::PercentOutput, -1.0);
-	m_rollerpwm.Set(-.75);
+	m_rollerpwm.Set(-1.0);  //.75
 	PickUpExtend();
 }
 
@@ -201,18 +202,26 @@ void PickUpSubsystem::ShooterOnManual() {
 // ============================================================================
 
 void PickUpSubsystem::ShooterOnLimeLight() {
-	counter++;
+	if (counter > 0) counter--;
 
 	auto tx = m_limelightTable->GetNumber("tx", 0);
 	double ty = m_limelightTable->GetNumber("ty", 0);
+	auto tv = m_limelightTable->GetNumber("tv",0);
 
-	if (fabs(tx) < 2 && tx != 0&& !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && counter > 24) {
+	frc::SmartDashboard::PutNumber("LL xerr", tx - m_offset);
+	double tolerance = frc::SmartDashboard::GetNumber("limelightTolerance", 3);
+
+	if (fabs(tx - m_offset) < tolerance && tv != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && m_controller->GetRightTriggerAxis() > .1) {
 		IndexerOn();
+		counter = 30;
 	}
+	if ( counter == 1 ) 
+		IndexerOff();
 
-    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.33);
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", .285);
 	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
-	m_shooterSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
+	
+	m_shooterSpeed = shooterconstant + 0.0204*m_realDist + .00867*pow(m_realDist, 2);
 
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
@@ -221,7 +230,7 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 void PickUpSubsystem::ShooterOnLimeLightAuto() {
 
 	double ty = m_limelightTable->GetNumber("ty", 0);
-    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.33);
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.35);
 	double limeLightSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 
 	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
@@ -306,3 +315,11 @@ void PickUpSubsystem::ShooterDistToggle() {
 }
 
 // ============================================================================
+
+void PickUpSubsystem::SetDist(double value){
+		m_realDist = value;
+}
+
+void PickUpSubsystem::SetOffset(double value){
+		m_offset = value;
+}

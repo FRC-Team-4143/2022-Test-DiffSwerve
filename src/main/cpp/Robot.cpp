@@ -63,6 +63,9 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
+	m_container.m_pickUp.SetDist(m_container.m_drive.GetDist() );
+	m_container.m_pickUp.SetOffset(m_container.m_drive.GetOffset() );
+	m_container.m_pickUp.ShooterOn();
 }
 
 /**
