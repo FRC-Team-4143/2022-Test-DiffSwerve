@@ -6,7 +6,8 @@ PickUpCycle::PickUpCycle(PickUpSubsystem* subsystem,frc::XboxController* control
 
 void PickUpCycle::Initialize() {
 	m_pickUp->RollerIn();
-	m_pickUp->PickUpBounce();
+	m_pickUp->PickUpExtend();
+	//m_pickUp->PickUpBounce(); // this line does the scoop pickup motion
 	m_pickUp->IndexerLoad();
 	counter = 0;
 	counter2 = 0;

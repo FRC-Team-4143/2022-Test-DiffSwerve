@@ -67,6 +67,8 @@ RobotContainer::RobotContainer()
 			//frc::SmartDashboard::PutNumber("rotMod", rotMod);
 			auto rotMod = 1.0;
 
+			if(m_driverController.GetRightTriggerAxis()) {x = std::clamp(x,-.75,.75); y = std::clamp(y,-.75,.75); }
+
 			m_drive.Drive(
 				units::meters_per_second_t(x * DriveConstants::kMaxSpeed * power),
 				units::meters_per_second_t(y * DriveConstants::kMaxSpeed * power),
@@ -114,7 +116,7 @@ RobotContainer::RobotContainer()
 	m_pathManager.AddPath("BackUp");				//11
 	m_pathManager.AddPath("devious1");				//12
 	m_pathManager.AddPath("devious2");				//13
-
+	m_pathManager.AddPath("devious3");				//14
 
 
 	//m_pathManager.AddPath("midBall");

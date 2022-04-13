@@ -86,6 +86,7 @@ private:
 	rev::SparkMaxPIDController m_backSpinPIDController;
 
 	int counter = 0;
+	int counter2 = 0;
 
 	double m_offset;
 	double m_realDist;

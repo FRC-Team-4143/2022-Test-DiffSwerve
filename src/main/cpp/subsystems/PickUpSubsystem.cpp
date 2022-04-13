@@ -46,7 +46,7 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 	m_shooter1PIDController.SetFF(1.5e-5);
 	m_shooter2PIDController.SetFF(1.5e-5);
 	m_backSpinPIDController.SetFF(1.5e-5);
-	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.33));
+	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.285));
 }
 
 // ============================================================================
@@ -212,9 +212,14 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 	double tolerance = frc::SmartDashboard::GetNumber("limelightTolerance", 3);
 
 	if (fabs(tx - m_offset) < tolerance && tv != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && m_controller->GetRightTriggerAxis() > .1) {
-		IndexerOn();
-		counter = 30;
+		counter2++;
+		if(counter2 > 2) {  // must be locked on for 3 cycles
+			IndexerOn();
+			counter = 30;
+		}	
 	}
+	else counter2 = 0;
+
 	if ( counter == 1 ) 
 		IndexerOff();
 

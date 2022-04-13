@@ -43,7 +43,7 @@ void DriveSubsystem::Periodic() {
 	auto frontRightState = m_frontRight.GetState();
 	auto rearRightState = m_rearRight.GetState();
 
-	auto [vx, vy, angularVelocity] = kDriveKinematics.ToChassisSpeeds(frontLeftState, rearLeftState, frontRightState, rearRightState);
+	auto [vx, vy, vr] = kDriveKinematics.ToChassisSpeeds(frontLeftState, frontRightState, rearLeftState, rearRightState);
 
 	double ty = m_limelightTable->GetNumber("ty",0);
 	double tx = m_limelightTable->GetNumber("tx",0);
@@ -65,7 +65,7 @@ void DriveSubsystem::Periodic() {
 	m_expectedOffset = 1/.02 * atan2(-vy.value()*.02, dist);  //Radians per Second
 	m_expectedOffset *= .65;   /// adjust to change lag of shot
 
-	m_offset = atan2(-vy.value()*airTime, totDist);   //radians
+	m_offset = atan2(-vy.value()*airTime, totDist) * 1.;   //radians    // test constant
 
 	m_offset *= 180./wpi::numbers::pi;  // degrees
 
@@ -79,16 +79,16 @@ void DriveSubsystem::Periodic() {
 	m_odometry.Update(
 		GetHeading(),
 		frontLeftState,
-		rearLeftState,
 		frontRightState,
+		rearLeftState,
 		rearRightState
 	);
 /*
 	m_poseEstimator.Update(
 		GetHeading(),
 		frontLeftState,
-		rearLeftState,
 		frontRightState,
+		rearLeftState,
 		rearRightState
 	);
 */
@@ -106,8 +106,8 @@ void DriveSubsystem::Periodic() {
 	//m per s
 	
 
-	auto rsPosition{_GetPositionFromRealSense()};
-	auto rsYaw{_GetYawFromRealSense()};
+	//auto rsPosition{_GetPositionFromRealSense()};
+	//auto rsYaw{_GetYawFromRealSense()};
 /*
 	m_poseEstimator.AddVisionMeasurement(
 		frc::Pose2d{rsPosition, rsYaw},
@@ -125,10 +125,13 @@ void DriveSubsystem::Periodic() {
 */
 	frc::SmartDashboard::PutNumber("Gyro", GetHeading().value());
 	frc::SmartDashboard::PutBoolean("FieldCentric", m_fieldCentric);
-	frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
+	//frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
 	frc::SmartDashboard::PutNumber("vx" ,vx.value());
 	frc::SmartDashboard::PutNumber("vy", vy.value());
-	frc::SmartDashboard::PutNumber("Angular Velocity", angularVelocity.value());
+	frc::SmartDashboard::PutNumber("vr", vr.value());
+	//frc::SmartDashboard::PutNumber("vxbug" ,vxbug.value());
+	//frc::SmartDashboard::PutNumber("vybug", vybug.value());
+	//frc::SmartDashboard::PutNumber("vrbug", vrbug.value());
 	frc::SmartDashboard::PutNumber("m_offset", m_offset);
 	frc::SmartDashboard::PutNumber("actualrealDist", m_realDist);
 	frc::SmartDashboard::PutNumber("expectedOFfset", m_expectedOffset);
