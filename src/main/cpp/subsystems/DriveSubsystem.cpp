@@ -55,15 +55,17 @@ void DriveSubsystem::Periodic() {
 	//converts dist to meters from inches
 	double dist = 0.0254*(67.77761 - 1.716064*ty + 0.2305231*pow(ty,2));  //meters
 */
-	double dist = 2.62 + -0.177*ty + .00823*pow(ty,2);
-	double airTime = 0.671 + 0.0418*dist + 0.0186*pow(dist,2);
+//	double dist = 2.62 + -0.177*ty + .00823*pow(ty,2);
+//	double airTime = 0.671 + 0.0418*dist + 0.0186*pow(dist,2);
+	double dist = 3.99 + -0.117*ty + .00823*pow(ty,2);
+	double airTime = 0.649 + -.00923*dist + 0.0186*pow(dist,2);
 
 	if (tv == 0) {dist = 3; airTime = 1;}
 
 	double totDist = dist + -vx.value()*airTime;  //meters
 
 	m_expectedOffset = 1/.02 * atan2(-vy.value()*.02, dist);  //Radians per Second
-	m_expectedOffset *= .65;   /// adjust to change lag of shot
+	m_expectedOffset *= 1.;   /// adjust to change lag of shot
 
 	m_offset = atan2(-vy.value()*airTime, totDist) * 1.;   //radians    // test constant
 
