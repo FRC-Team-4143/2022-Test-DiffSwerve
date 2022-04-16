@@ -46,7 +46,9 @@ PickUpSubsystem::PickUpSubsystem(frc::XboxController* controller)
 	m_shooter1PIDController.SetFF(1.5e-5);
 	m_shooter2PIDController.SetFF(1.5e-5);
 	m_backSpinPIDController.SetFF(1.5e-5);
-	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.26));
+	//frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.26));
+	frc::SmartDashboard::PutNumber("shooter constant", frc::SmartDashboard::GetNumber("shooter constant", 0.));
+
 }
 
 // ============================================================================
@@ -211,7 +213,7 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 	frc::SmartDashboard::PutNumber("LL xerr", tx - m_offset);
 	double tolerance = frc::SmartDashboard::GetNumber("limelightTolerance", 3);
 
-	if (fabs(tx - m_offset) < tolerance && fabs(m_offset) < 25. && tv != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && m_controller->GetRightTriggerAxis() > .1) {
+	if (fabs(tx - m_offset) < tolerance && fabs(m_offset) < 25. && tv != 0 && !frc::SmartDashboard::GetBoolean("Disable Limelight", 0) && (m_controller->GetRightTriggerAxis() > .1 || frc::DriverStation::IsAutonomousEnabled())) {
 		counter2++;
 		if(counter2 > 2) {  // must be locked on for 3 cycles
 			IndexerOn();
@@ -223,28 +225,16 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 	if ( counter == 1 ) 
 		IndexerOff();
 
-    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", .26);
+    //double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", .26);
+    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.);
+
 	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 	
 	//m_shooterSpeed = shooterconstant + 0.0204*m_realDist + .00867*pow(m_realDist, 2);
-	m_shooterSpeed = shooterconstant + -.00383*m_realDist + .00867*pow(m_realDist, 2);
+	//m_shooterSpeed = shooterconstant + -.00383*m_realDist + .00867*pow(m_realDist, 2);
+	m_shooterSpeed = shooterconstant + 0.0345 + 0.0862*m_realDist + -2.81E-03*pow(m_realDist,2);
 
 
-	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
-	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
-}
-
-void PickUpSubsystem::ShooterOnLimeLightAuto() {
-
-	double ty = m_limelightTable->GetNumber("ty", 0);
-    double shooterconstant = frc::SmartDashboard::GetNumber("shooter constant", 0.26);
-	double limeLightSpeed = (shooterconstant - 0.00009270941*ty + 0.0005572375*pow(ty,2));
-
-	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
-	if (m_shooterSpeed*1.2 > limeLightSpeed && m_shooterSpeed*0.8 < limeLightSpeed) {
-	m_shooterSpeed = limeLightSpeed;
-	}
-	
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});
 	m_backSpinShooter.SetVoltage(units::voltage::volt_t{-10});
 }
@@ -283,18 +273,18 @@ void PickUpSubsystem::ShooterOff() {
 
 void PickUpSubsystem::ShooterFaster() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
-		m_shooterSpeed = m_shooterSpeedLongSlow = std::min(1.0, m_shooterSpeedLongSlow + 0.025);
+		m_shooterSpeed = m_shooterSpeedLongSlow = std::min(1.0, m_shooterSpeedLongSlow + 0.010);
 	else
-		m_shooterSpeed = m_shooterSpeedShortSlow = std::min(1.0, m_shooterSpeedShortSlow + 0.025);
+		m_shooterSpeed = m_shooterSpeedShortSlow = std::min(1.0, m_shooterSpeedShortSlow + 0.010);
 }
 
 // ============================================================================
 
 void PickUpSubsystem::ShooterSlower() {
 	if (m_shooterSolenoid.Get() == frc::DoubleSolenoid::Value::kForward)
-		m_shooterSpeed = m_shooterSpeedLongSlow = std::max(0.0, m_shooterSpeedLongSlow - 0.025);
+		m_shooterSpeed = m_shooterSpeedLongSlow = std::max(0.0, m_shooterSpeedLongSlow - 0.010);
 	else
-		m_shooterSpeed = m_shooterSpeedShortSlow = std::max(0.0, m_shooterSpeedShortSlow - 0.025);
+		m_shooterSpeed = m_shooterSpeedShortSlow = std::max(0.0, m_shooterSpeedShortSlow - 0.010);
 }
 
 // ============================================================================
@@ -330,4 +320,8 @@ void PickUpSubsystem::SetDist(double value){
 
 void PickUpSubsystem::SetOffset(double value){
 		m_offset = value;
+}
+
+bool PickUpSubsystem::HasShot() {
+	return (counter == 1);
 }

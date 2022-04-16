@@ -12,6 +12,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <frc/XboxController.h>
 #include "DriveSubsystem.h"
+#include <frc/DriverStation.h>
 
 class PickUpSubsystem : public frc2::SubsystemBase {
 public:
@@ -37,7 +38,6 @@ public:
 	void ShooterOn();
 	void ShooterOnManual();
 	void ShooterOnLimeLight();
-	void ShooterOnLimeLightAuto();
 	void ShooterOff();
 	void ShooterFaster();
 	void ShooterSlower();
@@ -49,6 +49,10 @@ public:
 
 	void SetDist(double value);
 	void SetOffset(double value);
+
+	bool HasShot();
+
+	//frc::DriverStation m_driverStation;
 
 private:
 

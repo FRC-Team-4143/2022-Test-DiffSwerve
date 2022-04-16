@@ -48,6 +48,7 @@ void DriveSubsystem::Periodic() {
 	double ty = m_limelightTable->GetNumber("ty",0);
 	double tx = m_limelightTable->GetNumber("tx",0);
 	double tv = m_limelightTable->GetNumber("tv",0);
+	ty = ty - .115*tx;
 
 
 /*
@@ -57,8 +58,14 @@ void DriveSubsystem::Periodic() {
 */
 //	double dist = 2.62 + -0.177*ty + .00823*pow(ty,2);
 //	double airTime = 0.671 + 0.0418*dist + 0.0186*pow(dist,2);
-	double dist = 3.99 + -0.117*ty + .00823*pow(ty,2);
-	double airTime = 0.649 + -.00923*dist + 0.0186*pow(dist,2);
+	//double dist = 3.99 + -0.117*ty + .00823*pow(ty,2);
+	double dist = 4.77 + -0.182*ty + 8.64E-03*pow(ty,2);
+
+
+// double dist = b + tx + ty + pow(tx, 2) + tx*ty + pow(ty,2) + pow(tx,3) + pow(tx,2)*ty + tx*pow(ty,2) + pow(tx,4) + pow(tx,3)*ty + pow(tx,2)*pow(ty,2) + tx*pow(ty,3) + pow(tx,5) + pow(tx,4)*ty + pow(tx,3)*pow(ty,2) + pow(tx,2)*pow(ty,3) + tx*pow(ty,4) + pow(ty,5);
+
+	//double airTime = 0.649 + -.00923*dist + 0.0186*pow(dist,2);
+	double airTime = 0.963 + -0.0246*dist + 0.0126*pow(dist,2);
 
 	if (tv == 0) {dist = 3; airTime = 1;}
 
@@ -85,6 +92,9 @@ void DriveSubsystem::Periodic() {
 		rearLeftState,
 		rearRightState
 	);
+
+		m_realSenseYaw = _GetYawFromRealSense().value();
+
 /*
 	m_poseEstimator.Update(
 		GetHeading(),
@@ -93,8 +103,8 @@ void DriveSubsystem::Periodic() {
 		rearLeftState,
 		rearRightState
 	);
-*/
-/*
+
+
 	frc::Pose2d currentPose = m_odometry.GetPose();
 	auto ds = m_lastPose - currentPose;
 	auto heading = currentPose.Rotation().Radians().value();
@@ -104,19 +114,18 @@ void DriveSubsystem::Periodic() {
 
 	auto lxVel = xVel * sin(heading) + yVel * cos(wpi::numbers::pi - heading);
 	auto lyVel = xVel * cos(heading) + yVel * sin(90 - heading);
-*/
+
 	//m per s
 	
 
 	//auto rsPosition{_GetPositionFromRealSense()};
-	//auto rsYaw{_GetYawFromRealSense()};
-/*
+
 	m_poseEstimator.AddVisionMeasurement(
 		frc::Pose2d{rsPosition, rsYaw},
 		frc::Timer::GetFPGATimestamp() - 0.05_s
 	);
-*/
-/*
+
+
 	frc::SmartDashboard::PutNumber("m_odometry_x", m_odometry.GetPose().X().value());
 	frc::SmartDashboard::PutNumber("m_odometry_y", m_odometry.GetPose().Y().value());
 	frc::SmartDashboard::PutNumber("m_odometry_r", m_odometry.GetPose().Rotation().Degrees().value());
@@ -124,22 +133,24 @@ void DriveSubsystem::Periodic() {
 	frc::SmartDashboard::PutNumber("m_poseEstimator_x", m_poseEstimator.GetEstimatedPosition().X().value());
 	frc::SmartDashboard::PutNumber("m_poseEstimator_y", m_poseEstimator.GetEstimatedPosition().Y().value());
 	frc::SmartDashboard::PutNumber("m_poseEstimator_r", m_poseEstimator.GetEstimatedPosition().Rotation().Degrees().value());
+
+	frc::SmartDashboard::PutNumber("vxbug" ,vxbug.value());
+	frc::SmartDashboard::PutNumber("vybug", vybug.value());
+	frc::SmartDashboard::PutNumber("vrbug", vrbug.value());
 */
+
+
 	frc::SmartDashboard::PutNumber("Gyro", GetHeading().value());
 	frc::SmartDashboard::PutBoolean("FieldCentric", m_fieldCentric);
-	//frc::SmartDashboard::PutNumber("RSYaw", rsYaw.value());
+	frc::SmartDashboard::PutNumber("RSYaw", m_realSenseYaw - m_realSenseZero);
 	frc::SmartDashboard::PutNumber("vx" ,vx.value());
 	frc::SmartDashboard::PutNumber("vy", vy.value());
 	frc::SmartDashboard::PutNumber("vr", vr.value());
-	//frc::SmartDashboard::PutNumber("vxbug" ,vxbug.value());
-	//frc::SmartDashboard::PutNumber("vybug", vybug.value());
-	//frc::SmartDashboard::PutNumber("vrbug", vrbug.value());
 	frc::SmartDashboard::PutNumber("m_offset", m_offset);
 	frc::SmartDashboard::PutNumber("actualrealDist", m_realDist);
 	frc::SmartDashboard::PutNumber("expectedOFfset", m_expectedOffset);
 	frc::SmartDashboard::PutNumber("airTime", airTime);
 
-	
 
 	m_field.SetRobotPose(m_odometry.GetPose());
 
@@ -253,6 +264,7 @@ units::degree_t DriveSubsystem::GetHeading() const {
 void DriveSubsystem::ZeroHeading() {
 //		m_pidgey.SetYaw(0,8);
 m_zero = m_pidgey.GetYaw();
+m_realSenseZero = m_realSenseYaw;
 }
 
 // ==========================================================================
@@ -260,6 +272,7 @@ m_zero = m_pidgey.GetYaw();
 void DriveSubsystem::SetOffsetHeading(int heading){
 //	   m_pidgey.SetYaw(heading, 8);
 m_zero = m_pidgey.GetYaw() - heading;
+m_realSenseZero = m_realSenseYaw - heading;
 }
 
 // ==========================================================================

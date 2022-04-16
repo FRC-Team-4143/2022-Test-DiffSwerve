@@ -190,4 +190,6 @@ private:
 	double txOffset;
 	double m_expectedOffset;
 	double m_zero;
+	double m_realSenseYaw;
+	double m_realSenseZero;
 };

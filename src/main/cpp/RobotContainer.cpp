@@ -64,7 +64,6 @@ RobotContainer::RobotContainer()
 			if(fabs(rot.value()) > DriveConstants::stickDeadBand && fabs(m_driverController.GetRightX()) < DriveConstants::stickDeadBand) m_rotLimiter.Reset(0);
 			
 			//auto rotMod = (fabs(x.value())>.3 || fabs(y.value()) > .3) ? .5 : 1.0;
-			//frc::SmartDashboard::PutNumber("rotMod", rotMod);
 			auto rotMod = 1.0;
 
 			if(m_driverController.GetRightTriggerAxis()) {x = std::clamp(x,-.75,.75); y = std::clamp(y,-.75,.75); }
@@ -493,10 +492,12 @@ void RobotContainer::_InitializeScriptEngine() {
 		frc4143::ScriptParserElement{
 			"ShooterLimeLight", {"SL"},
 			[this](std::vector<float> parameters) {
-				return std::make_unique<frc2::InstantCommand>(
-					[this]() {
-						m_pickUp.ShooterOnLimeLightAuto();
-					}
+				return std::make_unique<frc2::FunctionalCommand>(
+					[]() {},
+					[this]() { m_pickUp.ShooterOnLimeLight();
+							   m_drive.DriveLime();},
+					[](bool) {},
+					[this]() { return m_pickUp.HasShot(); }
 				);
 			}
 		}
@@ -714,6 +715,23 @@ void RobotContainer::_InitializeScriptEngine() {
 			}
 		}
 	);
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"EjectBall", {"EB"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::InstantCommand>(
+					[this]() {
+						m_pickUp.PickUpBounce();
+						m_pickUp.IndexerRev();
+						m_pickUp.RollerOut();
+					}
+				);
+			}
+		}
+	);
+
+
 
 	// Do an initial parse to build all the regular expressions.
 	parser->IsValid("S(0)");
