@@ -206,6 +206,7 @@ void DriveSubsystem::Drive(
 		: frc::ChassisSpeeds{xSpeed, ySpeed, rot}
 	);
 
+
 	kDriveKinematics.DesaturateWheelSpeeds(&states, DriveConstants::kMaxSpeed);
 
 	auto [fl, fr, bl, br] = states;
@@ -357,8 +358,13 @@ void DriveSubsystem::GyroCrab(double x, double y, double desiredAngle) {
 void DriveSubsystem::DriveLime() {
 	auto limeLightTX = m_limelightTable->GetNumber("tx", 0.0);
 	double rot = 0;
-	if (fabs(limeLightTX) >= 1) 
-			rot = (limeLightTX/(-30)*1);
+	//if (fabs(limeLightTX) >= 1) 
+	//		rot = (limeLightTX/(-30)*1);
+
+	double limeLightP = frc::SmartDashboard::GetNumber("limeLightP", -.03);
+	double tolerance = frc::SmartDashboard::GetNumber("limelightTolerance", 3);
+	if (fabs(limeLightTX) > tolerance)
+			rot = limeLightTX*(limeLightP);
 
 	Drive(units::meters_per_second_t(0), units::meters_per_second_t(0), units::radians_per_second_t(rot));
 }
