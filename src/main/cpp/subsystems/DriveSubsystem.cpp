@@ -48,7 +48,7 @@ void DriveSubsystem::Periodic() {
 	double ty = m_limelightTable->GetNumber("ty",0);
 	double tx = m_limelightTable->GetNumber("tx",0);
 	double tv = m_limelightTable->GetNumber("tv",0);
-	ty = ty - .115*tx;
+	ty = ty - .1*tx*(ty+5.)/16.;    // adjust for parallax
 
 
 /*
@@ -58,18 +58,25 @@ void DriveSubsystem::Periodic() {
 */
 //	double dist = 2.62 + -0.177*ty + .00823*pow(ty,2);
 //	double airTime = 0.671 + 0.0418*dist + 0.0186*pow(dist,2);
-	//double dist = 3.99 + -0.117*ty + .00823*pow(ty,2);
-	double dist = 4.77 + -0.182*ty + 8.64E-03*pow(ty,2);
+	double dist = 3.99 + -0.117*ty + .00823*pow(ty,2);
+	//double dist = 4.77 + -0.182*ty + 8.64E-03*pow(ty,2); // newest sheet
 
 
 // double dist = b + tx + ty + pow(tx, 2) + tx*ty + pow(ty,2) + pow(tx,3) + pow(tx,2)*ty + tx*pow(ty,2) + pow(tx,4) + pow(tx,3)*ty + pow(tx,2)*pow(ty,2) + tx*pow(ty,3) + pow(tx,5) + pow(tx,4)*ty + pow(tx,3)*pow(ty,2) + pow(tx,2)*pow(ty,3) + tx*pow(ty,4) + pow(ty,5);
 
-	//double airTime = 0.649 + -.00923*dist + 0.0186*pow(dist,2);
-	double airTime = 0.963 + -0.0246*dist + 0.0126*pow(dist,2);
+	double airTime = 0.649 + -.00923*dist + 0.0186*pow(dist,2);
+	//double airTime = (0.963 + -0.0246*dist + 0.0126*pow(dist,2)) * .8;   //newest sheet
 
+	
 	if (tv == 0) {dist = 3; airTime = 1;}
 
-	double totDist = dist + -vx.value()*airTime;  //meters
+	double totDist = 0;
+	if(fabs(vy.value()) > .2 || fabs(vr.value()) >.2)
+		totDist = dist + -vx.value()*airTime;  //meters  // strafing or rotating
+	else if(vx.value() < 0)
+		totDist = dist + -vx.value()*airTime*1.2;  //fade away
+	else
+		totDist = dist + -vx.value()*airTime*.5;   // floaters
 
 	m_expectedOffset = 1/.02 * atan2(-vy.value()*.02, dist);  //Radians per Second
 	m_expectedOffset *= 1.;   /// adjust to change lag of shot

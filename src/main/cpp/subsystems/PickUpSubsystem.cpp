@@ -231,8 +231,8 @@ void PickUpSubsystem::ShooterOnLimeLight() {
 	//m_shooterSpeed = (0.378515 - 0.00009270941*ty + 0.0005572375*pow(ty,2));
 	
 	//m_shooterSpeed = shooterconstant + 0.0204*m_realDist + .00867*pow(m_realDist, 2);
-	//m_shooterSpeed = shooterconstant + -.00383*m_realDist + .00867*pow(m_realDist, 2);
-	m_shooterSpeed = shooterconstant + 0.0345 + 0.0862*m_realDist + -2.81E-03*pow(m_realDist,2);
+	m_shooterSpeed = shooterconstant + .26 + -.00383*m_realDist + .00867*pow(m_realDist, 2);
+	//m_shooterSpeed = shooterconstant + 0.0345 + 0.0862*m_realDist + -2.81E-03*pow(m_realDist,2); // newest sheet
 
 
 	m_shooter.SetVoltage(units::voltage::volt_t{m_shooterSpeed*12});

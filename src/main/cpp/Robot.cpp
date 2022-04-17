@@ -16,6 +16,8 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
+	m_container.m_pickUp.SetDist(m_container.m_drive.GetDist() );
+	m_container.m_pickUp.SetOffset(m_container.m_drive.GetOffset() );
 }
 
 /**
@@ -63,8 +65,6 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-	m_container.m_pickUp.SetDist(m_container.m_drive.GetDist() );
-	m_container.m_pickUp.SetOffset(m_container.m_drive.GetOffset() );
 	m_container.m_pickUp.ShooterOn();
 }
 
