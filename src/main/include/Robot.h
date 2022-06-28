@@ -31,7 +31,7 @@ private:
 
 	RobotContainer m_container;
 
-	wpi::log::DoubleLogEntry fltMotorVoltage;
-	wpi::log::DoubleLogEntry flbMotorVoltage;
-	wpi::log::DoubleLogEntry frtMotorVoltage;
+	wpi::log::DoubleLogEntry fltMotorCurrent;
+	wpi::log::DoubleLogEntry flbMotorCurrent;
+	wpi::log::DoubleLogEntry frtMotorCurrent;
 };

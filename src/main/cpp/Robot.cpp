@@ -7,7 +7,7 @@
 void Robot::RobotInit() {
 	frc::DataLogManager::Start();
 
-	wpi::log::DataLog& log = DataLogManager::GetLog();
+	wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
 	//front f, back b, left l, right r, top t, bottom b
 
@@ -32,8 +32,8 @@ void Robot::RobotPeriodic() {
 	//data logging
 	//wanna try to only append when enabled
 	if (true){
-		fltMotorVoltage.Append(m_container.m_drive.m_frontLeft.topMotorCurrent);
-		flbMotorVoltage.Append(m_container.m_drive.m_frontLeft.bottomMotorCurrent);
+		fltMotorCurrent.Append(m_container.m_drive.m_frontLeft.topMotorCurrent);
+		flbMotorCurrent.Append(m_container.m_drive.m_frontLeft.bottomMotorCurrent);
 	}
 }
 
