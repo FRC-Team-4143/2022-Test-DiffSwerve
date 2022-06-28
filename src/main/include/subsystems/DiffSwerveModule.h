@@ -38,6 +38,9 @@ public:
 
 	void SetVoltage(double driveMax);
 
+	double topMotorCurrent;
+	double bottomMotorCurrent;
+
 private:
 
 	// We have to use meters here instead of radians due to the fact that

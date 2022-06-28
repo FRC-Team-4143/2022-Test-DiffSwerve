@@ -1,8 +1,18 @@
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 void Robot::RobotInit() {
+	frc::DataLogManager::Start();
+
+	wpi::log::DataLog& log = DataLogManager::GetLog();
+
+	//front f, back b, left l, right r, top t, bottom b
+
+	fltMotorVoltage = wpi::log::DoubleLogEntry(log, "/fltMotorVoltage/double");
+	flbMotorVoltage = wpi::log::DoubleLogEntry(log, "/flbMotorVoltage/double");
 }
 
 /**
@@ -18,6 +28,13 @@ void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 	m_container.m_pickUp.SetDist(m_container.m_drive.GetDist() );
 	m_container.m_pickUp.SetOffset(m_container.m_drive.GetOffset() );
+
+	//data logging
+	//wanna try to only append when enabled
+	if (true){
+		fltMotorVoltage.Append(m_container.m_drive.m_frontLeft.topMotorCurrent);
+		flbMotorVoltage.Append(m_container.m_drive.m_frontLeft.bottomMotorCurrent);
+	}
 }
 
 /**

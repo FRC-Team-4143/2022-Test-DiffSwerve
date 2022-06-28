@@ -7,6 +7,8 @@
 #include <frc2/command/Command.h>
 #include "RobotContainer.h"
 #include <memory>
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -28,4 +30,8 @@ private:
 	std::unique_ptr <frc2::Command> m_autonomousCommand = nullptr;
 
 	RobotContainer m_container;
+
+	wpi::log::DoubleLogEntry fltMotorVoltage;
+	wpi::log::DoubleLogEntry flbMotorVoltage;
+	wpi::log::DoubleLogEntry frtMotorVoltage;
 };

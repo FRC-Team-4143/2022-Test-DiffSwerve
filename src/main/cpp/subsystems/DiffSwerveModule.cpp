@@ -83,6 +83,9 @@ frc::SwerveModuleState DiffSwerveModule::GetState() {
         //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
         frc::Rotation2d(units::radian_t(m_moduleAngle))
     };
+
+    topMotorCurrent = m_driveMotor.GetOutputCurrent();
+    bottomMotorCurrent = m_turningMotor.GetOutputCurrent();
 }
 
 // ============================================================================
