@@ -11,8 +11,8 @@ void Robot::RobotInit() {
 
 	//front f, back b, left l, right r, top t, bottom b
 
-	fltMotorVoltage = wpi::log::DoubleLogEntry(log, "/fltMotorVoltage/double");
-	flbMotorVoltage = wpi::log::DoubleLogEntry(log, "/flbMotorVoltage/double");
+	fltMotorCurrent = wpi::log::DoubleLogEntry(log, "/fltMotorCurrent/double");
+	flbMotorCurrent = wpi::log::DoubleLogEntry(log, "/flbMotorCurrent/double");
 }
 
 /**
