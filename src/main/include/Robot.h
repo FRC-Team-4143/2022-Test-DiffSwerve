@@ -30,8 +30,4 @@ private:
 	std::unique_ptr <frc2::Command> m_autonomousCommand = nullptr;
 
 	RobotContainer m_container;
-
-	wpi::log::DoubleLogEntry fltMotorCurrent;
-	wpi::log::DoubleLogEntry flbMotorCurrent;
-	wpi::log::DoubleLogEntry frtMotorCurrent;
 };

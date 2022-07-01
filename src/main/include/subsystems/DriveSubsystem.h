@@ -22,12 +22,13 @@
 #include "ISwerveModule.h"
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
-
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 class DriveSubsystem : public frc2::SubsystemBase {
 public:
 
-	DriveSubsystem(frc::XboxController* controller);
+	DriveSubsystem(frc::XboxController* controller, wpi::log::DataLog& log);
 
 	/**
 	 * Will be called periodically whenever the CommandScheduler runs.
@@ -136,7 +137,6 @@ public:
 	DiffSwerveModule m_frontRight;
 	DiffSwerveModule m_rearRight;
 
-
 private:
 
 	frc::Translation2d _GetPositionFromRealSense();
@@ -184,6 +184,9 @@ private:
 	frc::XboxController* m_controller;
 
 	frc::Pose2d m_lastPose;
+
+	wpi::log::DataLog& m_log;
+
 
 	double m_realDist;
 	double m_offset;

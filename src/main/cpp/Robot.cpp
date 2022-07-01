@@ -5,14 +5,7 @@
 #include <wpi/DataLog.h>
 
 void Robot::RobotInit() {
-	frc::DataLogManager::Start();
 
-	wpi::log::DataLog& log = frc::DataLogManager::GetLog();
-
-	//front f, back b, left l, right r, top t, bottom b
-
-	fltMotorCurrent = wpi::log::DoubleLogEntry(log, "/fltMotorCurrent/double");
-	flbMotorCurrent = wpi::log::DoubleLogEntry(log, "/flbMotorCurrent/double");
 }
 
 /**
@@ -28,13 +21,6 @@ void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 	m_container.m_pickUp.SetDist(m_container.m_drive.GetDist() );
 	m_container.m_pickUp.SetOffset(m_container.m_drive.GetOffset() );
-
-	//data logging
-	//wanna try to only append when enabled
-	if (true){
-		fltMotorCurrent.Append(m_container.m_drive.m_frontLeft.topMotorCurrent);
-		flbMotorCurrent.Append(m_container.m_drive.m_frontLeft.bottomMotorCurrent);
-	}
 }
 
 /**
@@ -83,6 +69,7 @@ void Robot::TeleopInit() {
  */
 void Robot::TeleopPeriodic() {
 	m_container.m_pickUp.ShooterOn();
+	m_container.LogData();
 }
 
 /**

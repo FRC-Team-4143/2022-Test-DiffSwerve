@@ -42,7 +42,8 @@ using namespace DriveConstants;
 // ==========================================================================
 
 RobotContainer::RobotContainer()
-:	m_drive{&m_driverController}, m_pickUp{&m_driverController}, m_climber{&m_climberController},
+:	m_log{frc::DataLogManager::GetLog()}, m_drive{&m_driverController, m_log}, m_pickUp{&m_driverController}, m_climber{&m_climberController},
+	m_powerDistributionPanel{},
 	m_driveCommand{
 		[this] {
 			//auto x = -m_xspeedLimiter.Calculate(frc::ApplyDeadband(m_driverController.GetLeftY(), DriveConstants::stickDeadBand));
@@ -82,9 +83,12 @@ RobotContainer::RobotContainer()
 	m_validateScriptCmd{}
 {
 	// Initialize all of your commands and subsystems here
+
 	_InitializeScriptEngine();
 	_ConfigureDashboardControls();
 	_ConfigureButtonBindings();
+
+	frc::DataLogManager::Start();
 
 	frc::LiveWindow::DisableAllTelemetry();
 
@@ -122,6 +126,19 @@ RobotContainer::RobotContainer()
 	//m_pathManager.AddPath("topBall");
 
 #endif
+
+	m_totalCurrent = wpi::log::DoubleLogEntry(m_log, "/robot/totalCurrent");
+    m_batteryVoltage = wpi::log::DoubleLogEntry(m_log, "/robot/batteryVoltage");
+}
+
+// ==========================================================================
+
+	//m_powerDistributionPanel.GetTotalCurrent();
+
+void RobotContainer::LogData() {
+	m_totalCurrent.Append(m_powerDistributionPanel.GetTotalCurrent());
+	m_batteryVoltage.Append(m_powerDistributionPanel.GetVoltage());
+
 }
 
 // ==========================================================================

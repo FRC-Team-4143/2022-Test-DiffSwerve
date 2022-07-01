@@ -19,15 +19,16 @@ using namespace DriveConstants;
 
 // ==========================================================================
 
-DriveSubsystem::DriveSubsystem(frc::XboxController* controller)
-:	m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "roborio"},
-	m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANIVORE},
-	m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "roborio"},
-	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE},
+DriveSubsystem::DriveSubsystem(frc::XboxController* controller, wpi::log::DataLog& log)
+:	m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "roborio", log},
+	m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANIVORE, log},
+	m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "roborio", log},
+	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE, log},
 	m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
 	m_fieldCentric{false},
 	m_controller(controller),
-	m_lastPose{m_odometry.GetPose()}
+	m_lastPose{m_odometry.GetPose()},
+	m_log(log)
 {
 	LoadWheelOffsets();
 	frc::SmartDashboard::PutData("Field", &m_field);

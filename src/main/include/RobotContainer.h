@@ -18,6 +18,9 @@
 #include <memory>
 #include <pathplanner/lib/PathPlanner.h>
 #include <wpi/fs.h>
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
+#include <frc/PowerDistribution.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -32,12 +35,20 @@ public:
 
 	RobotContainer();
 
+	void LogData();
+
 	//frc2::Command* GetAutonomousCommandOld();
 	std::unique_ptr<frc2::Command> GetAutonomousCommand();
+
+	wpi::log::DataLog& m_log;
 
 	DriveSubsystem m_drive;
 	PickUpSubsystem m_pickUp;
 	ClimberSubsystem m_climber;
+	
+	frc::PowerDistribution m_powerDistributionPanel;
+
+
 
 private:
 
@@ -69,4 +80,7 @@ private:
 	void _InitializeScriptEngine();
 
 	//bool IsNearWaypoint(Pose2d waypoint, double within);
+
+	wpi::log::DoubleLogEntry m_totalCurrent;
+	wpi::log::DoubleLogEntry m_batteryVoltage;
 };

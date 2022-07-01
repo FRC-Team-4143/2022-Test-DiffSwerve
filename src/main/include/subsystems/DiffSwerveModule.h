@@ -12,6 +12,8 @@
 #include <ctre/Phoenix.h>
 #include <string>
 #include "Constants.h"
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 class DiffSwerveModule {
 	using radians_per_second_squared_t =
@@ -22,8 +24,8 @@ class DiffSwerveModule {
 
 public:
 
-	DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus);
-	DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name);
+	DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus, wpi::log::DataLog& log);
+	DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, wpi::log::DataLog& log);
 
 	frc::SwerveModuleState GetState();
 
@@ -34,12 +36,21 @@ public:
 	void SetWheelOffset();
 	void LoadWheelOffset();
 	void motorsOff();
-	double GetDriveMotorSpeed();
+	double GetDriveMotorSpeed(double topSpeed, double bottomSpeed);
 
 	void SetVoltage(double driveMax);
 
-	double topMotorCurrent;
-	double bottomMotorCurrent;
+	//wpi::log::DataLog& GetDataLog(wpi::log::DataLog& log);
+
+
+	wpi::log::DoubleLogEntry m_topMotorCurrent;
+	wpi::log::DoubleLogEntry m_bottomMotorCurrent;
+	wpi::log::DoubleLogEntry m_wheelSpeed;
+	wpi::log::DoubleLogEntry m_topMotorRPM;
+	wpi::log::DoubleLogEntry m_bottomMotorRPM;
+	wpi::log::DoubleLogEntry m_moduleAngleLog;
+	wpi::log::DoubleLogEntry m_expectedSpeed;
+	wpi::log::DoubleLogEntry m_expectedAngle;
 
 private:
 
@@ -66,6 +77,7 @@ private:
 	WPI_CANCoder m_encoder;
 
 	std::string m_name;
+	wpi::log::DataLog& m_log;
 
 	frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{ModuleConstants::ks, ModuleConstants::kv, ModuleConstants::ka};
 	//frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{DriveConstants::kts, DriveConstants::ktv};

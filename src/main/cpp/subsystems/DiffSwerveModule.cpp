@@ -3,11 +3,12 @@
 
 // ============================================================================
 
-DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus)
+DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, std::string CANbus, wpi::log::DataLog& log)
 :   m_driveMotor(driveMotorChannel, CANbus),
     m_turningMotor(turningMotorChannel, CANbus),
     m_encoder(encoderChannel, CANbus),
-    m_name(name)
+    m_name(name),
+    m_log(log)
 {          
     //Reset motors and encoders
     m_driveMotor.ConfigFactoryDefault();
@@ -35,13 +36,24 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
         units::radian_t{-wpi::numbers::pi}, units::radian_t(wpi::numbers::pi));
     m_driveMotor.SetNeutralMode(NeutralMode::Coast);
     m_turningMotor.SetNeutralMode(NeutralMode::Coast);
+
+    m_topMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorCurrent");
+    m_bottomMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorCurrent");
+    m_wheelSpeed = wpi::log::DoubleLogEntry(log, "/"+m_name+"/wheelSpeed");
+    m_topMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorRPM");
+    m_bottomMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorRPM");
+    m_moduleAngleLog = wpi::log::DoubleLogEntry(log, "/"+m_name+"/moduleAngle");
+    m_expectedSpeed = wpi::log::DoubleLogEntry(log, "/"+m_name+"/expectedSpeed");
+    m_expectedAngle = wpi::log::DoubleLogEntry(log, "/"+m_name+"/expectedAngle");
+
 }
 
-DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name)
+DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChannel, int encoderChannel, std::string name, wpi::log::DataLog& log)
 :   m_driveMotor(driveMotorChannel),
     m_turningMotor(turningMotorChannel),
     m_encoder(encoderChannel),
-    m_name(name)
+    m_name(name),
+    m_log(log)
 {          
     //Reset motors and encoders
     m_driveMotor.ConfigFactoryDefault();
@@ -70,6 +82,13 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
         units::radian_t{-wpi::numbers::pi}, units::radian_t(wpi::numbers::pi));
     m_driveMotor.SetNeutralMode(NeutralMode::Coast);
     m_turningMotor.SetNeutralMode(NeutralMode::Coast);
+
+    m_topMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorCurrent");
+    m_bottomMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorCurrent");
+    m_wheelSpeed = wpi::log::DoubleLogEntry(log, "/"+m_name+"/wheelSpeed");
+    m_topMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorRPM");
+    m_bottomMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorRPM");
+    m_moduleAngleLog = wpi::log::DoubleLogEntry(log, "/"+m_name+"/moduleAngle");
 }
 
 // ============================================================================
@@ -77,21 +96,32 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
 //called from DriveSubsystem Periodic
 
 frc::SwerveModuleState DiffSwerveModule::GetState() {
-    m_driveSpeed = GetDriveMotorSpeed();
+
+    double topMotorSpeed = m_driveMotor.GetSelectedSensorVelocity();
+    double bottomMotorSpeed = m_turningMotor.GetSelectedSensorVelocity();
+
+    m_driveSpeed = GetDriveMotorSpeed(topMotorSpeed, bottomMotorSpeed);
     m_moduleAngle = (m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi;
     return {units::meters_per_second_t{m_driveSpeed},
         //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
         frc::Rotation2d(units::radian_t(m_moduleAngle))
     };
 
-    topMotorCurrent = m_driveMotor.GetOutputCurrent();
-    bottomMotorCurrent = m_turningMotor.GetOutputCurrent();
+    //data logging
+    m_topMotorCurrent.Append(m_driveMotor.GetOutputCurrent());
+    m_bottomMotorCurrent.Append(m_turningMotor.GetOutputCurrent());
+    m_wheelSpeed.Append(m_driveSpeed);
+    m_topMotorRPM.Append(topMotorSpeed);
+    m_bottomMotorRPM.Append(bottomMotorSpeed);
+    m_moduleAngleLog.Append(m_moduleAngle);
+
+
 }
 
 // ============================================================================
 
-double DiffSwerveModule::GetDriveMotorSpeed() {
-    double speed = ((m_driveMotor.GetSelectedSensorVelocity() - m_turningMotor.GetSelectedSensorVelocity()) / 2.0) 
+double DiffSwerveModule::GetDriveMotorSpeed(double topSpeed, double bottomSpeed) {
+    double speed = ((topSpeed - bottomSpeed) / 2.0) 
     * (10.0 / 2048) /*Revs per second*/ * ((10  / 88.0) * (54 / 14.0) * (1 / 3.0)) /*Gear Ratios*/ * (4 * 0.0254 * wpi::numbers::pi * 1.10); //1.1 worn wheels 3/24/22
 
     frc::SmartDashboard::PutNumber(m_name + " Wheel Speed ", speed);
@@ -110,9 +140,11 @@ double DiffSwerveModule::SetDesiredState(const frc::SwerveModuleState& reference
 
     // Calculate the drive output from the drive PID controller.
     const auto driveOutput{m_drivePIDController.Calculate(m_driveSpeed, state.speed.value())};
+    m_expectedSpeed.Append(state.speed.value());
 
     // Calculate the turning motor output from the turning PID controller.
     auto turnOutput{m_turningPIDController.Calculate(units::radian_t(m_moduleAngle), state.angle.Radians())};
+    m_expectedAngle.Append(state.angle.Radians().value());
 
     turnOutput = std::clamp(turnOutput,-ModuleConstants::kmaxTurnOutput,ModuleConstants::kmaxTurnOutput);
 
@@ -120,48 +152,16 @@ double DiffSwerveModule::SetDesiredState(const frc::SwerveModuleState& reference
 
     auto feedForward = driveFeedforward.value();
 
-    /*
-    if(feedForward - m_lastDriveVoltage > 0.5 && feedForward > 0 )
-        feedForward = m_lastDriveVoltage + 0.5;
-    
-    if(feedForward - m_lastDriveVoltage < -0.5 && feedForward < 0)
-        feedForward = m_lastDriveVoltage - 0.5;
+    m_driveVoltage =
+        driveOutput
+        + driveFeedforward.value()
+        + DriveConstants::driveMaxVoltage * turnOutput;
 
-    if(feedForward > 0 && m_lastDriveVoltage < 0)
-        feedForward = 0;
+    m_turnVoltage =
+        -driveOutput
+        - driveFeedforward.value()
+        + DriveConstants::driveMaxVoltage * turnOutput;
 
-    if(feedForward < 0 && m_lastDriveVoltage > 0)
-        feedForward = 0;
-
-    m_lastDriveVoltage = feedForward;
-    */
-
-    // Set the motor outputs
-    /*if(!(fabs(state.angle.Radians().value()-encoderValue) < wpi::numbers::pi/4) &&
-       !(fabs(state.angle.Radians().value()-encoderValue+(wpi::numbers::pi*2)) < wpi::numbers::pi/4) &&
-       !(fabs(state.angle.Radians().value()-encoderValue-(wpi::numbers::pi*2)) < wpi::numbers::pi/4)){
-        driveVoltage = DriveConstants::driveMaxVoltage * turnOutput;
-        turnVoltage = DriveConstants::driveMaxVoltage * turnOutput;
-    } else */ {
-        m_driveVoltage =
-            driveOutput
-            + driveFeedforward.value()
-            + DriveConstants::driveMaxVoltage * turnOutput;
-
-        m_turnVoltage =
-            -driveOutput
-            - driveFeedforward.value()
-            + DriveConstants::driveMaxVoltage * turnOutput;
-    }
-
-
-/*
-    frc::SmartDashboard::PutNumber(m_name + " m_moduleAngle", m_moduleAngle);
-    frc::SmartDashboard::PutNumber(m_name + " driveFeedforward", driveFeedforward.value());
-    frc::SmartDashboard::PutNumber(m_name + " turnOutput", turnOutput * DriveConstants::driveMaxVoltage);
-    frc::SmartDashboard::PutNumber(m_name + " m_driveVoltage", m_driveVoltage);
-    frc::SmartDashboard::PutNumber(m_name + " driveOutput", driveOutput);
-*/
     return std::max(m_driveVoltage,m_turnVoltage);
 }
 
