@@ -102,19 +102,22 @@ frc::SwerveModuleState DiffSwerveModule::GetState() {
 
     m_driveSpeed = GetDriveMotorSpeed(topMotorSpeed, bottomMotorSpeed);
     m_moduleAngle = (m_encoder.GetAbsolutePosition() - m_offset) / 360 * 2 * wpi::numbers::pi;
-    return {units::meters_per_second_t{m_driveSpeed},
-        //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
-        frc::Rotation2d(units::radian_t(m_moduleAngle))
-    };
+    
 
     //data logging
-    m_topMotorCurrent.Append(m_driveMotor.GetOutputCurrent());
-    m_bottomMotorCurrent.Append(m_turningMotor.GetOutputCurrent());
+    auto topCurrent = m_driveMotor.GetStatorCurrent();
+    auto bottomCurrent = m_turningMotor.GetStatorCurrent();
+    m_topMotorCurrent.Append(topCurrent);
+    m_bottomMotorCurrent.Append(bottomCurrent);
     m_wheelSpeed.Append(m_driveSpeed);
     m_topMotorRPM.Append(topMotorSpeed);
     m_bottomMotorRPM.Append(bottomMotorSpeed);
     m_moduleAngleLog.Append(m_moduleAngle);
 
+    return {units::meters_per_second_t{m_driveSpeed},
+        //frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
+        frc::Rotation2d(units::radian_t(m_moduleAngle))
+    };
 
 }
 

@@ -5,7 +5,7 @@
 #include <wpi/DataLog.h>
 
 void Robot::RobotInit() {
-
+	frc::DataLogManager::Start();
 }
 
 /**
