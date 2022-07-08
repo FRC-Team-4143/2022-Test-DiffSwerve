@@ -557,7 +557,7 @@ void RobotContainer::_InitializeScriptEngine() {
 		[]() { return false; },
 	};
 
-	parser->Add(
+	/*parser->Add(
 		frc4143::ScriptParserElement{
 			"PickUpRetract", {"PR"},
 			[this](std::vector<float> parameters) {
@@ -565,6 +565,20 @@ void RobotContainer::_InitializeScriptEngine() {
 					[this]() {
 						m_pickUp.PickUpRetract();
 					}
+				);
+			}
+		}
+	);*/
+
+	parser->Add(
+		frc4143::ScriptParserElement{
+			"PickUpRetract", {"PR"},
+			[this](std::vector<float> parameters) {
+				return std::make_unique<frc2::FunctionalCommand>(
+					[this]() { m_pickUp.PickUpRetract(); m_pickUp.IndexerLoad();},
+					[]() {},
+					[this](bool) { m_pickUp.IndexerOff(); m_pickUp.RollerOff();},
+					[]() {return false;}
 				);
 			}
 		}
