@@ -89,6 +89,9 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
     m_topMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorRPM");
     m_bottomMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorRPM");
     m_moduleAngleLog = wpi::log::DoubleLogEntry(log, "/"+m_name+"/moduleAngle");
+    m_driveoutput = wpi::log::DoubleLogEntry(log, "/"+m_name+"/driveOutput");
+    m_drivefeedforward = wpi::log::DoubleLogEntry(log, "/"+m_name+"/drivefeedforward");
+    m_turnoutput = wpi::log::DoubleLogEntry(log, "/"+m_name+"/turnOutput");
 }
 
 // ============================================================================
@@ -110,8 +113,8 @@ frc::SwerveModuleState DiffSwerveModule::GetState() {
     m_topMotorCurrent.Append(topCurrent);
     m_bottomMotorCurrent.Append(bottomCurrent);
     m_wheelSpeed.Append(m_driveSpeed);
-    m_topMotorRPM.Append(topMotorSpeed);
-    m_bottomMotorRPM.Append(bottomMotorSpeed);
+    m_topMotorRPM.Append(topMotorSpeed*10/2048*60);
+    m_bottomMotorRPM.Append(bottomMotorSpeed*10/2048*60);
     m_moduleAngleLog.Append(m_moduleAngle);
 
     return {units::meters_per_second_t{m_driveSpeed},
@@ -154,6 +157,10 @@ double DiffSwerveModule::SetDesiredState(const frc::SwerveModuleState& reference
     const auto driveFeedforward{m_driveFeedforward.Calculate(state.speed)};
 
     auto feedForward = driveFeedforward.value();
+
+    m_turnoutput.Append(DriveConstants::driveMaxVoltage * turnOutput);
+    m_drivefeedforward.Append(driveFeedforward.value());
+    m_driveoutput.Append(driveOutput);
 
     m_driveVoltage =
         driveOutput

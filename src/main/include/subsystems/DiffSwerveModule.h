@@ -51,7 +51,9 @@ public:
 	wpi::log::DoubleLogEntry m_moduleAngleLog;
 	wpi::log::DoubleLogEntry m_expectedSpeed;
 	wpi::log::DoubleLogEntry m_expectedAngle;
-
+	wpi::log::DoubleLogEntry m_driveoutput;
+	wpi::log::DoubleLogEntry m_drivefeedforward;
+	wpi::log::DoubleLogEntry m_turnoutput;
 private:
 
 	// We have to use meters here instead of radians due to the fact that
