@@ -39,6 +39,8 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
 
     m_topMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorCurrent");
     m_bottomMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorCurrent");
+    m_topSupplyCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topSupplyCurrent");
+    m_bottomSupplyCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomSupplyCurrent");
     m_wheelSpeed = wpi::log::DoubleLogEntry(log, "/"+m_name+"/wheelSpeed");
     m_topMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorRPM");
     m_bottomMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorRPM");
@@ -85,6 +87,8 @@ DiffSwerveModule::DiffSwerveModule(int driveMotorChannel, int turningMotorChanne
 
     m_topMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorCurrent");
     m_bottomMotorCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorCurrent");
+    m_topSupplyCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topSupplyCurrent");
+    m_bottomSupplyCurrent = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomSupplyCurrent");
     m_wheelSpeed = wpi::log::DoubleLogEntry(log, "/"+m_name+"/wheelSpeed");
     m_topMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/topMotorRPM");
     m_bottomMotorRPM = wpi::log::DoubleLogEntry(log, "/"+m_name+"/bottomMotorRPM");
@@ -110,8 +114,12 @@ frc::SwerveModuleState DiffSwerveModule::GetState() {
     //data logging
     auto topCurrent = m_driveMotor.GetStatorCurrent();
     auto bottomCurrent = m_turningMotor.GetStatorCurrent();
+    auto topSupplyCurrent = m_driveMotor.GetSupplyCurrent();
+    auto bottomSupplyCurrent = m_turningMotor.GetSupplyCurrent();
     m_topMotorCurrent.Append(topCurrent);
     m_bottomMotorCurrent.Append(bottomCurrent);
+    m_topSupplyCurrent.Append(topSupplyCurrent);
+    m_bottomSupplyCurrent.Append(bottomSupplyCurrent);
     m_wheelSpeed.Append(m_driveSpeed);
     m_topMotorRPM.Append(topMotorSpeed*10/2048*60);
     m_bottomMotorRPM.Append(bottomMotorSpeed*10/2048*60);

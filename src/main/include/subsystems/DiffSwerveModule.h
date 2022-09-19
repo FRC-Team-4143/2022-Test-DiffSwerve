@@ -45,6 +45,8 @@ public:
 
 	wpi::log::DoubleLogEntry m_topMotorCurrent;
 	wpi::log::DoubleLogEntry m_bottomMotorCurrent;
+	wpi::log::DoubleLogEntry m_topSupplyCurrent;
+	wpi::log::DoubleLogEntry m_bottomSupplyCurrent;
 	wpi::log::DoubleLogEntry m_wheelSpeed;
 	wpi::log::DoubleLogEntry m_topMotorRPM;
 	wpi::log::DoubleLogEntry m_bottomMotorRPM;
