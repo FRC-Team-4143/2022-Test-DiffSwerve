@@ -20,10 +20,10 @@ using namespace DriveConstants;
 // ==========================================================================
 
 DriveSubsystem::DriveSubsystem(frc::XboxController* controller, wpi::log::DataLog& log)
-:	m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", "roborio", log},
-	m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", CANIVORE, log},
-	m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", "roborio", log},
-	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", CANIVORE, log},
+:	m_frontLeft{kFrontLeftDriveMotorPort, kFrontLeftTurningMotorPort, kFrontLeftPot, "frontLeft", log},
+	m_rearLeft{kRearLeftDriveMotorPort, kRearLeftTurningMotorPort, kRearLeftPot, "rearLeft", log},
+	m_frontRight{kFrontRightDriveMotorPort, kFrontRightTurningMotorPort, kFrontRightPot, "frontRight", log},
+	m_rearRight{kRearRightDriveMotorPort, kRearRightTurningMotorPort, kRearRightPot, "rearRight", log},
 	m_odometry{kDriveKinematics, GetHeading(), frc::Pose2d()},
 	m_fieldCentric{false},
 	m_controller(controller),
@@ -91,7 +91,9 @@ void DriveSubsystem::Periodic() {
 	m_realDist = totDist;
 	//double m_realDist = -vy.value()*airTime/sin(m_offset);
 
-	m_currentYaw = m_pidgey.GetYaw() - m_zero;
+	//m_currentYaw = m_pidgey.GetYaw() - m_zero;
+
+	m_currentYaw = -m_pidgey->GetYaw() - m_zero;
 
 	m_odometry.Update(
 		GetHeading(),
@@ -272,7 +274,8 @@ units::degree_t DriveSubsystem::GetHeading() const {
 
 void DriveSubsystem::ZeroHeading() {
 //		m_pidgey.SetYaw(0,8);
-m_zero = m_pidgey.GetYaw();
+//m_zero = m_pidgey.GetYaw();
+m_zero = -m_pidgey->GetYaw();
 m_realSenseZero = m_realSenseYaw;
 }
 
@@ -280,14 +283,17 @@ m_realSenseZero = m_realSenseYaw;
 
 void DriveSubsystem::SetOffsetHeading(int heading){
 //	   m_pidgey.SetYaw(heading, 8);
-m_zero = m_pidgey.GetYaw() - heading;
+//m_zero = m_pidgey.GetYaw() - heading;
+m_zero = -m_pidgey->GetYaw() - heading;
 m_realSenseZero = m_realSenseYaw - heading;
 }
 
 // ==========================================================================
 
 double DriveSubsystem::GetTurnRate() {
-	return m_pidgey.GetRate();
+	//return m_pidgey.GetRate();
+	return -m_pidgey->GetRate();
+
 }
 
 // ==========================================================================

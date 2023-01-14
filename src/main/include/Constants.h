@@ -27,20 +27,20 @@
 // ==========================================================================
 
 namespace DriveConstants {
-	constexpr int kFrontLeftDriveMotorPort = 22;
-	constexpr int kRearLeftDriveMotorPort = 24;
-	constexpr int kFrontRightDriveMotorPort = 28;
-	constexpr int kRearRightDriveMotorPort = 26;
+	constexpr int kFrontLeftDriveMotorPort = 23;
+	constexpr int kRearLeftDriveMotorPort = 28;
+	constexpr int kFrontRightDriveMotorPort = 24;
+	constexpr int kRearRightDriveMotorPort = 22;
 
-	constexpr int kFrontLeftTurningMotorPort = 21;
-	constexpr int kRearLeftTurningMotorPort = 23;
-	constexpr int kFrontRightTurningMotorPort = 27;
-	constexpr int kRearRightTurningMotorPort = 25;
+	constexpr int kFrontLeftTurningMotorPort = 1;
+	constexpr int kRearLeftTurningMotorPort = 27;
+	constexpr int kFrontRightTurningMotorPort = 0;
+	constexpr int kRearRightTurningMotorPort = 21;
 
-	constexpr int kFrontLeftPot = 1;
-	constexpr int kFrontRightPot = 4;
-	constexpr int kRearLeftPot = 2;
-	constexpr int kRearRightPot = 3;
+	constexpr int kFrontLeftPot = 3;
+	constexpr int kFrontRightPot = 2;
+	constexpr int kRearLeftPot = 0;
+	constexpr int kRearRightPot = 1;
 
 	//constexpr double driveMaxVoltage = 12;
 	constexpr double driveMaxVoltage = 10;
@@ -136,8 +136,8 @@ namespace PickUpConstants {
 
 	constexpr int kUpperForwardSolenoidPort = 5;
 	constexpr int kUpperReverseSolenoidPort = 1;
-	constexpr int kLowerForwardSolenoidPort = 0;
-	constexpr int kLowerReverseSolenoidPort = 6;
+	constexpr int kLowerForwardSolenoidPort = 6;
+	constexpr int kLowerReverseSolenoidPort = 7;
 
 	constexpr double kShortSpeed = 0.6;
 	constexpr double kLongSpeed = 0.475;
@@ -154,7 +154,7 @@ namespace ClimberConstants {
 	constexpr int kExtendRightPort = 43;
 
 	constexpr int kBrakeSolenoidPortRght = 3;
-	constexpr int kBrakeSolenoidPortLeft = 7;
+	constexpr int kBrakeSolenoidPortLeft = 0;
 
 
 	//constexpr float kMaxExtendPower = .6;

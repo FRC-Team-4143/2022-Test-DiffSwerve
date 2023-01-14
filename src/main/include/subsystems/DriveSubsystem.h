@@ -17,13 +17,15 @@
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include "SwerveModule.h"
 #include <frc/XboxController.h>
-#include "DiffSwerveModule.h"
+#include "AnalogDiffSwerveModule.h"
 #include "PinnedDiffSwerveModule.h"
 #include "ISwerveModule.h"
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/DataLogManager.h>
 #include <wpi/DataLog.h>
+#include <AHRS.h>
+
 
 class DriveSubsystem : public frc2::SubsystemBase {
 public:
@@ -132,10 +134,10 @@ public:
 
 	std::shared_ptr<nt::NetworkTable> m_limelightTable;
 
-	DiffSwerveModule m_frontLeft;
-	DiffSwerveModule m_rearLeft;
-	DiffSwerveModule m_frontRight;
-	DiffSwerveModule m_rearRight;
+	AnalogDiffSwerveModule m_frontLeft;
+	AnalogDiffSwerveModule m_rearLeft;
+	AnalogDiffSwerveModule m_frontRight;
+	AnalogDiffSwerveModule m_rearRight;
 
 private:
 
@@ -143,7 +145,8 @@ private:
 	units::degree_t _GetYawFromRealSense();
 
 	// The gyro sensor
-	WPI_Pigeon2 m_pidgey{0, "Default Name"};
+	//WPI_Pigeon2 m_pidgey{0, "Default Name"};
+	AHRS *m_pidgey = new AHRS(frc::SPI::Port::kMXP);
 
 
 	// Components (e.g. motor controllers and sensors) should generally be
